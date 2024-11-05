@@ -27,6 +27,9 @@
   ],
   "author": "benhar-dev",
   "license": "MIT",
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
