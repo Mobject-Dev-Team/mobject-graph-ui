@@ -630,15 +630,6 @@ function _toPropertyKey(t) {
   var i = _toPrimitive(t, "string");
   return "symbol" == typeof i ? i : i + "";
 }
-function _typeof(o) {
-  "@babel/helpers - typeof";
-
-  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
-    return typeof o;
-  } : function (o) {
-    return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
-  }, _typeof(o);
-}
 function _unsupportedIterableToArray(r, a) {
   if (r) {
     if ("string" == typeof r) return _arrayLikeToArray(r, a);
@@ -1912,15 +1903,11 @@ var Node = /*#__PURE__*/function (_LGraphNode) {
     _this._shape = 2;
     return _this;
   }
-
-  // this method was overridden as the size was not correctly
-  // handled by the standard method.
   _inherits(Node, _LGraphNode);
   return _createClass(Node, [{
     key: "addCustomWidget",
     value: function addCustomWidget(widget) {
       _superPropGet(Node, "addCustomWidget", this, 3)([widget]);
-      this.resetSize();
       if (widget.registerWithParent) {
         widget.registerWithParent(this);
       }
@@ -1941,36 +1928,6 @@ var Node = /*#__PURE__*/function (_LGraphNode) {
       _classPrivateFieldGet2(_eventEmitter, this).emit("nodeStatusUpdated", status);
     }
   }, {
-    key: "resetSize",
-    value: function resetSize() {
-      this.setSize(this.computeSize());
-    }
-  }, {
-    key: "computeSize",
-    value: function computeSize(out) {
-      var size = _superPropGet(Node, "computeSize", this, 3)([out]);
-
-      // the code below was added to correct long titles and
-      // a bug which litegraph would not use a widget width
-      // for the calculations
-
-      var title_width = mobjectLitegraph.LiteGraph.computeTextWidth(this.title) + 40;
-      var widgets_maximum_width = 0;
-      if (this.widgets && this.widgets.length) {
-        for (var i = 0, l = this.widgets.length; i < l; ++i) {
-          var widget_size = this.widgets[i].computeSize();
-          widgets_maximum_width = Math.max(widgets_maximum_width, widget_size[0]);
-        }
-      }
-      size[0] = Math.max(size[0], title_width, widgets_maximum_width);
-      if (this.onComputeSize) {
-        var custom_size = this.onComputeSize(size);
-        size[0] = Math.max(size[0], custom_size[0]);
-        size[1] = Math.max(size[1], custom_size[1]);
-      }
-      return size;
-    }
-  }, {
     key: "setPropertyDefaultValue",
     value: function setPropertyDefaultValue(name, value) {
       var _this$widgets;
@@ -1987,17 +1944,10 @@ var Node = /*#__PURE__*/function (_LGraphNode) {
         widgetToUpdate.value = value;
       }
     }
-
-    // added to prevent error with no return value
   }, {
-    key: "onDropItem",
-    value: function onDropItem(e) {
-      return {
-        return_value: false,
-        result_priority: 0,
-        prevent_default: false,
-        stop_replication: false
-      };
+    key: "resetSize",
+    value: function resetSize() {
+      this.setSize(this.computeSize());
     }
   }, {
     key: "onDropFile",
@@ -2028,7 +1978,7 @@ var Node = /*#__PURE__*/function (_LGraphNode) {
           }
         }
       }
-      console.log("Node ".concat(this.type, " was registered to handle a dropped file, but failed to handle it."));
+      mobjectLitegraph.LiteGraph.log_warn("Node ".concat(this.type, " was registered to handle a dropped file, but failed to handle it."));
     }
   }]);
 }(mobjectLitegraph.LGraphNode);
@@ -2135,30 +2085,9 @@ var NodeClassFactory = /*#__PURE__*/function () {
   }]);
 }();
 
-// look after the widgets
-// have a .RegisterNodesByBlueprint
-// have a .RegisterDatatypesByBlueprint
-// wrap LiteGraph
-
-// method .Create(); returns graph
-
-/**
- * GraphFramework is a dynamic proxy class designed to wrap the LiteGraph library.
- *
- * This wrapper provides an interface to all existing methods of LiteGraph through automatic delegation,
- * enabling transparent use of its functionalities. The proxy approach allows this wrapper to automatically
- * forward calls to LiteGraph methods that are not explicitly defined in this class.
- * This makes the wrapper highly maintainable and extensible, as it does not need to be updated with each
- * change in the LiteGraph API. Additionally, it provides an easy way to extend or override specific methods
- * of LiteGraph for customization or enhancement, such as adding logging, custom error handling, or other features.
- *
- * Use this wrapper to leverage all of LiteGraph's capabilities while maintaining the flexibility to extend
- * and customize its behavior as needed for your specific application requirements.
- */
 var GraphFramework = /*#__PURE__*/function () {
   function GraphFramework() {
     _classCallCheck(this, GraphFramework);
-    _defineProperty(this, "debug", false);
     if (GraphFramework.instance) {
       return GraphFramework.instance;
     }
@@ -2168,10 +2097,6 @@ var GraphFramework = /*#__PURE__*/function () {
     this.liteGraph = mobjectLitegraph.LiteGraph;
     this.liteGraph.initialize();
     this.widgets = new Widgets();
-    this.liteGraph.unregisterNodeType("graph/subgraph");
-    this.liteGraph.unregisterNodeType("graph/input");
-    this.liteGraph.unregisterNodeType("graph/output");
-    this.liteGraph.unregisterNodeType("graph/function");
     this.nodeClassFactory = new NodeClassFactory(this.widgets);
     this.nodeClassFactory.registerHandler(new NodeInputPortBlueprintHandler());
     this.nodeClassFactory.registerHandler(new NodeOutputPortBlueprintHandler());
@@ -2206,13 +2131,6 @@ var GraphFramework = /*#__PURE__*/function () {
     return GraphFramework.instance;
   }
   return _createClass(GraphFramework, [{
-    key: "log",
-    value: function log() {
-      var _console;
-      if (!this.debug) return;
-      (_console = console).log.apply(_console, arguments);
-    }
-  }, {
     key: "install",
     value: function install(graphPack, options) {
       graphPack.install(this, options);
@@ -2233,17 +2151,17 @@ var GraphFramework = /*#__PURE__*/function () {
       if (blueprint) {
         var nodeType = this.nodeClassFactory.getNodeTypeFromBlueprint(blueprint);
         if (!nodeType) {
-          this.log("Failed to determine node type from blueprint.");
+          this.log_warn("Failed to determine node type from blueprint.");
           return;
         }
         var nodeClass = this.nodeClassFactory.create(blueprint);
         if (!nodeClass) {
-          this.log("Unable to create node class from blueprint.", nodeType, blueprint);
+          this.log_warn("Unable to create node class from blueprint.", nodeType, blueprint);
           return;
         }
-        this.registerNodeClass(nodeType, nodeClass);
+        this.registerNodeType(nodeType, nodeClass);
       } else {
-        this.log("No blueprint provided to installNodeBlueprint.");
+        this.log_warn("No blueprint provided to installNodeBlueprint.");
       }
     }
   }, {
@@ -2282,68 +2200,6 @@ var GraphFramework = /*#__PURE__*/function () {
     key: "getVersion",
     value: function getVersion() {
       return this.liteGraph.VERSION;
-    }
-
-    /* this method was overridden as it was incorrectly overwriting the prototype
-     ** of our base class, as such this was made.  Also, some of the unused parts
-     ** were removed to simplfiy the call
-     */
-  }, {
-    key: "registerNodeClass",
-    value: function registerNodeClass(type, base_class) {
-      base_class.type = type;
-      var classname = base_class.name;
-      var pos = type.lastIndexOf("/");
-      base_class.category = type.substring(0, pos);
-      if (!base_class.title) {
-        base_class.title = classname;
-      }
-      if (base_class.supported_extensions) {
-        for (var _i in base_class.supported_extensions) {
-          var _ext = base_class.supported_extensions[_i];
-          if (_ext && _ext.constructor === String) {
-            this.liteGraph.node_types_by_file_extension[_ext.toLowerCase()] = base_class;
-          }
-        }
-      }
-      var prev = this.liteGraph.registered_node_types[type];
-      if (prev) {
-        this.log_debug("registerNodeType", "replacing node type", type, prev);
-      }
-      this.liteGraph.registered_node_types[type] = base_class;
-      if (base_class.constructor.name) {
-        this.liteGraph.Nodes[classname] = base_class;
-      }
-      this.processCallbackHandlers("onNodeTypeRegistered", {
-        def_cb: this.onNodeTypeRegistered
-      }, type, base_class);
-      if (prev) {
-        this.processCallbackHandlers("onNodeTypeReplaced", {
-          def_cb: this.onNodeTypeReplaced
-        }, type, base_class, prev);
-      }
-
-      // warnings
-      if (base_class.prototype.onPropertyChange) {
-        mobjectLitegraph.LiteGraph.log_warn("LiteGraph node class " + type + " has onPropertyChange method, it must be called onPropertyChanged with d at the end");
-      }
-
-      // used to know which nodes create when dragging files to the canvas
-      if (base_class.supported_extensions) {
-        for (var i = 0; i < base_class.supported_extensions.length; i++) {
-          var ext = base_class.supported_extensions[i];
-          if (ext && ext.constructor === String) this.node_types_by_file_extension[ext.toLowerCase()] = base_class;
-        }
-      }
-      this.log_debug("registerNodeType", "type registered", type);
-      if (this.auto_load_slot_types) {
-        var _base_class$title;
-        // auto_load_slot_types should be used when not specifing slot type to LiteGraph
-        // good for testing: this will create a temporary node for each type
-        this.log_debug("registerNodeType", "auto_load_slot_types, create empy tmp node", type);
-        var tmpnode = new base_class((_base_class$title = base_class.title) !== null && _base_class$title !== void 0 ? _base_class$title : "tmpnode");
-        tmpnode.post_constructor(); // could not call, but eventually checking for errors in the chain ?
-      }
     }
   }]);
 }();
@@ -2399,387 +2255,6 @@ var Graph = /*#__PURE__*/function (_LGraph) {
     }
   }]);
 }(mobjectLitegraph.LGraph);
-
-// This function has been overidden to expand the functionality to add graceful fall over if the node
-// has not yet been registered with litegraph (this can happen if you are still waiting for blueprints)
-
-mobjectLitegraph.LGraphCanvas.prototype.checkDropItem = function (e) {
-  if (e.dataTransfer.files.length) {
-    var file = e.dataTransfer.files[0];
-    var ext = mobjectLitegraph.LGraphCanvas.getFileExtension(file.name);
-    var nodetype = mobjectLitegraph.LiteGraph.node_types_by_file_extension[ext];
-    if (nodetype) {
-      this.graph.beforeChange();
-      var node = mobjectLitegraph.LiteGraph.createNode(nodetype.type);
-      if (!node) {
-        console.log(nodetype.type, "is not available to handle", ext);
-        return;
-      }
-      node.pos = [e.canvasX, e.canvasY];
-      this.graph.add(node, false, {
-        doProcessChange: true
-      });
-      node.processCallbackHandlers("onDropFile", {
-        def_cb: node.onDropFile
-      }, file, nodetype.widgetName || null);
-      this.graph.onGraphChanged({
-        action: "fileDrop",
-        doSave: true
-      });
-      this.graph.afterChange();
-    }
-  }
-};
-
-// This function has been overridden due to an error when cloning a node.  It calls selectNodes and passes
-// the cloned nodes in as members of an object.
-mobjectLitegraph.LGraphCanvas.prototype.selectNodes = function (nodes, add_to_current_selection) {
-  var _this = this;
-  if (!add_to_current_selection) {
-    this.deselectAllNodes();
-  }
-
-  // Start of modification
-  nodes = nodes || this.graph._nodes;
-  if (typeof nodes === "string") {
-    nodes = [nodes];
-  } else if (!Array.isArray(nodes) && _typeof(nodes) === "object") {
-    nodes = Object.values(nodes);
-  }
-  // end of modification
-
-  Object.values(nodes).forEach(function (node) {
-    var _node$inputs, _node$outputs;
-    if (node.is_selected) {
-      _this.deselectNode(node);
-      return;
-    }
-    node.is_selected = true;
-    _this.selected_nodes[node.id] = node;
-    node.processCallbackHandlers("onSelected", {
-      def_cb: node.onSelected
-    });
-    (_node$inputs = node.inputs) === null || _node$inputs === void 0 || _node$inputs.forEach(function (input) {
-      _this.highlighted_links[input.link] = true;
-    });
-    (_node$outputs = node.outputs) === null || _node$outputs === void 0 || _node$outputs.forEach(function (out) {
-      var _out$links;
-      (_out$links = out.links) === null || _out$links === void 0 || _out$links.forEach(function (link) {
-        _this.highlighted_links[link] = true;
-      });
-    });
-  });
-  this.processCallbackHandlers("onSelectionChange", {
-    def_cb: this.onSelectionChange
-  }, this.selected_nodes);
-  this.setDirty(true);
-};
-
-// This function has been overridden as there was an error in the core litegraph code. The mouse up event was not sent to the
-// widget when the mouse was released outside of the widget area.
-// this caused numeric controls to miss the onMouseUp and as such the value would not update.
-
-// if (e.which == 1) {
-//     if (this.node_widget) {
-//       this.processNodeWidgets(
-//         this.node_widget[0],
-//         this.graph_mouse,
-//         e,
-//         this.node_widget[1] // <-- This line here was added to fix the mouse up even issue
-//       );
-//     }
-//
-mobjectLitegraph.LGraphCanvas.prototype.processMouseUp = function (e) {
-  var is_primary = e.isPrimary === undefined || e.isPrimary;
-
-  // early exit for extra pointer
-  if (!is_primary) {
-    /* e.stopPropagation();
-            e.preventDefault();*/
-    mobjectLitegraph.LiteGraph.log_verbose("pointerevents: processMouseUp pointerN_stop " + e.pointerId + " " + e.isPrimary);
-    return false;
-  }
-  mobjectLitegraph.LiteGraph.log_verbose("pointerevents: processMouseUp " + e.pointerId + " " + e.isPrimary + " :: " + e.clientX + " " + e.clientY);
-  if (this.set_canvas_dirty_on_mouse_event) this.dirty_canvas = true;
-  if (!this.graph) return;
-  var window = this.getCanvasWindow();
-  var document = window.document;
-  mobjectLitegraph.LGraphCanvas.active_canvas = this;
-
-  // restore the mousemove event back to the canvas
-  if (!this.options.skip_events) {
-    mobjectLitegraph.LiteGraph.log_verbose("pointerevents: processMouseUp adjustEventListener");
-    document.removeEventListener("pointermove", this._mousemove_callback, true);
-    this.canvas.addEventListener("pointermove", this._mousemove_callback, true);
-    document.removeEventListener("pointerup", this._mouseup_callback, true);
-  }
-  this.adjustMouseEvent(e);
-  var now = mobjectLitegraph.LiteGraph.getTime();
-  e.click_time = now - this.last_mouseclick;
-  this.last_mouse_dragging = false;
-  this.last_click_position = null;
-  if (this.block_click) {
-    mobjectLitegraph.LiteGraph.log_verbose("pointerevents: processMouseUp block_clicks");
-    this.block_click = false; // used to avoid sending twice a click in a immediate button
-  }
-  mobjectLitegraph.LiteGraph.log_verbose("pointerevents: processMouseUp which: " + e.which);
-  if (e.which == 1) {
-    if (this.node_widget) {
-      this.processNodeWidgets(this.node_widget[0], this.graph_mouse, e, this.node_widget[1]);
-    }
-
-    // left button
-    this.node_widget = null;
-    if (this.selected_group) {
-      var diffx = this.selected_group.pos[0] - Math.round(this.selected_group.pos[0]);
-      var diffy = this.selected_group.pos[1] - Math.round(this.selected_group.pos[1]);
-      this.selected_group.move(diffx, diffy, e.ctrlKey);
-      this.selected_group.pos[0] = Math.round(this.selected_group.pos[0]);
-      this.selected_group.pos[1] = Math.round(this.selected_group.pos[1]);
-      if (this.selected_group._nodes.length) {
-        this.dirty_canvas = true;
-      }
-      this.selected_group.recomputeInsideNodes();
-      if (this.selected_group_resizing) {
-        this.processCallbackHandlers("onGroupResized", {
-          def_cb: this.onGroupResized
-        }, this.selected_group);
-        this.graph.onGraphChanged({
-          action: "groupResize",
-          doSave: true
-        });
-        this.graph.afterChange(); // this.selected_group
-      } else {
-        if (diffx || diffy) {
-          this.processCallbackHandlers("onGroupMoved", {
-            def_cb: this.onGroupMoved
-          }, this.selected_group);
-          this.graph.onGraphChanged({
-            action: "groupMove",
-            doSave: true
-          });
-          this.graph.afterChange(); // this.selected_group
-        }
-      }
-      this.selected_group = null;
-    }
-    this.selected_group_resizing = false;
-    var node = this.graph.getNodeOnPos(e.canvasX, e.canvasY, this.visible_nodes);
-    if (this.dragging_rectangle) {
-      if (this.graph) {
-        var nodes = this.graph._nodes;
-        var node_bounding = new Float32Array(4);
-
-        // compute bounding and flip if left to right
-        var w = Math.abs(this.dragging_rectangle[2]);
-        var h = Math.abs(this.dragging_rectangle[3]);
-        var startx = this.dragging_rectangle[2] < 0 ? this.dragging_rectangle[0] - w : this.dragging_rectangle[0];
-        var starty = this.dragging_rectangle[3] < 0 ? this.dragging_rectangle[1] - h : this.dragging_rectangle[1];
-        this.dragging_rectangle[0] = startx;
-        this.dragging_rectangle[1] = starty;
-        this.dragging_rectangle[2] = w;
-        this.dragging_rectangle[3] = h;
-
-        // test dragging rect size, if minimun simulate a click
-        if (!node || w > 10 && h > 10) {
-          mobjectLitegraph.LiteGraph.log_debug("lgraphcanvas", "processMouseUp", "computing box selection for nodes", this.dragging_rectangle);
-          // test against all nodes (not visible because the rectangle maybe start outside
-          var to_select = [];
-          for (var i = 0; i < nodes.length; ++i) {
-            var nodeX = nodes[i];
-            nodeX.getBounding(node_bounding);
-            if (!mobjectLitegraph.LiteGraph.overlapBounding(this.dragging_rectangle, node_bounding)) {
-              continue;
-            } // out of the visible area
-            to_select.push(nodeX);
-          }
-          if (to_select.length) {
-            mobjectLitegraph.LiteGraph.log_debug("lgraphcanvas", "processMouseUp", "selecting nodes", to_select);
-            this.selectNodes(to_select, e.shiftKey); // add to selection with shift
-          }
-        } else {
-          // will select of update selection
-          this.selectNodes([node], e.shiftKey || e.ctrlKey); // add to selection add to selection with ctrlKey or shiftKey
-        }
-      }
-      this.dragging_rectangle = null;
-    } else if (this.connecting_node) {
-      // dragging a connection
-      this.dirty_canvas = true;
-      this.dirty_bgcanvas = true;
-      var connInOrOut = this.connecting_output || this.connecting_input;
-      var connType = connInOrOut.type;
-      node = this.graph.getNodeOnPos(e.canvasX, e.canvasY, this.visible_nodes);
-
-      // node below mouse
-      if (node) {
-        // slot below mouse? connect
-        var slot;
-        if (this.connecting_output) {
-          mobjectLitegraph.LiteGraph.log_debug("lgraphcanvas", "processMouseUp", "connecting_output", this.connecting_output, "connecting_node", this.connecting_node, "connecting_slot", this.connecting_slot);
-          slot = this.isOverNodeInput(node, e.canvasX, e.canvasY);
-          if (slot != -1) {
-            this.connecting_node.connect(this.connecting_slot, node, slot);
-          } else {
-            // not on top of an input
-            // look for a good slot
-            this.connecting_node.connectByType(this.connecting_slot, node, connType);
-          }
-        } else if (this.connecting_input) {
-          mobjectLitegraph.LiteGraph.log_debug("lgraphcanvas", "processMouseUp", "connecting_input", this.connecting_input, "connecting_node", this.connecting_node, "connecting_slot", this.connecting_slot);
-          slot = this.isOverNodeOutput(node, e.canvasX, e.canvasY);
-          if (slot != -1) {
-            if (this.connecting && this.connecting.inputs) {
-              // multi connect
-              for (var iC in this.connecting.inputs) {
-                node.connect(slot, this.connecting.inputs[iC].node, this.connecting.inputs[iC].slot);
-              }
-            } else {
-              // default single connect
-              node.connect(slot, this.connecting_node, this.connecting_slot); // this is inverted has output-input nature like
-            }
-          } else {
-            // not on top of an input
-            // look for a good slot
-            this.connecting_node.connectByTypeOutput(this.connecting_slot, node, connType);
-          }
-        }
-        // }
-      } else {
-        // add menu when releasing link in empty space
-        if (mobjectLitegraph.LiteGraph.release_link_on_empty_shows_menu) {
-          if (e.shiftKey && this.allow_searchbox) {
-            if (this.connecting_output) {
-              this.showSearchBox(e, {
-                node_from: this.connecting_node,
-                slot_from: this.connecting_output,
-                type_filter_in: this.connecting_output.type
-              });
-            } else if (this.connecting_input) {
-              this.showSearchBox(e, {
-                node_to: this.connecting_node,
-                slot_from: this.connecting_input,
-                type_filter_out: this.connecting_input.type
-              });
-            }
-          } else {
-            if (this.connecting_output) {
-              this.showConnectionMenu({
-                nodeFrom: this.connecting_node,
-                slotFrom: this.connecting_output,
-                e: e
-              });
-            } else if (this.connecting_input) {
-              this.showConnectionMenu({
-                nodeTo: this.connecting_node,
-                slotTo: this.connecting_input,
-                e: e
-              });
-            }
-          }
-        }
-      }
-      this.connecting_output = null;
-      this.connecting_input = null;
-      this.connecting_pos = null;
-      this.connecting_node = null;
-      this.connecting_slot = -1;
-      this.connecting = false;
-    } else if (this.resizing_node) {
-      // not dragging connection
-      this.dirty_canvas = true;
-      this.dirty_bgcanvas = true;
-      this.graph.afterChange(this.resizing_node);
-      this.resizing_node = null;
-    } else if (this.node_dragged) {
-      // node being dragged?
-      node = this.node_dragged;
-      if (node && e.click_time < 300 && mobjectLitegraph.LiteGraph.isInsideRectangle(e.canvasX, e.canvasY, node.pos[0], node.pos[1] - mobjectLitegraph.LiteGraph.NODE_TITLE_HEIGHT, mobjectLitegraph.LiteGraph.NODE_TITLE_HEIGHT, mobjectLitegraph.LiteGraph.NODE_TITLE_HEIGHT)) {
-        node.collapse();
-      }
-      this.dirty_canvas = true;
-      this.dirty_bgcanvas = true;
-      this.node_dragged.pos[0] = Math.round(this.node_dragged.pos[0]);
-      this.node_dragged.pos[1] = Math.round(this.node_dragged.pos[1]);
-      if (this.graph.config.align_to_grid || this.align_to_grid) {
-        this.node_dragged.alignToGrid();
-      }
-      // TAG callback graphrenderer event entrypoint
-      this.processCallbackHandlers("onNodeMoved", {
-        def_cb: this.onNodeMoved
-      }, this.node_dragged, this.selected_nodes);
-      // multi nodes dragged ?
-      for (var _i in this.selected_nodes) {
-        var ndrg = this.selected_nodes[_i];
-        ndrg.processCallbackHandlers("onMoved", {
-          def_cb: ndrg.onMoved
-        }, this.node_dragged, this.selected_nodes);
-      }
-      this.graph.onGraphChanged({
-        action: "nodeDrag",
-        doSave: true
-      });
-      this.graph.afterChange(this.node_dragged);
-      this.node_dragged = null;
-    } else {
-      // no node being dragged
-      // get node over
-      node = this.graph.getNodeOnPos(e.canvasX, e.canvasY, this.visible_nodes);
-      if (!node && e.click_time < 300) {
-        this.deselectAllNodes();
-      }
-      this.dirty_canvas = true;
-      this.dragging_canvas = false;
-      if (this.node_over) {
-        // TAG callback node event entrypoint
-        this.node_over.processCallbackHandlers("onMouseUp", {
-          def_cb: this.node_over.onMouseUp
-        }, e, [e.canvasX - this.node_over.pos[0], e.canvasY - this.node_over.pos[1]], this);
-      }
-      if (this.node_capturing_input) {
-        // TAG callback node event entrypoint
-        this.node_capturing_input.processCallbackHandlers("onMouseUp", {
-          def_cb: this.node_capturing_input.onMouseUp
-        }, e, [e.canvasX - this.node_capturing_input.pos[0], e.canvasY - this.node_capturing_input.pos[1]]);
-      }
-    }
-  } else if (e.which == 2) {
-    // middle button
-    // trace("middle");
-    this.dirty_canvas = true;
-    this.dragging_canvas = false;
-  } else if (e.which == 3) {
-    // right button
-    // trace("right");
-    this.dirty_canvas = true;
-    this.dragging_canvas = false;
-  }
-
-  /*
-        if((this.dirty_canvas || this.dirty_bgcanvas) && this.rendering_timer_id == null)
-            this.draw();
-        */
-
-  if (is_primary) {
-    this.pointer_is_down = false;
-    this.pointer_is_double = false;
-  }
-  this.graph.change();
-  mobjectLitegraph.LiteGraph.log_verbose("pointerevents: processMouseUp stopPropagation");
-  e.stopPropagation();
-  e.preventDefault();
-  return false;
-};
-
-// added to prevent error with no return value
-mobjectLitegraph.LGraphCanvas.prototype.onDropItem = function (e) {
-  return {
-    return_value: false,
-    result_priority: 0,
-    prevent_default: false,
-    stop_replication: false
-  };
-};
 
 var MobjectGraphTransformer = /*#__PURE__*/function () {
   function MobjectGraphTransformer() {

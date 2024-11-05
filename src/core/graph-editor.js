@@ -1,5 +1,5 @@
 import { Graph } from "./graph.js";
-import { LGraphCanvas } from "./graph-canvas.js";
+import { LGraphCanvas } from "mobject-litegraph";
 import { MobjectGraphTransformer } from "../utils/litegraph-converter.js";
 
 export class GraphEditor {
