@@ -21,6 +21,10 @@
   "scripts": {
     "build": "rollup -c"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mobject-Dev-Team/mobject-graph-ui"
+  },
   "keywords": [
     "mobject-graph",
     "mobject"
