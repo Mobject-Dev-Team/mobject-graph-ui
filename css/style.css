@@ -1,0 +1,51 @@
+﻿.litegraph .dialog .dialog-content table {
+  margin: 10px;
+}
+
+a {
+  color: lightblue;
+}
+
+.link-button-rounded {
+  background-color: dimgray;
+  color: white;
+  display: block;
+  padding: 10px 10px;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.link-button-rounded {
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -ms-border-radius: 8px;
+  -o-border-radius: 8px;
+}
+
+.link-button-rounded:hover {
+  background-color: grey;
+}
+
+.litegraph .graphdialog {
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  padding: 4px 10px;
+  position: fixed;
+  color: white;
+  font-family: "Courier New", Courier, monospace;
+}
+
+.litegraph .graphdialog button {
+  padding: 4px 18px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.graphdialog button {
+  margin-top: 3px;
+  vertical-align: top;
+  background-color: #999;
+  border: 0;
+}
