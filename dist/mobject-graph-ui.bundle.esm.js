@@ -626,6 +626,15 @@ function _toPropertyKey(t) {
   var i = _toPrimitive(t, "string");
   return "symbol" == typeof i ? i : i + "";
 }
+function _typeof(o) {
+  "@babel/helpers - typeof";
+
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
+    return typeof o;
+  } : function (o) {
+    return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
+  }, _typeof(o);
+}
 function _unsupportedIterableToArray(r, a) {
   if (r) {
     if ("string" == typeof r) return _arrayLikeToArray(r, a);
@@ -2092,6 +2101,9 @@ var GraphFramework = /*#__PURE__*/function () {
     }
     this.liteGraph = LiteGraph;
     this.liteGraph.initialize();
+    this.nodeExtensions = [];
+    this.canvasExtensions = [];
+    this.editorExtensions = [];
     this.widgets = new Widgets();
     this.nodeClassFactory = new NodeClassFactory(this.widgets);
     this.nodeClassFactory.registerHandler(new NodeInputPortBlueprintHandler());
@@ -2188,9 +2200,40 @@ var GraphFramework = /*#__PURE__*/function () {
       }
     }
   }, {
-    key: "registerExtension",
-    value: function registerExtension(extension) {
-      extension.registerWithGraph(this);
+    key: "registerNodeExtension",
+    value: function registerNodeExtension(extension) {
+      this.nodeExtensions.push(extension);
+    }
+  }, {
+    key: "registerCanvasExtension",
+    value: function registerCanvasExtension(extension) {
+      this.canvasExtensions.push(extension);
+    }
+  }, {
+    key: "registerEditorExtension",
+    value: function registerEditorExtension(extension) {
+      this.editorExtensions.push(extension);
+    }
+  }, {
+    key: "applyExtensions",
+    value: function applyExtensions(type, instance) {
+      var extensions;
+      switch (type) {
+        case "node":
+          extensions = this.nodeExtensions;
+          break;
+        case "canvas":
+          extensions = this.canvasExtensions;
+          break;
+        case "editor":
+          extensions = this.editorExtensions;
+          break;
+        default:
+          throw new Error("Unknown extension type: ".concat(type));
+      }
+      extensions.forEach(function (extension) {
+        return instance.applyExtension(extension);
+      });
     }
   }, {
     key: "getVersion",
@@ -2240,6 +2283,9 @@ var Graph = /*#__PURE__*/function (_LGraph) {
       }
     }
   }, {
+    key: "exportForBackend",
+    value: function exportForBackend() {}
+  }, {
     key: "beforeChange",
     value: function beforeChange() {
       // before a graph change
@@ -2251,6 +2297,96 @@ var Graph = /*#__PURE__*/function (_LGraph) {
     }
   }]);
 }(LGraph);
+
+var GraphEditor = /*#__PURE__*/function () {
+  function GraphEditor(containerId, connection) {
+    _classCallCheck(this, GraphEditor);
+    this.eventEmitter = new EventEmitter();
+    this.connection = connection;
+    this.rootElement = null;
+    this.parentDiv = null;
+    this.toolbarElement = null;
+    this.mainWindowElement = null;
+    this.footerElement = null;
+    this.canvasElement = null;
+    this.graphCanvas = null;
+    this.graph = new Graph();
+    this.extensions = [];
+    var graphFramework = new GraphFramework();
+    graphFramework.applyExtensions("editor", this);
+    this.makeEditorWindow(containerId);
+    this.setGraph(this.graph);
+    this.eventEmitter.emit("instantiated", this);
+    return this.graph;
+  }
+  return _createClass(GraphEditor, [{
+    key: "getConnection",
+    value: function getConnection() {
+      return this.connection;
+    }
+  }, {
+    key: "getGraph",
+    value: function getGraph() {
+      return this.graph;
+    }
+  }, {
+    key: "setGraph",
+    value: function setGraph(graph) {
+      if (this.graph) {
+        this.eventEmitter.emit("graphReplaced", this.graph);
+      }
+      this.graph = graph;
+      this.graphCanvas.setGraph(this.graph, true);
+      this.eventEmitter.emit("graphSet", this.graph);
+      return graph;
+    }
+  }, {
+    key: "on",
+    value: function on(eventName, listener) {
+      this.eventEmitter.on(eventName, listener);
+    }
+  }, {
+    key: "off",
+    value: function off(eventName, listener) {
+      this.eventEmitter.off(eventName, listener);
+    }
+  }, {
+    key: "applyExtension",
+    value: function applyExtension(extension) {
+      this.eventEmitter.emit("applyExtension", extension);
+      try {
+        var instance = new extension(this);
+        this.extensions.push(instance);
+      } catch (error) {
+        if (_typeof(extension) === "object" && typeof extension.apply === "function") {
+          extension.apply(this);
+          this.extensions.push(extension);
+        } else {
+          throw new Error("Extension must be a class or an object with an apply method");
+        }
+      }
+    }
+  }, {
+    key: "makeEditorWindow",
+    value: function makeEditorWindow(container_id) {
+      var root = this.rootElement = document.createElement("div");
+      root.className = "mgui-editor";
+      root.innerHTML = "\n    <div class=\"mgui-editor-toolbar\">\n        <div class=\"mgui-editor-tools mgui-editor-tools-left\"></div>\n        <div class=\"mgui-editor-tools mgui-editor-tools-right\"></div>\n    </div>\n    <div class=\"mgui-editor-main-window\">\n        <div class=\"editor-area\">\n            <canvas class=\"mgui-editor-graphcanvas\" width=\"1000\" height=\"500\" tabindex=\"10\"></canvas>\n        </div>\n    </div>\n    <div class=\"mgui-editor-footer\">\n        <div class=\"mgui-editor-tools mgui-editor-tools-left\"></div>\n        <div class=\"mgui-editor-tools mgui-editor-tools-right\"></div>\n    </div>";
+      this.toolbarElement = root.querySelector(".mgui-editor-toolbar");
+      this.mainWindowElement = root.querySelector(".mgui-editor-main-window");
+      this.footerElement = root.querySelector(".mgui-editor-footer");
+      var canvas = this.canvasElement = root.querySelector(".mgui-editor-graphcanvas");
+      this.graphCanvas = new LGraphCanvas(canvas);
+      this.parentDiv = document.getElementById(container_id);
+      if (this.parentDiv) {
+        var _this$parentDiv;
+        (_this$parentDiv = this.parentDiv) === null || _this$parentDiv === void 0 || _this$parentDiv.appendChild(root);
+      } else {
+        throw new Error("Editor has no parentElement to bind to");
+      }
+    }
+  }]);
+}();
 
 var MobjectGraphTransformer = /*#__PURE__*/function () {
   function MobjectGraphTransformer() {
@@ -2311,53 +2447,40 @@ function _transformLinks(nodes, links) {
   });
 }
 
-var GraphEditor = /*#__PURE__*/function () {
-  function GraphEditor(_ref, connection) {
-    var containerSelector = _ref.containerSelector,
-      _ref$width = _ref.width,
-      width = _ref$width === void 0 ? 800 : _ref$width,
-      _ref$height = _ref.height,
-      height = _ref$height === void 0 ? 600 : _ref$height;
-    _classCallCheck(this, GraphEditor);
+var EditorAutoUpdateExtension = /*#__PURE__*/function () {
+  function EditorAutoUpdateExtension(editor) {
+    var _this = this;
+    _classCallCheck(this, EditorAutoUpdateExtension);
     this.graphTimeout = null;
     this.statusTimeout = null;
-    this.connection = connection;
     this.isCreatingGraph = false;
     this.isUpdatingStatus = false;
-    this.setupContainer(containerSelector);
-    this.setupCanvas(width, height);
-    return this.initializeGraph();
+    this.editor = editor;
+    this.connection = editor.getConnection();
+    this.editor.on("graphReplaced", function (graph) {
+      _this.unregisterCallbacksFromGraph(graph);
+    });
+    this.editor.on("graphSet", function (graph) {
+      _this.registerCallbacksWithGraph(graph);
+    });
   }
-  return _createClass(GraphEditor, [{
-    key: "setupContainer",
-    value: function setupContainer(containerSelector) {
-      this.container = document.querySelector(containerSelector);
-      if (!this.container) {
-        throw new Error("Container element with selector \"".concat(containerSelector, "\" not found"));
+  return _createClass(EditorAutoUpdateExtension, [{
+    key: "unregisterCallbacksFromGraph",
+    value: function unregisterCallbacksFromGraph(graph) {}
+  }, {
+    key: "registerCallbacksWithGraph",
+    value: function registerCallbacksWithGraph(graph) {
+      var _this2 = this;
+      if (!graph) {
+        return;
       }
-    }
-  }, {
-    key: "setupCanvas",
-    value: function setupCanvas(width, height) {
-      this.canvas = document.createElement("canvas");
-      this.canvas.width = width;
-      this.canvas.height = height;
-      this.container.appendChild(this.canvas);
-    }
-  }, {
-    key: "initializeGraph",
-    value: function initializeGraph() {
-      var _this = this;
-      var graph = new Graph();
-      new LGraphCanvas(this.canvas, graph);
-      this.graph = graph;
-      this.graph.registerCallbackHandler("onConnectionChange", /*#__PURE__*/function () {
-        var _ref2 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(oCbInfo, node) {
+      graph.registerCallbackHandler("onConnectionChange", /*#__PURE__*/function () {
+        var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(oCbInfo, node) {
           return _regeneratorRuntime().wrap(function _callee$(_context) {
             while (1) switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return _this.callCreateGraph();
+                return _this2.callCreateGraph(graph);
               case 2:
               case "end":
                 return _context.stop();
@@ -2365,30 +2488,30 @@ var GraphEditor = /*#__PURE__*/function () {
           }, _callee);
         }));
         return function (_x, _x2) {
-          return _ref2.apply(this, arguments);
+          return _ref.apply(this, arguments);
         };
       }());
-      this.graph.registerCallbackHandler("onNodeAdded", /*#__PURE__*/function () {
-        var _ref3 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3(oCbInfo, node) {
+      graph.registerCallbackHandler("onNodeAdded", /*#__PURE__*/function () {
+        var _ref2 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3(oCbInfo, node) {
           return _regeneratorRuntime().wrap(function _callee3$(_context3) {
             while (1) switch (_context3.prev = _context3.next) {
               case 0:
                 node.registerCallbackHandler("onPropertyChanged", /*#__PURE__*/function () {
-                  var _ref4 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2(oCbInfo, name, value, prevValue) {
+                  var _ref3 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2(oCbInfo, name, value, prevValue) {
                     return _regeneratorRuntime().wrap(function _callee2$(_context2) {
                       while (1) switch (_context2.prev = _context2.next) {
                         case 0:
                           _context2.prev = 0;
                           _context2.next = 3;
-                          return _this.waitForGraphCreationToComplete();
+                          return _this2.waitForGraphCreationToComplete();
                         case 3:
                           _context2.next = 5;
-                          return _this.waitForStatusUpdateToComplete();
+                          return _this2.waitForStatusUpdateToComplete();
                         case 5:
-                          console.log("api update parameter, graphid:", _this.graph.uuid, "nodeId:", node.id, "parameterName:", name, "parameterValue:", value);
+                          console.log("api update parameter, graphid:", graph.uuid, "nodeId:", node.id, "parameterName:", name, "parameterValue:", value);
                           _context2.next = 8;
-                          return _this.connection.send("UpdateParameterValue", {
-                            graphUuid: _this.graph.uuid,
+                          return _this2.connection.send("UpdateParameterValue", {
+                            graphUuid: graph.uuid,
                             nodeId: node.id,
                             parameterName: name,
                             parameterValue: value
@@ -2408,11 +2531,11 @@ var GraphEditor = /*#__PURE__*/function () {
                     }, _callee2, null, [[0, 11]]);
                   }));
                   return function (_x5, _x6, _x7, _x8) {
-                    return _ref4.apply(this, arguments);
+                    return _ref3.apply(this, arguments);
                   };
                 }());
                 _context3.next = 3;
-                return _this.callCreateGraph();
+                return _this2.callCreateGraph(graph);
               case 3:
               case "end":
                 return _context3.stop();
@@ -2420,16 +2543,16 @@ var GraphEditor = /*#__PURE__*/function () {
           }, _callee3);
         }));
         return function (_x3, _x4) {
-          return _ref3.apply(this, arguments);
+          return _ref2.apply(this, arguments);
         };
       }());
-      this.graph.registerCallbackHandler("onNodeRemoved", /*#__PURE__*/function () {
-        var _ref5 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4(oCbInfo, node) {
+      graph.registerCallbackHandler("onNodeRemoved", /*#__PURE__*/function () {
+        var _ref4 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4(oCbInfo, node) {
           return _regeneratorRuntime().wrap(function _callee4$(_context4) {
             while (1) switch (_context4.prev = _context4.next) {
               case 0:
                 _context4.next = 2;
-                return _this.callCreateGraph();
+                return _this2.callCreateGraph(graph);
               case 2:
               case "end":
                 return _context4.stop();
@@ -2437,10 +2560,9 @@ var GraphEditor = /*#__PURE__*/function () {
           }, _callee4);
         }));
         return function (_x9, _x10) {
-          return _ref5.apply(this, arguments);
+          return _ref4.apply(this, arguments);
         };
       }());
-      return graph;
     }
   }, {
     key: "waitForGraphCreationToComplete",
@@ -2505,7 +2627,7 @@ var GraphEditor = /*#__PURE__*/function () {
   }, {
     key: "callCreateGraph",
     value: function () {
-      var _callCreateGraph = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+      var _callCreateGraph = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7(graph) {
         return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) switch (_context7.prev = _context7.next) {
             case 0:
@@ -2516,9 +2638,9 @@ var GraphEditor = /*#__PURE__*/function () {
               return this.waitForStatusUpdateToComplete();
             case 5:
               this.isCreatingGraph = true;
-              this.graph.generateNewUuid();
-              console.log("New Graph Uuid > ", this.graph.uuid);
-              this.startGraphUpdate();
+              graph.generateNewUuid();
+              console.log("New Graph Uuid > ", graph.uuid);
+              this.startGraphUpdate(graph);
               _context7.next = 14;
               break;
             case 11:
@@ -2531,16 +2653,16 @@ var GraphEditor = /*#__PURE__*/function () {
           }
         }, _callee7, this, [[0, 11]]);
       }));
-      function callCreateGraph() {
+      function callCreateGraph(_x11) {
         return _callCreateGraph.apply(this, arguments);
       }
       return callCreateGraph;
     }()
   }, {
     key: "startGraphUpdate",
-    value: function startGraphUpdate() {
+    value: function startGraphUpdate(graph) {
       this.stopGraphUpdate();
-      this.scheduleNextGraphUpdate();
+      this.scheduleNextGraphUpdate(graph);
     }
   }, {
     key: "stopGraphUpdate",
@@ -2553,8 +2675,8 @@ var GraphEditor = /*#__PURE__*/function () {
   }, {
     key: "scheduleNextGraphUpdate",
     value: function () {
-      var _scheduleNextGraphUpdate = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
-        var _this2 = this;
+      var _scheduleNextGraphUpdate = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9(graph) {
+        var _this3 = this;
         return _regeneratorRuntime().wrap(function _callee9$(_context9) {
           while (1) switch (_context9.prev = _context9.next) {
             case 0:
@@ -2564,34 +2686,34 @@ var GraphEditor = /*#__PURE__*/function () {
                   while (1) switch (_context8.prev = _context8.next) {
                     case 0:
                       _context8.prev = 0;
-                      graphPayload = MobjectGraphTransformer.Convert(_this2.graph);
+                      graphPayload = MobjectGraphTransformer.Convert(graph);
                       console.log("api create graph", graphPayload);
                       _context8.next = 5;
-                      return _this2.connection.send("CreateGraph", {
+                      return _this3.connection.send("CreateGraph", {
                         graph: graphPayload
                       });
                     case 5:
                       status = _context8.sent;
                       console.log("api create graph reply >", status);
-                      if (!(status.uuid !== _this2.graph.uuid)) {
+                      if (!(status.uuid !== graph.uuid)) {
                         _context8.next = 9;
                         break;
                       }
                       throw new Error("Uuid mismatch after Graph generation.");
                     case 9:
-                      _this2.graph.update(status);
-                      _this2.isCreatingGraph = false;
-                      _this2.startStatusUpdates();
+                      graph.update(status);
+                      _this3.isCreatingGraph = false;
+                      _this3.startStatusUpdates(graph);
                       _context8.next = 18;
                       break;
                     case 14:
                       _context8.prev = 14;
                       _context8.t0 = _context8["catch"](0);
                       console.log(_context8.t0);
-                      _this2.stopGraphUpdate();
+                      _this3.stopGraphUpdate();
                     case 18:
                       _context8.prev = 18;
-                      _this2.isCreatingGraph = false;
+                      _this3.isCreatingGraph = false;
                       return _context8.finish(18);
                     case 21:
                     case "end":
@@ -2605,16 +2727,16 @@ var GraphEditor = /*#__PURE__*/function () {
           }
         }, _callee9, this);
       }));
-      function scheduleNextGraphUpdate() {
+      function scheduleNextGraphUpdate(_x12) {
         return _scheduleNextGraphUpdate.apply(this, arguments);
       }
       return scheduleNextGraphUpdate;
     }()
   }, {
     key: "startStatusUpdates",
-    value: function startStatusUpdates() {
+    value: function startStatusUpdates(graph) {
       this.stopStatusUpdates();
-      this.scheduleNextStatusUpdate();
+      this.scheduleNextStatusUpdate(graph);
     }
   }, {
     key: "stopStatusUpdates",
@@ -2627,8 +2749,8 @@ var GraphEditor = /*#__PURE__*/function () {
   }, {
     key: "scheduleNextStatusUpdate",
     value: function () {
-      var _scheduleNextStatusUpdate = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
-        var _this3 = this;
+      var _scheduleNextStatusUpdate = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee11(graph) {
+        var _this4 = this;
         return _regeneratorRuntime().wrap(function _callee11$(_context11) {
           while (1) switch (_context11.prev = _context11.next) {
             case 0:
@@ -2639,36 +2761,36 @@ var GraphEditor = /*#__PURE__*/function () {
                     case 0:
                       _context10.prev = 0;
                       _context10.next = 3;
-                      return _this3.waitForGraphCreationToComplete();
+                      return _this4.waitForGraphCreationToComplete();
                     case 3:
-                      _this3.isUpdatingStatus = true;
-                      console.log("api get status", _this3.graph.uuid);
+                      _this4.isUpdatingStatus = true;
+                      console.log("api get status", graph.uuid);
                       _context10.next = 7;
-                      return _this3.connection.send("GetStatus", {
-                        graphUuid: _this3.graph.uuid
+                      return _this4.connection.send("GetStatus", {
+                        graphUuid: graph.uuid
                       });
                     case 7:
                       status = _context10.sent;
                       console.log("api get status reply >", status);
-                      if (!(status.uuid !== _this3.graph.uuid)) {
+                      if (!(status.uuid !== graph.uuid)) {
                         _context10.next = 11;
                         break;
                       }
                       throw new Error("Uuid mismatch after Status update.");
                     case 11:
-                      _this3.graph.update(status);
-                      _this3.isUpdatingStatus = false;
-                      _this3.scheduleNextStatusUpdate();
+                      graph.update(status);
+                      _this4.isUpdatingStatus = false;
+                      _this4.scheduleNextStatusUpdate(graph);
                       _context10.next = 20;
                       break;
                     case 16:
                       _context10.prev = 16;
                       _context10.t0 = _context10["catch"](0);
                       console.log(_context10.t0);
-                      _this3.stopStatusUpdates();
+                      _this4.stopStatusUpdates();
                     case 20:
                       _context10.prev = 20;
-                      _this3.isUpdatingStatus = false;
+                      _this4.isUpdatingStatus = false;
                       return _context10.finish(20);
                     case 23:
                     case "end":
@@ -2682,7 +2804,7 @@ var GraphEditor = /*#__PURE__*/function () {
           }
         }, _callee11, this);
       }));
-      function scheduleNextStatusUpdate() {
+      function scheduleNextStatusUpdate(_x13) {
         return _scheduleNextStatusUpdate.apply(this, arguments);
       }
       return scheduleNextStatusUpdate;
@@ -2694,14 +2816,14 @@ var DefaultPack = /*#__PURE__*/function () {
   function DefaultPack() {
     _classCallCheck(this, DefaultPack);
   }
-  return _createClass(DefaultPack, null, [{
+  return _createClass(DefaultPack, [{
     key: "install",
     value: function install() {
       var graphFramework = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new GraphFramework();
       var options = arguments.length > 1 ? arguments[1] : undefined;
       this.registerBundledPacks(graphFramework, options);
       this.registerGraphExtensions(graphFramework, options);
-      this.registerCanvasExtension(graphFramework, options);
+      this.registerCanvasExtensions(graphFramework, options);
       this.registerEditorExtensions(graphFramework, options);
       this.registerNodeExtensions(graphFramework, options);
       this.registerWidgets(graphFramework, options);
@@ -2718,17 +2840,18 @@ var DefaultPack = /*#__PURE__*/function () {
     // these switchable via the options object.
     // graphFramework.registerNodeExtensions(...);
   }, {
-    key: "registerCanvasExtension",
-    value: function registerCanvasExtension(graphFramework) {
+    key: "registerCanvasExtensions",
+    value: function registerCanvasExtensions(graphFramework) {
     } // add any default canvas extensions here.  It's good practice to make
     // these switchable via the options object.
     // graphFramework.registerCanvasExtension(...);
   }, {
     key: "registerEditorExtensions",
     value: function registerEditorExtensions(graphFramework) {
-    } // add any default editor extensions here.  It's good practice to make
-    // these switchable via the options object.
-    // graphFramework.registerEditorExtensions(...);
+      // add any default editor extensions here.  It's good practice to make
+      // these switchable via the options object.
+      graphFramework.registerEditorExtension(EditorAutoUpdateExtension);
+    }
   }, {
     key: "registerNodeExtensions",
     value: function registerNodeExtensions(graphFramework) {

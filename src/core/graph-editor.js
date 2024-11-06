@@ -1,198 +1,113 @@
 import { Graph } from "./graph.js";
 import { LGraphCanvas } from "mobject-litegraph";
-import { MobjectGraphTransformer } from "../utils/litegraph-converter.js";
+import { GraphFramework } from "../core/graph-framework.js";
+import { EventEmitter } from "../utils/event-emitter.js";
 
 export class GraphEditor {
-  constructor({ containerSelector, width = 800, height = 600 }, connection) {
-    this.graphTimeout = null;
-    this.statusTimeout = null;
+  constructor(containerId, connection) {
+    this.eventEmitter = new EventEmitter();
     this.connection = connection;
-    this.isCreatingGraph = false;
-    this.isUpdatingStatus = false;
-    this.setupContainer(containerSelector);
-    this.setupCanvas(width, height);
-    return this.initializeGraph();
+    this.rootElement = null;
+    this.parentDiv = null;
+    this.toolbarElement = null;
+    this.mainWindowElement = null;
+    this.footerElement = null;
+    this.canvasElement = null;
+    this.graphCanvas = null;
+    this.graph = new Graph();
+    this.extensions = [];
+
+    const graphFramework = new GraphFramework();
+    graphFramework.applyExtensions("editor", this);
+
+    this.makeEditorWindow(containerId);
+    this.setGraph(this.graph);
+
+    this.eventEmitter.emit("instantiated", this);
+    return this.graph;
   }
 
-  setupContainer(containerSelector) {
-    this.container = document.querySelector(containerSelector);
-    if (!this.container) {
-      throw new Error(
-        `Container element with selector "${containerSelector}" not found`
-      );
+  getConnection() {
+    return this.connection;
+  }
+
+  getGraph() {
+    return this.graph;
+  }
+
+  setGraph(graph) {
+    if (this.graph) {
+      this.eventEmitter.emit("graphReplaced", this.graph);
     }
-  }
-
-  setupCanvas(width, height) {
-    this.canvas = document.createElement("canvas");
-    this.canvas.width = width;
-    this.canvas.height = height;
-    this.container.appendChild(this.canvas);
-  }
-
-  initializeGraph() {
-    const graph = new Graph();
-    new LGraphCanvas(this.canvas, graph);
     this.graph = graph;
+    this.graphCanvas.setGraph(this.graph, true);
 
-    this.graph.registerCallbackHandler(
-      "onConnectionChange",
-      async (oCbInfo, node) => {
-        await this.callCreateGraph();
-      }
-    );
-
-    this.graph.registerCallbackHandler("onNodeAdded", async (oCbInfo, node) => {
-      node.registerCallbackHandler(
-        "onPropertyChanged",
-        async (oCbInfo, name, value, prevValue) => {
-          try {
-            await this.waitForGraphCreationToComplete();
-            await this.waitForStatusUpdateToComplete();
-
-            console.log(
-              "api update parameter, graphid:",
-              this.graph.uuid,
-              "nodeId:",
-              node.id,
-              "parameterName:",
-              name,
-              "parameterValue:",
-              value
-            );
-
-            const reply = await this.connection.send("UpdateParameterValue", {
-              graphUuid: this.graph.uuid,
-              nodeId: node.id,
-              parameterName: name,
-              parameterValue: value,
-            });
-          } catch (e) {
-            console.log(e);
-          }
-        }
-      );
-      await this.callCreateGraph();
-    });
-
-    this.graph.registerCallbackHandler(
-      "onNodeRemoved",
-      async (oCbInfo, node) => {
-        await this.callCreateGraph();
-      }
-    );
+    this.eventEmitter.emit("graphSet", this.graph);
 
     return graph;
   }
 
-  async waitForGraphCreationToComplete() {
-    while (this.isCreatingGraph) {
-      console.log("Waiting for Graph creation to complete...");
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
+  on(eventName, listener) {
+    this.eventEmitter.on(eventName, listener);
   }
 
-  async waitForStatusUpdateToComplete() {
-    while (this.isUpdatingStatus) {
-      console.log("Waiting for Status update to complete...");
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
+  off(eventName, listener) {
+    this.eventEmitter.off(eventName, listener);
   }
 
-  async callCreateGraph() {
+  applyExtension(extension) {
+    this.eventEmitter.emit("applyExtension", extension);
     try {
-      this.stopGraphUpdate();
-      this.stopStatusUpdates();
-      await this.waitForStatusUpdateToComplete();
-
-      this.isCreatingGraph = true;
-
-      this.graph.generateNewUuid();
-      console.log("New Graph Uuid > ", this.graph.uuid);
-
-      this.startGraphUpdate();
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
-  startGraphUpdate() {
-    this.stopGraphUpdate();
-    this.scheduleNextGraphUpdate();
-  }
-
-  stopGraphUpdate() {
-    if (this.graphTimeout) {
-      clearTimeout(this.graphTimeout);
-      this.graphTimeout = null;
-    }
-  }
-
-  async scheduleNextGraphUpdate() {
-    this.graphTimeout = setTimeout(async () => {
-      try {
-        const graphPayload = MobjectGraphTransformer.Convert(this.graph);
-
-        console.log("api create graph", graphPayload);
-        const status = await this.connection.send("CreateGraph", {
-          graph: graphPayload,
-        });
-
-        console.log("api create graph reply >", status);
-        if (status.uuid !== this.graph.uuid) {
-          throw new Error("Uuid mismatch after Graph generation.");
-        }
-
-        this.graph.update(status);
-
-        this.isCreatingGraph = false;
-        this.startStatusUpdates();
-      } catch (error) {
-        console.log(error);
-        this.stopGraphUpdate();
-      } finally {
-        this.isCreatingGraph = false;
+      const instance = new extension(this);
+      this.extensions.push(instance);
+    } catch (error) {
+      if (
+        typeof extension === "object" &&
+        typeof extension.apply === "function"
+      ) {
+        extension.apply(this);
+        this.extensions.push(extension);
+      } else {
+        throw new Error(
+          "Extension must be a class or an object with an apply method"
+        );
       }
-    }, 100);
-  }
-
-  startStatusUpdates() {
-    this.stopStatusUpdates();
-    this.scheduleNextStatusUpdate();
-  }
-
-  stopStatusUpdates() {
-    if (this.statusTimeout) {
-      clearTimeout(this.statusTimeout);
-      this.statusTimeout = null;
     }
   }
 
-  async scheduleNextStatusUpdate() {
-    this.statusTimeout = setTimeout(async () => {
-      try {
-        await this.waitForGraphCreationToComplete();
-        this.isUpdatingStatus = true;
+  makeEditorWindow(container_id, options = {}) {
+    const root = (this.rootElement = document.createElement("div"));
+    root.className = "mgui-editor";
+    root.innerHTML = `
+    <div class="mgui-editor-toolbar">
+        <div class="mgui-editor-tools mgui-editor-tools-left"></div>
+        <div class="mgui-editor-tools mgui-editor-tools-right"></div>
+    </div>
+    <div class="mgui-editor-main-window">
+        <div class="editor-area">
+            <canvas class="mgui-editor-graphcanvas" width="1000" height="500" tabindex="10"></canvas>
+        </div>
+    </div>
+    <div class="mgui-editor-footer">
+        <div class="mgui-editor-tools mgui-editor-tools-left"></div>
+        <div class="mgui-editor-tools mgui-editor-tools-right"></div>
+    </div>`;
 
-        console.log("api get status", this.graph.uuid);
-        const status = await this.connection.send("GetStatus", {
-          graphUuid: this.graph.uuid,
-        });
+    this.toolbarElement = root.querySelector(".mgui-editor-toolbar");
+    this.mainWindowElement = root.querySelector(".mgui-editor-main-window");
+    this.footerElement = root.querySelector(".mgui-editor-footer");
 
-        console.log("api get status reply >", status);
-        if (status.uuid !== this.graph.uuid) {
-          throw new Error("Uuid mismatch after Status update.");
-        }
+    const canvas = (this.canvasElement = root.querySelector(
+      ".mgui-editor-graphcanvas"
+    ));
 
-        this.graph.update(status);
-        this.isUpdatingStatus = false;
-        this.scheduleNextStatusUpdate();
-      } catch (error) {
-        console.log(error);
-        this.stopStatusUpdates();
-      } finally {
-        this.isUpdatingStatus = false;
-      }
-    }, 1000);
+    this.graphCanvas = new LGraphCanvas(canvas);
+
+    this.parentDiv = document.getElementById(container_id);
+    if (this.parentDiv) {
+      this.parentDiv?.appendChild(root);
+    } else {
+      throw new Error("Editor has no parentElement to bind to");
+    }
   }
 }

@@ -22,6 +22,10 @@ export class GraphFramework {
 
     this.liteGraph = LiteGraph;
     this.liteGraph.initialize();
+
+    this.nodeExtensions = [];
+    this.canvasExtensions = [];
+    this.editorExtensions = [];
     this.widgets = new Widgets();
 
     this.nodeClassFactory = new NodeClassFactory(this.widgets);
@@ -119,8 +123,35 @@ export class GraphFramework {
     }
   }
 
-  registerExtension(extension) {
-    extension.registerWithGraph(this);
+  registerNodeExtension(extension) {
+    this.nodeExtensions.push(extension);
+  }
+
+  registerCanvasExtension(extension) {
+    this.canvasExtensions.push(extension);
+  }
+
+  registerEditorExtension(extension) {
+    this.editorExtensions.push(extension);
+  }
+
+  applyExtensions(type, instance) {
+    let extensions;
+    switch (type) {
+      case "node":
+        extensions = this.nodeExtensions;
+        break;
+      case "canvas":
+        extensions = this.canvasExtensions;
+        break;
+      case "editor":
+        extensions = this.editorExtensions;
+        break;
+      default:
+        throw new Error(`Unknown extension type: ${type}`);
+    }
+
+    extensions.forEach((extension) => instance.applyExtension(extension));
   }
 
   getVersion() {

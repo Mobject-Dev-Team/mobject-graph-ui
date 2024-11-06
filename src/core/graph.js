@@ -31,6 +31,8 @@ export class Graph extends LGraph {
     }
   }
 
+  exportForBackend() {}
+
   beforeChange() {
     // before a graph change
   }
