@@ -2,11 +2,13 @@ import { EventEmitter } from "../utils/event-emitter.js";
 import { LiteGraph, LGraphNode } from "mobject-litegraph";
 
 export class Node extends LGraphNode {
-  #eventEmitter = new EventEmitter();
+  eventEmitter = new EventEmitter();
 
   constructor(title) {
     super(title);
     this._shape = 2;
+
+    this.registerCallbackHandlers();
   }
 
   addCustomWidget(widget) {
@@ -17,15 +19,15 @@ export class Node extends LGraphNode {
   }
 
   on(eventName, listener) {
-    this.#eventEmitter.on(eventName, listener);
+    this.eventEmitter.on(eventName, listener);
   }
 
   off(eventName, listener) {
-    this.#eventEmitter.off(eventName, listener);
+    this.eventEmitter.off(eventName, listener);
   }
 
   update(status) {
-    this.#eventEmitter.emit("nodeStatusUpdated", status);
+    this.eventEmitter.emit("nodeStatusUpdated", status);
   }
 
   setPropertyDefaultValue(name, value) {
@@ -66,6 +68,37 @@ export class Node extends LGraphNode {
     }
     LiteGraph.log_warn(
       `Node ${this.type} was registered to handle a dropped file, but failed to handle it.`
+    );
+  }
+
+  registerCallbackHandlers() {
+    this.registerCallbackHandler("onAdded", (oCbInfo) => {
+      this.eventEmitter.emit("added", this);
+    });
+
+    this.registerCallbackHandler("onRemoved", (oCbInfo) => {
+      this.eventEmitter.emit("removed", this);
+    });
+
+    // this.registerCallbackHandler(
+    //   "onDrawForeground",
+    //   (oCbInfo, ctx, visible_rect) => {
+    //     this.eventEmitter.emit("drawForeground", this, ctx, visible_rect);
+    //   }
+    // );
+
+    // this.registerCallbackHandler(
+    //   "onDrawBackground",
+    //   (oCbInfo, ctx, visible_area) => {
+    //     this.eventEmitter.emit("drawBackground", this, ctx, visible_area);
+    //   }
+    // );
+
+    this.registerCallbackHandler(
+      "onPropertyChanged",
+      (oCbInfo, name, value, prevValue) => {
+        this.eventEmitter.emit("propertyChanged", this, name, value, prevValue);
+      }
     );
   }
 }

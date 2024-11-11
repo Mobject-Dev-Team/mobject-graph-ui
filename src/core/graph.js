@@ -1,23 +1,35 @@
 import { LiteGraph, LGraph } from "mobject-litegraph";
+import { EventEmitter } from "../utils/event-emitter.js";
+import { LiteGraphConverter } from "../utils/litegraph-converter.js";
 
 export class Graph extends LGraph {
   #uuid = null;
 
   constructor(o) {
     super(o);
-    this.#uuid = this.generateNewUuid();
-    this.registerCallbackHandler("onSerialize", (oCbInfo, data) => {
-      data.uuid = this.#uuid;
-    });
+    this.eventEmitter = new EventEmitter();
+    this.#uuid = null;
+    this.updateGraphUuid();
+  }
+
+  on(eventName, listener) {
+    this.eventEmitter.on(eventName, listener);
+  }
+
+  off(eventName, listener) {
+    this.eventEmitter.off(eventName, listener);
   }
 
   get uuid() {
     return this.#uuid;
   }
 
-  generateNewUuid() {
+  get isEmpty() {
+    return this._nodes.length === 0;
+  }
+
+  updateGraphUuid() {
     this.#uuid = LiteGraph.uuidv4();
-    return this.#uuid;
   }
 
   update(status) {
@@ -31,12 +43,49 @@ export class Graph extends LGraph {
     }
   }
 
-  exportForBackend() {}
-
-  beforeChange() {
-    // before a graph change
+  serialize() {
+    let data = super.serialize();
+    data.uuid = this.#uuid;
+    return data;
   }
-  afterChange() {
-    // after a graph change
+
+  exportForBackend() {
+    return LiteGraphConverter.Convert(this);
+  }
+
+  onNodeAdded(node) {
+    this.updateGraphUuid();
+    node.on("propertyChanged", this.emitOnNodePropertyChange.bind(this));
+    this.eventEmitter.emit("nodeAdded", this, node);
+  }
+
+  onNodeRemoved(node) {
+    this.updateGraphUuid();
+    node.off("propertyChanged", this.emitOnNodePropertyChange.bind(this));
+    this.eventEmitter.emit("nodeRemoved", this, node);
+  }
+
+  onConnectionChange(node) {
+    this.updateGraphUuid();
+    this.eventEmitter.emit("connectionChange", this, node);
+  }
+
+  onBeforeChange() {
+    this.eventEmitter.emit("beforeChange", this);
+  }
+
+  onAfterChange() {
+    this.eventEmitter.emit("afterChange", this);
+  }
+
+  emitOnNodePropertyChange(node, name, value, prevValue) {
+    this.eventEmitter.emit(
+      "nodePropertyChanged",
+      this,
+      node,
+      name,
+      value,
+      prevValue
+    );
   }
 }

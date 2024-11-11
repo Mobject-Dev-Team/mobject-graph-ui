@@ -66,811 +66,241 @@ mobjectLitegraph.LiteGraph.use_deferred_actions = true;
 mobjectLitegraph.LiteGraph.context_menu_filter_enabled = false;
 mobjectLitegraph.LiteGraph.reprocess_slot_while_node_configure = false;
 
-function _arrayLikeToArray(r, a) {
-  (null == a || a > r.length) && (a = r.length);
-  for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
-  return n;
-}
-function _arrayWithHoles(r) {
-  if (Array.isArray(r)) return r;
-}
-function _arrayWithoutHoles(r) {
-  if (Array.isArray(r)) return _arrayLikeToArray(r);
-}
-function _assertClassBrand(e, t, n) {
-  if ("function" == typeof e ? e === t : e.has(t)) return arguments.length < 3 ? t : n;
-  throw new TypeError("Private element is not present on this object");
-}
-function _assertThisInitialized(e) {
-  if (void 0 === e) throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  return e;
-}
-function asyncGeneratorStep(n, t, e, r, o, a, c) {
-  try {
-    var i = n[a](c),
-      u = i.value;
-  } catch (n) {
-    return void e(n);
-  }
-  i.done ? t(u) : Promise.resolve(u).then(r, o);
-}
-function _asyncToGenerator(n) {
-  return function () {
-    var t = this,
-      e = arguments;
-    return new Promise(function (r, o) {
-      var a = n.apply(t, e);
-      function _next(n) {
-        asyncGeneratorStep(a, r, o, _next, _throw, "next", n);
-      }
-      function _throw(n) {
-        asyncGeneratorStep(a, r, o, _next, _throw, "throw", n);
-      }
-      _next(void 0);
-    });
-  };
-}
-function _callSuper(t, o, e) {
-  return o = _getPrototypeOf(o), _possibleConstructorReturn(t, _isNativeReflectConstruct() ? Reflect.construct(o, e || [], _getPrototypeOf(t).constructor) : o.apply(t, e));
-}
-function _checkPrivateRedeclaration(e, t) {
-  if (t.has(e)) throw new TypeError("Cannot initialize the same private elements twice on an object");
-}
-function _classCallCheck(a, n) {
-  if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function");
-}
-function _classPrivateFieldGet2(s, a) {
-  return s.get(_assertClassBrand(s, a));
-}
-function _classPrivateFieldInitSpec(e, t, a) {
-  _checkPrivateRedeclaration(e, t), t.set(e, a);
-}
-function _classPrivateFieldSet2(s, a, r) {
-  return s.set(_assertClassBrand(s, a), r), r;
-}
-function _classPrivateMethodInitSpec(e, a) {
-  _checkPrivateRedeclaration(e, a), a.add(e);
-}
-function _defineProperties(e, r) {
-  for (var t = 0; t < r.length; t++) {
-    var o = r[t];
-    o.enumerable = o.enumerable || !1, o.configurable = !0, "value" in o && (o.writable = !0), Object.defineProperty(e, _toPropertyKey(o.key), o);
-  }
-}
-function _createClass(e, r, t) {
-  return r && _defineProperties(e.prototype, r), t && _defineProperties(e, t), Object.defineProperty(e, "prototype", {
-    writable: !1
-  }), e;
-}
-function _createForOfIteratorHelper(r, e) {
-  var t = "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
-  if (!t) {
-    if (Array.isArray(r) || (t = _unsupportedIterableToArray(r)) || e && r && "number" == typeof r.length) {
-      t && (r = t);
-      var n = 0,
-        F = function () {};
-      return {
-        s: F,
-        n: function () {
-          return n >= r.length ? {
-            done: !0
-          } : {
-            done: !1,
-            value: r[n++]
-          };
-        },
-        e: function (r) {
-          throw r;
-        },
-        f: F
-      };
-    }
-    throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-  }
-  var o,
-    a = !0,
-    u = !1;
-  return {
-    s: function () {
-      t = t.call(r);
-    },
-    n: function () {
-      var r = t.next();
-      return a = r.done, r;
-    },
-    e: function (r) {
-      u = !0, o = r;
-    },
-    f: function () {
-      try {
-        a || null == t.return || t.return();
-      } finally {
-        if (u) throw o;
-      }
-    }
-  };
-}
-function _defineProperty(e, r, t) {
-  return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
-    value: t,
-    enumerable: !0,
-    configurable: !0,
-    writable: !0
-  }) : e[r] = t, e;
-}
-function _get() {
-  return _get = "undefined" != typeof Reflect && Reflect.get ? Reflect.get.bind() : function (e, t, r) {
-    var p = _superPropBase(e, t);
-    if (p) {
-      var n = Object.getOwnPropertyDescriptor(p, t);
-      return n.get ? n.get.call(arguments.length < 3 ? e : r) : n.value;
-    }
-  }, _get.apply(null, arguments);
-}
-function _getPrototypeOf(t) {
-  return _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function (t) {
-    return t.__proto__ || Object.getPrototypeOf(t);
-  }, _getPrototypeOf(t);
-}
-function _inherits(t, e) {
-  if ("function" != typeof e && null !== e) throw new TypeError("Super expression must either be null or a function");
-  t.prototype = Object.create(e && e.prototype, {
-    constructor: {
-      value: t,
-      writable: !0,
-      configurable: !0
-    }
-  }), Object.defineProperty(t, "prototype", {
-    writable: !1
-  }), e && _setPrototypeOf(t, e);
-}
-function _isNativeReflectConstruct() {
-  try {
-    var t = !Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
-  } catch (t) {}
-  return (_isNativeReflectConstruct = function () {
-    return !!t;
-  })();
-}
-function _iterableToArray(r) {
-  if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r);
-}
-function _iterableToArrayLimit(r, l) {
-  var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"];
-  if (null != t) {
-    var e,
-      n,
-      i,
-      u,
-      a = [],
-      f = !0,
-      o = !1;
-    try {
-      if (i = (t = t.call(r)).next, 0 === l) {
-        if (Object(t) !== t) return;
-        f = !1;
-      } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0);
-    } catch (r) {
-      o = !0, n = r;
-    } finally {
-      try {
-        if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return;
-      } finally {
-        if (o) throw n;
-      }
-    }
-    return a;
-  }
-}
-function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-function _nonIterableSpread() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-function ownKeys(e, r) {
-  var t = Object.keys(e);
-  if (Object.getOwnPropertySymbols) {
-    var o = Object.getOwnPropertySymbols(e);
-    r && (o = o.filter(function (r) {
-      return Object.getOwnPropertyDescriptor(e, r).enumerable;
-    })), t.push.apply(t, o);
-  }
-  return t;
-}
-function _objectSpread2(e) {
-  for (var r = 1; r < arguments.length; r++) {
-    var t = null != arguments[r] ? arguments[r] : {};
-    r % 2 ? ownKeys(Object(t), !0).forEach(function (r) {
-      _defineProperty(e, r, t[r]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) {
-      Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r));
-    });
-  }
-  return e;
-}
-function _possibleConstructorReturn(t, e) {
-  if (e && ("object" == typeof e || "function" == typeof e)) return e;
-  if (void 0 !== e) throw new TypeError("Derived constructors may only return object or undefined");
-  return _assertThisInitialized(t);
-}
-function _regeneratorRuntime() {
-  _regeneratorRuntime = function () {
-    return e;
-  };
-  var t,
-    e = {},
-    r = Object.prototype,
-    n = r.hasOwnProperty,
-    o = Object.defineProperty || function (t, e, r) {
-      t[e] = r.value;
-    },
-    i = "function" == typeof Symbol ? Symbol : {},
-    a = i.iterator || "@@iterator",
-    c = i.asyncIterator || "@@asyncIterator",
-    u = i.toStringTag || "@@toStringTag";
-  function define(t, e, r) {
-    return Object.defineProperty(t, e, {
-      value: r,
-      enumerable: !0,
-      configurable: !0,
-      writable: !0
-    }), t[e];
-  }
-  try {
-    define({}, "");
-  } catch (t) {
-    define = function (t, e, r) {
-      return t[e] = r;
-    };
-  }
-  function wrap(t, e, r, n) {
-    var i = e && e.prototype instanceof Generator ? e : Generator,
-      a = Object.create(i.prototype),
-      c = new Context(n || []);
-    return o(a, "_invoke", {
-      value: makeInvokeMethod(t, r, c)
-    }), a;
-  }
-  function tryCatch(t, e, r) {
-    try {
-      return {
-        type: "normal",
-        arg: t.call(e, r)
-      };
-    } catch (t) {
-      return {
-        type: "throw",
-        arg: t
-      };
-    }
-  }
-  e.wrap = wrap;
-  var h = "suspendedStart",
-    l = "suspendedYield",
-    f = "executing",
-    s = "completed",
-    y = {};
-  function Generator() {}
-  function GeneratorFunction() {}
-  function GeneratorFunctionPrototype() {}
-  var p = {};
-  define(p, a, function () {
-    return this;
-  });
-  var d = Object.getPrototypeOf,
-    v = d && d(d(values([])));
-  v && v !== r && n.call(v, a) && (p = v);
-  var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p);
-  function defineIteratorMethods(t) {
-    ["next", "throw", "return"].forEach(function (e) {
-      define(t, e, function (t) {
-        return this._invoke(e, t);
-      });
-    });
-  }
-  function AsyncIterator(t, e) {
-    function invoke(r, o, i, a) {
-      var c = tryCatch(t[r], t, o);
-      if ("throw" !== c.type) {
-        var u = c.arg,
-          h = u.value;
-        return h && "object" == typeof h && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) {
-          invoke("next", t, i, a);
-        }, function (t) {
-          invoke("throw", t, i, a);
-        }) : e.resolve(h).then(function (t) {
-          u.value = t, i(u);
-        }, function (t) {
-          return invoke("throw", t, i, a);
-        });
-      }
-      a(c.arg);
-    }
-    var r;
-    o(this, "_invoke", {
-      value: function (t, n) {
-        function callInvokeWithMethodAndArg() {
-          return new e(function (e, r) {
-            invoke(t, n, e, r);
-          });
-        }
-        return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg();
-      }
-    });
-  }
-  function makeInvokeMethod(e, r, n) {
-    var o = h;
-    return function (i, a) {
-      if (o === f) throw Error("Generator is already running");
-      if (o === s) {
-        if ("throw" === i) throw a;
-        return {
-          value: t,
-          done: !0
-        };
-      }
-      for (n.method = i, n.arg = a;;) {
-        var c = n.delegate;
-        if (c) {
-          var u = maybeInvokeDelegate(c, n);
-          if (u) {
-            if (u === y) continue;
-            return u;
-          }
-        }
-        if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) {
-          if (o === h) throw o = s, n.arg;
-          n.dispatchException(n.arg);
-        } else "return" === n.method && n.abrupt("return", n.arg);
-        o = f;
-        var p = tryCatch(e, r, n);
-        if ("normal" === p.type) {
-          if (o = n.done ? s : l, p.arg === y) continue;
-          return {
-            value: p.arg,
-            done: n.done
-          };
-        }
-        "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg);
-      }
-    };
-  }
-  function maybeInvokeDelegate(e, r) {
-    var n = r.method,
-      o = e.iterator[n];
-    if (o === t) return r.delegate = null, "throw" === n && e.iterator.return && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y;
-    var i = tryCatch(o, e.iterator, r.arg);
-    if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y;
-    var a = i.arg;
-    return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y);
-  }
-  function pushTryEntry(t) {
-    var e = {
-      tryLoc: t[0]
-    };
-    1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e);
-  }
-  function resetTryEntry(t) {
-    var e = t.completion || {};
-    e.type = "normal", delete e.arg, t.completion = e;
-  }
-  function Context(t) {
-    this.tryEntries = [{
-      tryLoc: "root"
-    }], t.forEach(pushTryEntry, this), this.reset(!0);
-  }
-  function values(e) {
-    if (e || "" === e) {
-      var r = e[a];
-      if (r) return r.call(e);
-      if ("function" == typeof e.next) return e;
-      if (!isNaN(e.length)) {
-        var o = -1,
-          i = function next() {
-            for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next;
-            return next.value = t, next.done = !0, next;
-          };
-        return i.next = i;
-      }
-    }
-    throw new TypeError(typeof e + " is not iterable");
-  }
-  return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", {
-    value: GeneratorFunctionPrototype,
-    configurable: !0
-  }), o(GeneratorFunctionPrototype, "constructor", {
-    value: GeneratorFunction,
-    configurable: !0
-  }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) {
-    var e = "function" == typeof t && t.constructor;
-    return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name));
-  }, e.mark = function (t) {
-    return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t;
-  }, e.awrap = function (t) {
-    return {
-      __await: t
-    };
-  }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () {
-    return this;
-  }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) {
-    void 0 === i && (i = Promise);
-    var a = new AsyncIterator(wrap(t, r, n, o), i);
-    return e.isGeneratorFunction(r) ? a : a.next().then(function (t) {
-      return t.done ? t.value : a.next();
-    });
-  }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () {
-    return this;
-  }), define(g, "toString", function () {
-    return "[object Generator]";
-  }), e.keys = function (t) {
-    var e = Object(t),
-      r = [];
-    for (var n in e) r.push(n);
-    return r.reverse(), function next() {
-      for (; r.length;) {
-        var t = r.pop();
-        if (t in e) return next.value = t, next.done = !1, next;
-      }
-      return next.done = !0, next;
-    };
-  }, e.values = values, Context.prototype = {
-    constructor: Context,
-    reset: function (e) {
-      if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t);
-    },
-    stop: function () {
-      this.done = !0;
-      var t = this.tryEntries[0].completion;
-      if ("throw" === t.type) throw t.arg;
-      return this.rval;
-    },
-    dispatchException: function (e) {
-      if (this.done) throw e;
-      var r = this;
-      function handle(n, o) {
-        return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o;
-      }
-      for (var o = this.tryEntries.length - 1; o >= 0; --o) {
-        var i = this.tryEntries[o],
-          a = i.completion;
-        if ("root" === i.tryLoc) return handle("end");
-        if (i.tryLoc <= this.prev) {
-          var c = n.call(i, "catchLoc"),
-            u = n.call(i, "finallyLoc");
-          if (c && u) {
-            if (this.prev < i.catchLoc) return handle(i.catchLoc, !0);
-            if (this.prev < i.finallyLoc) return handle(i.finallyLoc);
-          } else if (c) {
-            if (this.prev < i.catchLoc) return handle(i.catchLoc, !0);
-          } else {
-            if (!u) throw Error("try statement without catch or finally");
-            if (this.prev < i.finallyLoc) return handle(i.finallyLoc);
-          }
-        }
-      }
-    },
-    abrupt: function (t, e) {
-      for (var r = this.tryEntries.length - 1; r >= 0; --r) {
-        var o = this.tryEntries[r];
-        if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) {
-          var i = o;
-          break;
-        }
-      }
-      i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null);
-      var a = i ? i.completion : {};
-      return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a);
-    },
-    complete: function (t, e) {
-      if ("throw" === t.type) throw t.arg;
-      return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y;
-    },
-    finish: function (t) {
-      for (var e = this.tryEntries.length - 1; e >= 0; --e) {
-        var r = this.tryEntries[e];
-        if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y;
-      }
-    },
-    catch: function (t) {
-      for (var e = this.tryEntries.length - 1; e >= 0; --e) {
-        var r = this.tryEntries[e];
-        if (r.tryLoc === t) {
-          var n = r.completion;
-          if ("throw" === n.type) {
-            var o = n.arg;
-            resetTryEntry(r);
-          }
-          return o;
-        }
-      }
-      throw Error("illegal catch attempt");
-    },
-    delegateYield: function (e, r, n) {
-      return this.delegate = {
-        iterator: values(e),
-        resultName: r,
-        nextLoc: n
-      }, "next" === this.method && (this.arg = t), y;
-    }
-  }, e;
-}
-function _setPrototypeOf(t, e) {
-  return _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function (t, e) {
-    return t.__proto__ = e, t;
-  }, _setPrototypeOf(t, e);
-}
-function _slicedToArray(r, e) {
-  return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest();
-}
-function _superPropBase(t, o) {
-  for (; !{}.hasOwnProperty.call(t, o) && null !== (t = _getPrototypeOf(t)););
-  return t;
-}
-function _superPropGet(t, o, e, r) {
-  var p = _get(_getPrototypeOf(1 & r ? t.prototype : t), o, e);
-  return 2 & r && "function" == typeof p ? function (t) {
-    return p.apply(e, t);
-  } : p;
-}
-function _toConsumableArray(r) {
-  return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread();
-}
-function _toPrimitive(t, r) {
-  if ("object" != typeof t || !t) return t;
-  var e = t[Symbol.toPrimitive];
-  if (void 0 !== e) {
-    var i = e.call(t, r || "default");
-    if ("object" != typeof i) return i;
-    throw new TypeError("@@toPrimitive must return a primitive value.");
-  }
-  return ("string" === r ? String : Number)(t);
-}
-function _toPropertyKey(t) {
-  var i = _toPrimitive(t, "string");
-  return "symbol" == typeof i ? i : i + "";
-}
-function _typeof(o) {
-  "@babel/helpers - typeof";
-
-  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
-    return typeof o;
-  } : function (o) {
-    return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
-  }, _typeof(o);
-}
-function _unsupportedIterableToArray(r, a) {
-  if (r) {
-    if ("string" == typeof r) return _arrayLikeToArray(r, a);
-    var t = {}.toString.call(r).slice(8, -1);
-    return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0;
-  }
-}
-
-var LedComponent = /*#__PURE__*/function () {
-  function LedComponent(label, defaultValue, colorGenerator) {
-    _classCallCheck(this, LedComponent);
+class LedComponent {
+  constructor(label, defaultValue, colorGenerator) {
     this.label = label;
     this.colorGenerator = colorGenerator;
     this._isActive = defaultValue;
     this.setupDefaults();
   }
-  return _createClass(LedComponent, [{
-    key: "setupDefaults",
-    value: function setupDefaults() {
-      this.labelFont = "12px Arial";
-      this.labelTextColor = this.colorGenerator.getLabelColor();
-      this.margin = 20;
-      this.outlineColor = this.colorGenerator.getBorderColor();
-      this.valueFont = "12px Arial";
-      this.valueTextColor = this.colorGenerator.getValueColor();
-      this.trueIndicatorColor = "#39e75f";
-      this.falseIndicatorColor = "#777";
-    }
-  }, {
-    key: "isActive",
-    get: function get() {
-      return this._isActive;
-    },
-    set: function set(value) {
-      this._isActive = value;
-    }
-  }, {
-    key: "computeSize",
-    value: function computeSize() {
-      return new Float32Array([220, 20]);
-    }
-  }, {
-    key: "draw",
-    value: function draw(ctx, node, widget_width, y, H) {
-      var drawWidth = widget_width - this.margin * 2;
-      this.drawLabel(ctx, y, H);
-      this.drawValue(ctx, drawWidth, y, H);
-      this.drawIndicator(ctx, drawWidth, y, H);
-    }
-  }, {
-    key: "drawLabel",
-    value: function drawLabel(ctx, y, H) {
-      ctx.font = this.labelFont;
-      ctx.fillStyle = this.labelTextColor;
-      ctx.fillText(this.label, this.margin, y + H * 0.7);
-    }
-  }, {
-    key: "drawValue",
-    value: function drawValue(ctx, drawWidth, y, H) {
-      ctx.font = this.valueFont;
-      ctx.fillStyle = this.valueTextColor;
-      ctx.textAlign = "right";
-      ctx.fillText(this._isActive ? "true" : "false", drawWidth + this.margin - 20, y + H * 0.7);
-    }
-  }, {
-    key: "drawIndicator",
-    value: function drawIndicator(ctx, drawWidth, y, H) {
-      var ledColor = this._isActive ? this.trueIndicatorColor : this.falseIndicatorColor;
-      var glowRadius = H * 0.6;
-      var glowGradient = ctx.createRadialGradient(drawWidth + this.margin - 5, y + H * 0.5, 0, drawWidth + this.margin - 5, y + H * 0.5, glowRadius);
-      glowGradient.addColorStop(0, ledColor);
-      glowGradient.addColorStop(1, "rgba(0, 0, 0, 0)");
-      if (this._isActive) {
-        ctx.fillStyle = glowGradient;
-        ctx.beginPath();
-        ctx.arc(drawWidth + this.margin - 5, y + H * 0.5, glowRadius, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.fillStyle = ledColor;
-      ctx.beginPath();
-      ctx.arc(drawWidth + this.margin - 5, y + H * 0.5, H * 0.35, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = "#222";
-      ctx.stroke();
-    }
-  }]);
-}();
 
-var EventEmitter = /*#__PURE__*/function () {
-  function EventEmitter() {
-    _classCallCheck(this, EventEmitter);
+  setupDefaults() {
+    this.labelFont = "12px Arial";
+    this.labelTextColor = this.colorGenerator.getLabelColor();
+    this.margin = 20;
+    this.outlineColor = this.colorGenerator.getBorderColor();
+    this.valueFont = "12px Arial";
+    this.valueTextColor = this.colorGenerator.getValueColor();
+    this.trueIndicatorColor = "#39e75f";
+    this.falseIndicatorColor = "#777";
+  }
+
+  get isActive() {
+    return this._isActive;
+  }
+
+  set isActive(value) {
+    this._isActive = value;
+  }
+
+  computeSize() {
+    return new Float32Array([220, 20]);
+  }
+
+  draw(ctx, node, widget_width, y, H) {
+    const drawWidth = widget_width - this.margin * 2;
+    this.drawLabel(ctx, y, H);
+    this.drawValue(ctx, drawWidth, y, H);
+    this.drawIndicator(ctx, drawWidth, y, H);
+  }
+
+  drawLabel(ctx, y, H) {
+    ctx.font = this.labelFont;
+    ctx.fillStyle = this.labelTextColor;
+    ctx.fillText(this.label, this.margin, y + H * 0.7);
+  }
+
+  drawValue(ctx, drawWidth, y, H) {
+    ctx.font = this.valueFont;
+    ctx.fillStyle = this.valueTextColor;
+    ctx.textAlign = "right";
+    ctx.fillText(
+      this._isActive ? "true" : "false",
+      drawWidth + this.margin - 20,
+      y + H * 0.7
+    );
+  }
+
+  drawIndicator(ctx, drawWidth, y, H) {
+    const ledColor = this._isActive
+      ? this.trueIndicatorColor
+      : this.falseIndicatorColor;
+
+    const glowRadius = H * 0.6;
+    const glowGradient = ctx.createRadialGradient(
+      drawWidth + this.margin - 5,
+      y + H * 0.5,
+      0,
+      drawWidth + this.margin - 5,
+      y + H * 0.5,
+      glowRadius
+    );
+    glowGradient.addColorStop(0, ledColor);
+    glowGradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+    if (this._isActive) {
+      ctx.fillStyle = glowGradient;
+      ctx.beginPath();
+      ctx.arc(
+        drawWidth + this.margin - 5,
+        y + H * 0.5,
+        glowRadius,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+    }
+
+    ctx.fillStyle = ledColor;
+    ctx.beginPath();
+    ctx.arc(drawWidth + this.margin - 5, y + H * 0.5, H * 0.35, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "#222";
+    ctx.stroke();
+  }
+}
+
+class EventEmitter {
+  constructor() {
     this.listeners = {};
   }
-  return _createClass(EventEmitter, [{
-    key: "on",
-    value: function on(eventName, listener) {
-      if (!this.listeners[eventName]) {
-        this.listeners[eventName] = [];
-      }
-      this.listeners[eventName].push(listener);
-    }
-  }, {
-    key: "off",
-    value: function off(eventName, listener) {
-      var listeners = this.listeners[eventName];
-      if (!listeners) return;
-      var index = listeners.indexOf(listener);
-      if (index !== -1) {
-        listeners.splice(index, 1);
-      }
-    }
-  }, {
-    key: "emit",
-    value: function emit(eventName) {
-      for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        args[_key - 1] = arguments[_key];
-      }
-      var listeners = this.listeners[eventName];
-      if (!listeners) return;
-      listeners.forEach(function (listener) {
-        listener.apply(void 0, args);
-      });
-    }
-  }]);
-}();
 
-var CheckboxComponent = /*#__PURE__*/function () {
-  function CheckboxComponent(label, defaultValue, colorGenerator) {
-    _classCallCheck(this, CheckboxComponent);
+  on(eventName, listener) {
+    if (!this.listeners[eventName]) {
+      this.listeners[eventName] = [];
+    }
+    this.listeners[eventName].push(listener);
+  }
+
+  off(eventName, listener) {
+    const listeners = this.listeners[eventName];
+    if (!listeners) return;
+    const index = listeners.indexOf(listener);
+    if (index !== -1) {
+      listeners.splice(index, 1);
+    }
+  }
+
+  emit(eventName, ...args) {
+    const listeners = this.listeners[eventName];
+    if (!listeners) return;
+    listeners.forEach((listener) => {
+      listener(...args);
+    });
+  }
+}
+
+class CheckboxComponent {
+  constructor(label, defaultValue, colorGenerator) {
     this.eventEmitter = new EventEmitter();
     this.label = label;
     this.colorGenerator = colorGenerator;
     this._isChecked = defaultValue;
     this.setupDefaults();
   }
-  return _createClass(CheckboxComponent, [{
-    key: "setupDefaults",
-    value: function setupDefaults() {
-      this.labelFont = "12px Arial";
-      this.labelTextColor = this.colorGenerator.getLabelColor();
-      this.margin = 20;
-      this.outlineColor = this.colorGenerator.getBorderColor();
-      this.backgroundColor = this.colorGenerator.getBackgroundColor();
-      this.checkboxSize = 20;
-      this.checkboxMargin = 5;
-      this.checkboxColor = this.colorGenerator.getValueColor();
-      this.checkboxX = 0;
-      this.checkboxY = 0;
-      this.labelEndPosition = 0;
+
+  setupDefaults() {
+    this.labelFont = "12px Arial";
+    this.labelTextColor = this.colorGenerator.getLabelColor();
+    this.margin = 20;
+    this.outlineColor = this.colorGenerator.getBorderColor();
+    this.backgroundColor = this.colorGenerator.getBackgroundColor();
+    this.checkboxSize = 20;
+    this.checkboxMargin = 5;
+    this.checkboxColor = this.colorGenerator.getValueColor();
+    this.checkboxX = 0;
+    this.checkboxY = 0;
+    this.labelEndPosition = 0;
+  }
+
+  get isChecked() {
+    return this._isChecked;
+  }
+
+  set isChecked(value) {
+    this._isChecked = value;
+    this.eventEmitter.emit("onChange", this._isChecked);
+  }
+
+  on(eventName, listener) {
+    this.eventEmitter.on(eventName, listener);
+  }
+
+  off(eventName, listener) {
+    this.eventEmitter.off(eventName, listener);
+  }
+
+  isClickInZone(pos) {
+    return (
+      pos[0] >= this.checkboxX &&
+      pos[0] <= this.checkboxX + this.labelEndPosition &&
+      pos[1] >= this.checkboxY &&
+      pos[1] <= this.checkboxY + this.checkboxSize
+    );
+  }
+
+  onMouse(event, pos) {
+    if (event.type === "pointerdown" && this.isClickInZone(pos)) {
+      this.isChecked = !this.isChecked;
     }
-  }, {
-    key: "isChecked",
-    get: function get() {
-      return this._isChecked;
-    },
-    set: function set(value) {
-      this._isChecked = value;
-      this.eventEmitter.emit("onChange", this._isChecked);
-    }
-  }, {
-    key: "on",
-    value: function on(eventName, listener) {
-      this.eventEmitter.on(eventName, listener);
-    }
-  }, {
-    key: "off",
-    value: function off(eventName, listener) {
-      this.eventEmitter.off(eventName, listener);
-    }
-  }, {
-    key: "isClickInZone",
-    value: function isClickInZone(pos) {
-      return pos[0] >= this.checkboxX && pos[0] <= this.checkboxX + this.labelEndPosition && pos[1] >= this.checkboxY && pos[1] <= this.checkboxY + this.checkboxSize;
-    }
-  }, {
-    key: "onMouse",
-    value: function onMouse(event, pos) {
-      if (event.type === "pointerdown" && this.isClickInZone(pos)) {
-        this.isChecked = !this.isChecked;
-      }
-    }
-  }, {
-    key: "computeSize",
-    value: function computeSize() {
-      return new Float32Array([220, 20]);
-    }
-  }, {
-    key: "draw",
-    value: function draw(ctx, node, widget_width, y, H) {
-      this.drawLabel(ctx, y, H);
-      this.drawCheckbox(ctx, y, H);
-    }
-  }, {
-    key: "drawLabel",
-    value: function drawLabel(ctx, y, H) {
-      ctx.font = this.labelFont;
-      ctx.fillStyle = this.labelTextColor;
-      var startX = this.margin * 2 + 5;
-      ctx.fillText(this.label, startX, y + H * 0.7);
-      var textWidth = ctx.measureText(this.label).width;
-      var endX = startX + textWidth;
-      this.labelEndPosition = endX;
-    }
-  }, {
-    key: "drawCheckbox",
-    value: function drawCheckbox(ctx, y, H) {
-      this.checkboxY = y + (H - this.checkboxSize) / 2;
-      this.checkboxX = this.margin;
-      ctx.fillStyle = this.backgroundColor;
-      ctx.strokeStyle = this.outlineColor;
+  }
+
+  computeSize() {
+    return new Float32Array([220, 20]);
+  }
+
+  draw(ctx, node, widget_width, y, H) {
+    this.drawLabel(ctx, y, H);
+    this.drawCheckbox(ctx, y, H);
+  }
+
+  drawLabel(ctx, y, H) {
+    ctx.font = this.labelFont;
+    ctx.fillStyle = this.labelTextColor;
+    const startX = this.margin * 2 + 5;
+    ctx.fillText(this.label, startX, y + H * 0.7);
+    const textWidth = ctx.measureText(this.label).width;
+    const endX = startX + textWidth;
+    this.labelEndPosition = endX;
+  }
+
+  drawCheckbox(ctx, y, H) {
+    this.checkboxY = y + (H - this.checkboxSize) / 2;
+    this.checkboxX = this.margin;
+
+    ctx.fillStyle = this.backgroundColor;
+    ctx.strokeStyle = this.outlineColor;
+    ctx.beginPath();
+
+    // ctx.roundRect(this.margin, y, drawWidth, H, H * 0.2);
+
+    ctx.roundRect(
+      this.checkboxX,
+      this.checkboxY,
+      this.checkboxSize,
+      this.checkboxSize,
+      2
+    );
+    ctx.fill();
+    ctx.stroke();
+
+    if (this._isChecked) {
+      ctx.strokeStyle = this.checkboxColor;
       ctx.beginPath();
-
-      // ctx.roundRect(this.margin, y, drawWidth, H, H * 0.2);
-
-      ctx.roundRect(this.checkboxX, this.checkboxY, this.checkboxSize, this.checkboxSize, 2);
-      ctx.fill();
+      ctx.moveTo(this.checkboxX + 3, this.checkboxY + this.checkboxSize / 2);
+      ctx.lineTo(
+        this.checkboxX + this.checkboxSize / 3,
+        this.checkboxY + this.checkboxSize - 3
+      );
+      ctx.lineTo(this.checkboxX + this.checkboxSize - 3, this.checkboxY + 3);
       ctx.stroke();
-      if (this._isChecked) {
-        ctx.strokeStyle = this.checkboxColor;
-        ctx.beginPath();
-        ctx.moveTo(this.checkboxX + 3, this.checkboxY + this.checkboxSize / 2);
-        ctx.lineTo(this.checkboxX + this.checkboxSize / 3, this.checkboxY + this.checkboxSize - 3);
-        ctx.lineTo(this.checkboxX + this.checkboxSize - 3, this.checkboxY + 3);
-        ctx.stroke();
-      }
     }
-  }]);
-}();
+  }
+}
 
-var ComboboxComponent = /*#__PURE__*/function () {
-  function ComboboxComponent(label, defaultValue, options, colorGenerator) {
-    _classCallCheck(this, ComboboxComponent);
+class ComboboxComponent {
+  constructor(label, defaultValue, options, colorGenerator) {
     this.eventEmitter = new EventEmitter();
     this.label = label;
     this.options = options;
@@ -878,174 +308,169 @@ var ComboboxComponent = /*#__PURE__*/function () {
     this._selection = defaultValue;
     this.setupDefaults();
   }
-  return _createClass(ComboboxComponent, [{
-    key: "setupDefaults",
-    value: function setupDefaults() {
-      this.labelFont = "12px Arial";
-      this.labelTextColor = this.colorGenerator.getLabelColor();
-      this.valueFont = "12px Arial";
-      this.valueTextColor = this.colorGenerator.getValueColor();
-      this.margin = 20;
-      this.outlineColor = this.colorGenerator.getBorderColor();
-      this.backgroundColor = this.colorGenerator.getBackgroundColor();
-    }
-  }, {
-    key: "selection",
-    get: function get() {
-      return this._text;
-    },
-    set: function set(value) {
-      this._selection = value;
-      this.eventEmitter.emit("onChange", this._selection);
-    }
-  }, {
-    key: "on",
-    value: function on(eventName, listener) {
-      this.eventEmitter.on(eventName, listener);
-    }
-  }, {
-    key: "off",
-    value: function off(eventName, listener) {
-      this.eventEmitter.off(eventName, listener);
-    }
-  }, {
-    key: "onMouse",
-    value: function onMouse(event, pos) {
-      var component = this;
-      if (event.type === "pointerdown") {
-        var ref_window = event.target.data.getCanvasWindow();
-        new mobjectLitegraph.LiteGraph.ContextMenu(this.options, {
+
+  setupDefaults() {
+    this.labelFont = "12px Arial";
+    this.labelTextColor = this.colorGenerator.getLabelColor();
+    this.valueFont = "12px Arial";
+    this.valueTextColor = this.colorGenerator.getValueColor();
+    this.margin = 20;
+    this.outlineColor = this.colorGenerator.getBorderColor();
+    this.backgroundColor = this.colorGenerator.getBackgroundColor();
+  }
+
+  get selection() {
+    return this._text;
+  }
+
+  set selection(value) {
+    this._selection = value;
+    this.eventEmitter.emit("onChange", this._selection);
+  }
+
+  on(eventName, listener) {
+    this.eventEmitter.on(eventName, listener);
+  }
+
+  off(eventName, listener) {
+    this.eventEmitter.off(eventName, listener);
+  }
+
+  onMouse(event, pos) {
+    const component = this;
+    if (event.type === "pointerdown") {
+      var ref_window = event.target.data.getCanvasWindow();
+      new mobjectLitegraph.LiteGraph.ContextMenu(
+        this.options,
+        {
           scale: 1,
           event: event,
           className: "dark",
-          callback: function callback(v) {
+          callback: function (v) {
             component.selection = v;
-          }
-        }, ref_window);
-      }
+          },
+        },
+        ref_window
+      );
     }
-  }, {
-    key: "computeSize",
-    value: function computeSize() {
-      var size = new Float32Array([220, 20]);
-      var maxValueWidth = 0;
-      this.options.forEach(function (optionsText) {
-        maxValueWidth = Math.max(maxValueWidth, mobjectLitegraph.LiteGraph.computeTextWidth(optionsText, 0.6));
-      });
-      size[0] = maxValueWidth;
-      size[0] += mobjectLitegraph.LiteGraph.computeTextWidth(this.label);
-      size[0] += 70;
-      size[1] = mobjectLitegraph.LiteGraph.NODE_WIDGET_HEIGHT;
-      return size;
-    }
-  }, {
-    key: "draw",
-    value: function draw(ctx, node, widget_width, y, H) {
-      ctx.textAlign = "left";
-      var drawWidth = widget_width - this.margin * 2;
-      this.drawBackground(ctx, y, drawWidth, H);
-      this.drawLabel(ctx, y, H);
-      this.drawValue(ctx, drawWidth, y, H);
-      this.drawDownArrow(ctx, y, widget_width, H);
-    }
-  }, {
-    key: "drawBackground",
-    value: function drawBackground(ctx, y, drawWidth, H) {
-      ctx.strokeStyle = this.outlineColor;
-      ctx.fillStyle = this.backgroundColor;
-      ctx.beginPath();
-      ctx.roundRect(this.margin, y, drawWidth, H, 2);
-      ctx.fill();
-      ctx.stroke();
-    }
-  }, {
-    key: "drawLabel",
-    value: function drawLabel(ctx, y, H) {
-      ctx.font = this.labelFont;
-      ctx.fillStyle = this.labelTextColor;
-      ctx.fillText(this.label, this.margin + 10, y + H * 0.7);
-    }
-  }, {
-    key: "drawDownArrow",
-    value: function drawDownArrow(ctx, y, widget_width, H) {
-      ctx.fillStyle = this.arrowColor;
-      ctx.beginPath();
-      ctx.moveTo(widget_width - this.margin - 12, y + H - 5);
-      ctx.lineTo(widget_width - this.margin - 18, y + 5);
-      ctx.lineTo(widget_width - this.margin - 6, y + 5);
-      ctx.fill();
-    }
-  }, {
-    key: "drawValue",
-    value: function drawValue(ctx, drawWidth, y, H) {
-      ctx.font = this.valueFont;
-      ctx.fillStyle = this.valueTextColor;
-      ctx.textAlign = "right";
-      ctx.fillText(this._selection, drawWidth - 5, y + H * 0.7);
-    }
-  }]);
-}();
+  }
 
-var NumericDisplayComponent = /*#__PURE__*/function () {
-  function NumericDisplayComponent(label, defaultValue, precision, colorGenerator) {
-    _classCallCheck(this, NumericDisplayComponent);
+  computeSize() {
+    let size = new Float32Array([220, 20]);
+    var maxValueWidth = 0;
+
+    this.options.forEach((optionsText) => {
+      maxValueWidth = Math.max(
+        maxValueWidth,
+        mobjectLitegraph.LiteGraph.computeTextWidth(optionsText, 0.6)
+      );
+    });
+
+    size[0] = maxValueWidth;
+    size[0] += mobjectLitegraph.LiteGraph.computeTextWidth(this.label);
+    size[0] += 70;
+    size[1] = mobjectLitegraph.LiteGraph.NODE_WIDGET_HEIGHT;
+
+    return size;
+  }
+
+  draw(ctx, node, widget_width, y, H) {
+    ctx.textAlign = "left";
+    const drawWidth = widget_width - this.margin * 2;
+    this.drawBackground(ctx, y, drawWidth, H);
+    this.drawLabel(ctx, y, H);
+    this.drawValue(ctx, drawWidth, y, H);
+    this.drawDownArrow(ctx, y, widget_width, H);
+  }
+
+  drawBackground(ctx, y, drawWidth, H) {
+    ctx.strokeStyle = this.outlineColor;
+    ctx.fillStyle = this.backgroundColor;
+    ctx.beginPath();
+    ctx.roundRect(this.margin, y, drawWidth, H, 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  drawLabel(ctx, y, H) {
+    ctx.font = this.labelFont;
+    ctx.fillStyle = this.labelTextColor;
+    ctx.fillText(this.label, this.margin + 10, y + H * 0.7);
+  }
+
+  drawDownArrow(ctx, y, widget_width, H) {
+    ctx.fillStyle = this.arrowColor;
+    ctx.beginPath();
+    ctx.moveTo(widget_width - this.margin - 12, y + H - 5);
+    ctx.lineTo(widget_width - this.margin - 18, y + 5);
+    ctx.lineTo(widget_width - this.margin - 6, y + 5);
+    ctx.fill();
+  }
+
+  drawValue(ctx, drawWidth, y, H) {
+    ctx.font = this.valueFont;
+    ctx.fillStyle = this.valueTextColor;
+    ctx.textAlign = "right";
+    ctx.fillText(this._selection, drawWidth - 5, y + H * 0.7);
+  }
+}
+
+class NumericDisplayComponent {
+  constructor(label, defaultValue, precision, colorGenerator) {
     this.label = label;
     this.precision = precision;
     this.colorGenerator = colorGenerator;
     this._value = defaultValue;
     this.setupDefaults();
   }
-  return _createClass(NumericDisplayComponent, [{
-    key: "setupDefaults",
-    value: function setupDefaults() {
-      this.labelFont = "12px Arial";
-      this.valueFont = "12px Arial";
-      this.margin = 20;
-      this.labelTextColor = this.colorGenerator.getLabelColor();
-      this.valueTextColor = this.colorGenerator.getValueColor();
-    }
-  }, {
-    key: "value",
-    get: function get() {
-      return this._value;
-    },
-    set: function set(value) {
-      this._value = value;
-    }
-  }, {
-    key: "computeSize",
-    value: function computeSize() {
-      return new Float32Array([220, 20]);
-    }
-  }, {
-    key: "draw",
-    value: function draw(ctx, node, widget_width, y, H) {
-      ctx.textAlign = "left";
-      var drawWidth = widget_width - this.margin * 2;
-      this.drawLabel(ctx, y, H);
-      this.drawValue(ctx, drawWidth, y, H);
-    }
-  }, {
-    key: "drawLabel",
-    value: function drawLabel(ctx, y, H) {
-      ctx.font = this.labelFont;
-      ctx.fillStyle = this.labelTextColor;
-      ctx.fillText(this.label, this.margin, y + H * 0.7);
-    }
-  }, {
-    key: "drawValue",
-    value: function drawValue(ctx, drawWidth, y, H) {
-      ctx.font = this.valueFont;
-      ctx.fillStyle = this.valueTextColor;
-      ctx.textAlign = "right";
-      ctx.fillText(Number(this._value).toFixed(this.precision), drawWidth + this.margin - 5, y + H * 0.7);
-    }
-  }]);
-}();
 
-var NumericInputComponent = /*#__PURE__*/function () {
-  function NumericInputComponent(label, defaultValue, precision, limiter, colorGenerator) {
-    _classCallCheck(this, NumericInputComponent);
+  setupDefaults() {
+    this.labelFont = "12px Arial";
+    this.valueFont = "12px Arial";
+    this.margin = 20;
+    this.labelTextColor = this.colorGenerator.getLabelColor();
+    this.valueTextColor = this.colorGenerator.getValueColor();
+  }
+
+  get value() {
+    return this._value;
+  }
+
+  set value(value) {
+    this._value = value;
+  }
+
+  computeSize() {
+    return new Float32Array([220, 20]);
+  }
+
+  draw(ctx, node, widget_width, y, H) {
+    ctx.textAlign = "left";
+    const drawWidth = widget_width - this.margin * 2;
+    this.drawLabel(ctx, y, H);
+    this.drawValue(ctx, drawWidth, y, H);
+  }
+
+  drawLabel(ctx, y, H) {
+    ctx.font = this.labelFont;
+    ctx.fillStyle = this.labelTextColor;
+    ctx.fillText(this.label, this.margin, y + H * 0.7);
+  }
+
+  drawValue(ctx, drawWidth, y, H) {
+    ctx.font = this.valueFont;
+    ctx.fillStyle = this.valueTextColor;
+    ctx.textAlign = "right";
+    ctx.fillText(
+      Number(this._value).toFixed(this.precision),
+      drawWidth + this.margin - 5,
+      y + H * 0.7
+    );
+  }
+}
+
+class NumericInputComponent {
+  constructor(label, defaultValue, precision, limiter, colorGenerator) {
     this.eventEmitter = new EventEmitter();
     this.label = label;
     this.precision = precision;
@@ -1057,125 +482,117 @@ var NumericInputComponent = /*#__PURE__*/function () {
     this.step = this.calculateStep(precision);
     this.setupDefaults();
   }
-  return _createClass(NumericInputComponent, [{
-    key: "setupDefaults",
-    value: function setupDefaults() {
-      this.labelFont = "12px Arial";
-      this.valueFont = "12px Arial";
-      this.margin = 20;
-      this.labelTextColor = this.colorGenerator.getLabelColor();
-      this.valueTextColor = this.colorGenerator.getValueColor();
-      this.outlineColor = this.colorGenerator.getBorderColor();
-      this.backgroundColor = this.colorGenerator.getBackgroundColor();
-      this.arrowColor = this.colorGenerator.getValueColor();
+
+  setupDefaults() {
+    this.labelFont = "12px Arial";
+    this.valueFont = "12px Arial";
+    this.margin = 20;
+    this.labelTextColor = this.colorGenerator.getLabelColor();
+    this.valueTextColor = this.colorGenerator.getValueColor();
+    this.outlineColor = this.colorGenerator.getBorderColor();
+    this.backgroundColor = this.colorGenerator.getBackgroundColor();
+    this.arrowColor = this.colorGenerator.getValueColor();
+  }
+
+  get value() {
+    return this._value;
+  }
+
+  set value(value) {
+    this._value = value;
+    this.eventEmitter.emit("onChange", this._value);
+  }
+
+  on(eventName, listener) {
+    this.eventEmitter.on(eventName, listener);
+  }
+
+  off(eventName, listener) {
+    this.eventEmitter.off(eventName, listener);
+  }
+
+  computeSize() {
+    return new Float32Array([220, 20]);
+  }
+
+  onMouse(event, pos, node) {
+    const x = pos[0];
+    const widgetWidth = node.size[0];
+    const multiplier = this.getMultiplier(event);
+
+    if (event.type === "pointerdown") {
+      this.handleMouseDown(x, widgetWidth, multiplier);
+    } else if (event.type === "pointermove") {
+      this.handleMouseMove(x, multiplier);
+    } else if (event.type === "pointerup") {
+      this.handleMouseUp(x, widgetWidth, event);
     }
-  }, {
-    key: "value",
-    get: function get() {
-      return this._value;
-    },
-    set: function set(value) {
-      this._value = value;
-      this.eventEmitter.emit("onChange", this._value);
+  }
+
+  calculateStep(precision) {
+    return Math.pow(10, -Math.abs(precision));
+  }
+
+  getMultiplier(event) {
+    if (event.shiftKey && event.ctrlKey) {
+      return 100;
+    } else if (event.shiftKey) {
+      return 10;
+    } else {
+      return 1;
     }
-  }, {
-    key: "on",
-    value: function on(eventName, listener) {
-      this.eventEmitter.on(eventName, listener);
-    }
-  }, {
-    key: "off",
-    value: function off(eventName, listener) {
-      this.eventEmitter.off(eventName, listener);
-    }
-  }, {
-    key: "computeSize",
-    value: function computeSize() {
-      return new Float32Array([220, 20]);
-    }
-  }, {
-    key: "onMouse",
-    value: function onMouse(event, pos, node) {
-      var x = pos[0];
-      var widgetWidth = node.size[0];
-      var multiplier = this.getMultiplier(event);
-      if (event.type === "pointerdown") {
-        this.handleMouseDown(x, widgetWidth, multiplier);
-      } else if (event.type === "pointermove") {
-        this.handleMouseMove(x, multiplier);
-      } else if (event.type === "pointerup") {
-        this.handleMouseUp(x, widgetWidth, event);
-      }
-    }
-  }, {
-    key: "calculateStep",
-    value: function calculateStep(precision) {
-      return Math.pow(10, -Math.abs(precision));
-    }
-  }, {
-    key: "getMultiplier",
-    value: function getMultiplier(event) {
-      if (event.shiftKey && event.ctrlKey) {
-        return 100;
-      } else if (event.shiftKey) {
-        return 10;
-      } else {
-        return 1;
-      }
-    }
-  }, {
-    key: "handleMouseDown",
-    value: function handleMouseDown(x, widgetWidth, multiplier) {
-      this.isMyMouseEvent = true;
-      this.isDragging = false;
-      this.startX = x;
-      this.adjustValueByPosition(x, widgetWidth, multiplier);
-    }
-  }, {
-    key: "handleMouseMove",
-    value: function handleMouseMove(currentX, multiplier) {
-      if (!this.isMyMouseEvent) return;
-      if (Math.abs(currentX - this.startX) > 1) {
-        var stepCount = Math.floor(currentX - this.startX);
-        this.limiter.incrementBy(stepCount * this.step * multiplier);
-        this._value = this.limiter.getValue();
-        this.startX = currentX;
-        this.isDragging = true;
-      }
-    }
-  }, {
-    key: "handleMouseUp",
-    value: function handleMouseUp(x, widgetWidth, event) {
-      if (!this.isDragging && this.isInsideInputArea(x, widgetWidth)) {
-        this.promptForValue(event);
-      }
-      this.isDragging = false;
-      this.isMyMouseEvent = false;
-      this.updateValueOnRelease();
-    }
-  }, {
-    key: "isInsideInputArea",
-    value: function isInsideInputArea(x, widgetWidth) {
-      return x > 40 && x < widgetWidth - 40;
-    }
-  }, {
-    key: "adjustValueByPosition",
-    value: function adjustValueByPosition(x, widgetWidth, multiplier) {
-      if (x < 40) {
-        // down arrow
-        this.limiter.decrementBy(this.step * multiplier);
-      } else if (x > widgetWidth - 40) {
-        // up arrow
-        this.limiter.incrementBy(this.step * multiplier);
-      }
+  }
+
+  handleMouseDown(x, widgetWidth, multiplier) {
+    this.isMyMouseEvent = true;
+    this.isDragging = false;
+    this.startX = x;
+    this.adjustValueByPosition(x, widgetWidth, multiplier);
+  }
+
+  handleMouseMove(currentX, multiplier) {
+    if (!this.isMyMouseEvent) return;
+    if (Math.abs(currentX - this.startX) > 1) {
+      const stepCount = Math.floor(currentX - this.startX);
+      this.limiter.incrementBy(stepCount * this.step * multiplier);
       this._value = this.limiter.getValue();
+      this.startX = currentX;
+      this.isDragging = true;
     }
-  }, {
-    key: "promptForValue",
-    value: function promptForValue(event) {
-      var widget = this;
-      event.target.data.prompt("Value", this.value.toString(), function (inputValue) {
-        var value = Number(inputValue);
+  }
+
+  handleMouseUp(x, widgetWidth, event) {
+    if (!this.isDragging && this.isInsideInputArea(x, widgetWidth)) {
+      this.promptForValue(event);
+    }
+    this.isDragging = false;
+    this.isMyMouseEvent = false;
+    this.updateValueOnRelease();
+  }
+
+  isInsideInputArea(x, widgetWidth) {
+    return x > 40 && x < widgetWidth - 40;
+  }
+
+  adjustValueByPosition(x, widgetWidth, multiplier) {
+    if (x < 40) {
+      // down arrow
+      this.limiter.decrementBy(this.step * multiplier);
+    } else if (x > widgetWidth - 40) {
+      // up arrow
+      this.limiter.incrementBy(this.step * multiplier);
+    }
+    this._value = this.limiter.getValue();
+  }
+
+  promptForValue(event) {
+    let widget = this;
+
+    event.target.data.prompt(
+      "Value",
+      this.value.toString(),
+      function (inputValue) {
+        const value = Number(inputValue);
         if (!isNaN(value)) {
           widget.limiter.setValue(value);
           widget.value = widget.limiter.getValue();
@@ -1183,1128 +600,1186 @@ var NumericInputComponent = /*#__PURE__*/function () {
         } else {
           console.error("Invalid input: Input is not a number.");
         }
-      }, event);
-    }
-  }, {
-    key: "updateValueOnRelease",
-    value: function updateValueOnRelease() {
-      this.limiter.setValue(this.value);
-      this.value = this.limiter.getValue();
-    }
-  }, {
-    key: "draw",
-    value: function draw(ctx, node, widget_width, y, H) {
-      ctx.textAlign = "left";
-      var drawWidth = widget_width - this.margin * 2;
-      this.drawBackground(ctx, y, drawWidth, H);
-      this.drawLeftArrow(ctx, y, H);
-      this.drawRightArrow(ctx, y, widget_width, H);
-      this.drawLabel(ctx, y, H);
-      this.drawValue(ctx, drawWidth, y, H);
-    }
-  }, {
-    key: "drawBackground",
-    value: function drawBackground(ctx, y, drawWidth, H) {
-      ctx.strokeStyle = this.outlineColor;
-      ctx.fillStyle = this.backgroundColor;
-      ctx.beginPath();
-      ctx.roundRect(this.margin, y, drawWidth, H, 2);
-      ctx.fill();
-      ctx.stroke();
-    }
-  }, {
-    key: "drawLeftArrow",
-    value: function drawLeftArrow(ctx, y, H) {
-      ctx.fillStyle = this.arrowColor;
-      ctx.beginPath();
-      ctx.moveTo(this.margin + 16, y + 5);
-      ctx.lineTo(this.margin + 6, y + H * 0.5);
-      ctx.lineTo(this.margin + 16, y + H - 5);
-      ctx.fill();
-    }
-  }, {
-    key: "drawRightArrow",
-    value: function drawRightArrow(ctx, y, widget_width, H) {
-      ctx.fillStyle = this.arrowColor;
-      ctx.beginPath();
-      ctx.moveTo(widget_width - this.margin - 16, y + 5);
-      ctx.lineTo(widget_width - this.margin - 6, y + H * 0.5);
-      ctx.lineTo(widget_width - this.margin - 16, y + H - 5);
-      ctx.fill();
-    }
-  }, {
-    key: "drawLabel",
-    value: function drawLabel(ctx, y, H) {
-      ctx.font = this.labelFont;
-      ctx.fillStyle = this.labelTextColor;
-      ctx.fillText(this.label, this.margin * 2 + 5, y + H * 0.7);
-    }
-  }, {
-    key: "drawValue",
-    value: function drawValue(ctx, drawWidth, y, H) {
-      ctx.font = this.valueFont;
-      ctx.fillStyle = this.valueTextColor;
-      ctx.textAlign = "right";
-      ctx.fillText(Number(this._value).toFixed(this.precision), drawWidth - 5, y + H * 0.7);
-    }
-  }]);
-}();
+      },
+      event
+    );
+  }
 
-var SingleLineTextDisplayComponent = /*#__PURE__*/function () {
-  function SingleLineTextDisplayComponent(label, defaultValue, colorGenerator) {
-    _classCallCheck(this, SingleLineTextDisplayComponent);
+  updateValueOnRelease() {
+    this.limiter.setValue(this.value);
+    this.value = this.limiter.getValue();
+  }
+
+  draw(ctx, node, widget_width, y, H) {
+    ctx.textAlign = "left";
+    const drawWidth = widget_width - this.margin * 2;
+    this.drawBackground(ctx, y, drawWidth, H);
+    this.drawLeftArrow(ctx, y, H);
+    this.drawRightArrow(ctx, y, widget_width, H);
+    this.drawLabel(ctx, y, H);
+    this.drawValue(ctx, drawWidth, y, H);
+  }
+
+  drawBackground(ctx, y, drawWidth, H) {
+    ctx.strokeStyle = this.outlineColor;
+    ctx.fillStyle = this.backgroundColor;
+    ctx.beginPath();
+    ctx.roundRect(this.margin, y, drawWidth, H, 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  drawLeftArrow(ctx, y, H) {
+    ctx.fillStyle = this.arrowColor;
+    ctx.beginPath();
+    ctx.moveTo(this.margin + 16, y + 5);
+    ctx.lineTo(this.margin + 6, y + H * 0.5);
+    ctx.lineTo(this.margin + 16, y + H - 5);
+    ctx.fill();
+  }
+
+  drawRightArrow(ctx, y, widget_width, H) {
+    ctx.fillStyle = this.arrowColor;
+    ctx.beginPath();
+    ctx.moveTo(widget_width - this.margin - 16, y + 5);
+    ctx.lineTo(widget_width - this.margin - 6, y + H * 0.5);
+    ctx.lineTo(widget_width - this.margin - 16, y + H - 5);
+    ctx.fill();
+  }
+
+  drawLabel(ctx, y, H) {
+    ctx.font = this.labelFont;
+    ctx.fillStyle = this.labelTextColor;
+    ctx.fillText(this.label, this.margin * 2 + 5, y + H * 0.7);
+  }
+
+  drawValue(ctx, drawWidth, y, H) {
+    ctx.font = this.valueFont;
+    ctx.fillStyle = this.valueTextColor;
+    ctx.textAlign = "right";
+    ctx.fillText(
+      Number(this._value).toFixed(this.precision),
+      drawWidth - 5,
+      y + H * 0.7
+    );
+  }
+}
+
+class SingleLineTextDisplayComponent {
+  constructor(label, defaultValue, colorGenerator) {
     this.label = label;
     this.colorGenerator = colorGenerator;
     this._text = defaultValue;
     this.setupDefaults();
   }
-  return _createClass(SingleLineTextDisplayComponent, [{
-    key: "setupDefaults",
-    value: function setupDefaults() {
-      this.labelFont = "12px Arial";
-      this.labelTextColor = this.colorGenerator.getLabelColor();
-      this.valueFont = "12px Arial";
-      this.valueTextColor = this.colorGenerator.getValueColor();
-      this.margin = 20;
-      this.outlineColor = this.colorGenerator.getBorderColor();
-      this.backgroundColor = this.colorGenerator.getBackgroundColor();
-    }
-  }, {
-    key: "text",
-    get: function get() {
-      return this._text;
-    },
-    set: function set(value) {
-      this._text = value;
-    }
-  }, {
-    key: "computeSize",
-    value: function computeSize() {
-      return new Float32Array([220, 20]);
-    }
-  }, {
-    key: "draw",
-    value: function draw(ctx, node, widget_width, y, H) {
-      ctx.textAlign = "left";
-      var drawWidth = widget_width - this.margin * 2;
-      this.drawLabel(ctx, y, H);
-      this.drawText(ctx, drawWidth, y, H);
-    }
-  }, {
-    key: "drawLabel",
-    value: function drawLabel(ctx, y, H) {
-      ctx.font = this.labelFont;
-      ctx.fillStyle = this.labelTextColor;
-      ctx.fillText(this.label, this.margin, y + H * 0.7);
-    }
-  }, {
-    key: "drawText",
-    value: function drawText(ctx, drawWidth, y, H) {
-      ctx.font = this.valueFont;
-      ctx.fillStyle = this.valueTextColor;
-      ctx.textAlign = "right";
-      ctx.fillText(this._text, drawWidth + this.margin, y + H * 0.7);
-    }
-  }]);
-}();
 
-var SingleLineTextInputComponent = /*#__PURE__*/function () {
-  function SingleLineTextInputComponent(label, defaultValue, colorGenerator) {
-    _classCallCheck(this, SingleLineTextInputComponent);
+  setupDefaults() {
+    this.labelFont = "12px Arial";
+    this.labelTextColor = this.colorGenerator.getLabelColor();
+    this.valueFont = "12px Arial";
+    this.valueTextColor = this.colorGenerator.getValueColor();
+    this.margin = 20;
+    this.outlineColor = this.colorGenerator.getBorderColor();
+    this.backgroundColor = this.colorGenerator.getBackgroundColor();
+  }
+
+  get text() {
+    return this._text;
+  }
+
+  set text(value) {
+    this._text = value;
+  }
+
+  computeSize() {
+    return new Float32Array([220, 20]);
+  }
+
+  draw(ctx, node, widget_width, y, H) {
+    ctx.textAlign = "left";
+    const drawWidth = widget_width - this.margin * 2;
+    this.drawLabel(ctx, y, H);
+    this.drawText(ctx, drawWidth, y, H);
+  }
+
+  drawLabel(ctx, y, H) {
+    ctx.font = this.labelFont;
+    ctx.fillStyle = this.labelTextColor;
+    ctx.fillText(this.label, this.margin, y + H * 0.7);
+  }
+
+  drawText(ctx, drawWidth, y, H) {
+    ctx.font = this.valueFont;
+    ctx.fillStyle = this.valueTextColor;
+    ctx.textAlign = "right";
+    ctx.fillText(this._text, drawWidth + this.margin, y + H * 0.7);
+  }
+}
+
+class SingleLineTextInputComponent {
+  constructor(label, defaultValue, colorGenerator) {
     this.eventEmitter = new EventEmitter();
     this.label = label;
     this.colorGenerator = colorGenerator;
     this._text = defaultValue;
     this.setupDefaults();
   }
-  return _createClass(SingleLineTextInputComponent, [{
-    key: "setupDefaults",
-    value: function setupDefaults() {
-      this.labelFont = "12px Arial";
-      this.labelTextColor = this.colorGenerator.getLabelColor();
-      this.valueFont = "12px Arial";
-      this.valueTextColor = this.colorGenerator.getValueColor();
-      this.margin = 20;
-      this.outlineColor = this.colorGenerator.getBorderColor();
-      this.backgroundColor = this.colorGenerator.getBackgroundColor();
-    }
-  }, {
-    key: "text",
-    get: function get() {
-      return this._text;
-    },
-    set: function set(value) {
-      this._text = value;
-      this.eventEmitter.emit("onChange", this._text);
-    }
-  }, {
-    key: "on",
-    value: function on(eventName, listener) {
-      this.eventEmitter.on(eventName, listener);
-    }
-  }, {
-    key: "off",
-    value: function off(eventName, listener) {
-      this.eventEmitter.off(eventName, listener);
-    }
-  }, {
-    key: "onMouse",
-    value: function onMouse(event, pos) {
-      var component = this;
-      if (event.type === "pointerdown") {
-        event.target.data.prompt("Value", this._text, function (v) {
-          component.text = v;
-        }, event);
-      }
-    }
-  }, {
-    key: "computeSize",
-    value: function computeSize() {
-      return new Float32Array([220, 20]);
-    }
-  }, {
-    key: "draw",
-    value: function draw(ctx, node, widget_width, y, H) {
-      ctx.textAlign = "left";
-      var drawWidth = widget_width - this.margin * 2;
-      this.drawBackground(ctx, y, drawWidth, H);
-      this.drawLabel(ctx, y, H);
-      this.drawText(ctx, drawWidth, y, H);
-    }
-  }, {
-    key: "drawBackground",
-    value: function drawBackground(ctx, y, drawWidth, H) {
-      ctx.strokeStyle = this.outlineColor;
-      ctx.fillStyle = this.backgroundColor;
-      ctx.beginPath();
-      ctx.roundRect(this.margin, y, drawWidth, H, 2);
-      ctx.fill();
-      ctx.stroke();
-    }
-  }, {
-    key: "drawLabel",
-    value: function drawLabel(ctx, y, H) {
-      ctx.font = this.labelFont;
-      ctx.fillStyle = this.labelTextColor;
-      ctx.fillText(this.label, this.margin + 10, y + H * 0.7);
-    }
-  }, {
-    key: "drawText",
-    value: function drawText(ctx, drawWidth, y, H) {
-      ctx.font = this.valueFont;
-      ctx.fillStyle = this.valueTextColor;
-      ctx.textAlign = "right";
-      ctx.fillText(this._text, this.margin + drawWidth - 10, y + H * 0.7);
-    }
-  }]);
-}();
 
-var ColorGenerator = /*#__PURE__*/function () {
-  function ColorGenerator(type) {
-    var other = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
-    _classCallCheck(this, ColorGenerator);
-    _defineProperty(this, "LABEL_BRIGHTNESS", 70);
-    _defineProperty(this, "LABEL_SATURATION", 0);
-    _defineProperty(this, "VALUE_BRIGHTNESS", 90);
-    _defineProperty(this, "VALUE_SATURATION", 0);
-    _defineProperty(this, "BORDER_BRIGHTNESS", 50);
-    _defineProperty(this, "BORDER_SATURATION", 0);
-    _defineProperty(this, "BACKGROUND_BRIGHTNESS", 10);
-    _defineProperty(this, "BACKGROUND_SATURATION", 0);
+  setupDefaults() {
+    this.labelFont = "12px Arial";
+    this.labelTextColor = this.colorGenerator.getLabelColor();
+    this.valueFont = "12px Arial";
+    this.valueTextColor = this.colorGenerator.getValueColor();
+    this.margin = 20;
+    this.outlineColor = this.colorGenerator.getBorderColor();
+    this.backgroundColor = this.colorGenerator.getBackgroundColor();
+  }
+
+  get text() {
+    return this._text;
+  }
+
+  set text(value) {
+    this._text = value;
+    this.eventEmitter.emit("onChange", this._text);
+  }
+
+  on(eventName, listener) {
+    this.eventEmitter.on(eventName, listener);
+  }
+
+  off(eventName, listener) {
+    this.eventEmitter.off(eventName, listener);
+  }
+
+  onMouse(event, pos) {
+    const component = this;
+    if (event.type === "pointerdown") {
+      event.target.data.prompt(
+        "Value",
+        this._text,
+        function (v) {
+          component.text = v;
+        },
+        event
+      );
+    }
+  }
+
+  computeSize() {
+    return new Float32Array([220, 20]);
+  }
+
+  draw(ctx, node, widget_width, y, H) {
+    ctx.textAlign = "left";
+    const drawWidth = widget_width - this.margin * 2;
+    this.drawBackground(ctx, y, drawWidth, H);
+    this.drawLabel(ctx, y, H);
+    this.drawText(ctx, drawWidth, y, H);
+  }
+
+  drawBackground(ctx, y, drawWidth, H) {
+    ctx.strokeStyle = this.outlineColor;
+    ctx.fillStyle = this.backgroundColor;
+    ctx.beginPath();
+    ctx.roundRect(this.margin, y, drawWidth, H, 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  drawLabel(ctx, y, H) {
+    ctx.font = this.labelFont;
+    ctx.fillStyle = this.labelTextColor;
+    ctx.fillText(this.label, this.margin + 10, y + H * 0.7);
+  }
+
+  drawText(ctx, drawWidth, y, H) {
+    ctx.font = this.valueFont;
+    ctx.fillStyle = this.valueTextColor;
+    ctx.textAlign = "right";
+    ctx.fillText(this._text, this.margin + drawWidth - 10, y + H * 0.7);
+  }
+}
+
+class ColorGenerator {
+  LABEL_BRIGHTNESS = 70;
+  LABEL_SATURATION = 0;
+  VALUE_BRIGHTNESS = 90;
+  VALUE_SATURATION = 0;
+  BORDER_BRIGHTNESS = 50;
+  BORDER_SATURATION = 0;
+  BACKGROUND_BRIGHTNESS = 10;
+  BACKGROUND_SATURATION = 0;
+  constructor(type, other = "") {
     this.type = type;
     this.other = other;
   }
-  return _createClass(ColorGenerator, [{
-    key: "generateHsl",
-    value: function generateHsl(saturation, brightness) {
-      var hash = 0;
-      for (var i = 0; i < this.type.length; i++) {
-        hash = this.type.charCodeAt(i) + ((hash << 5) - hash);
-      }
-      for (var _i = 0; _i < this.other.length; _i++) {
-        hash = this.other.charCodeAt(_i) + ((hash << 5) - hash);
-      }
-      var hue = Math.abs(hash) % 360;
-      return "hsl(".concat(hue, ", ").concat(saturation, "%, ").concat(brightness, "%)");
-    }
-  }, {
-    key: "getLabelColor",
-    value: function getLabelColor() {
-      return this.generateHsl(this.LABEL_SATURATION, this.LABEL_BRIGHTNESS);
-    }
-  }, {
-    key: "getValueColor",
-    value: function getValueColor() {
-      return this.generateHsl(this.VALUE_SATURATION, this.VALUE_BRIGHTNESS);
-    }
-  }, {
-    key: "getBorderColor",
-    value: function getBorderColor() {
-      return this.generateHsl(this.BORDER_SATURATION, this.BORDER_BRIGHTNESS);
-    }
-  }, {
-    key: "getBackgroundColor",
-    value: function getBackgroundColor() {
-      return this.generateHsl(this.BACKGROUND_SATURATION, this.BACKGROUND_BRIGHTNESS);
-    }
-  }]);
-}();
 
-var _minimum = /*#__PURE__*/new WeakMap();
-var _maximum = /*#__PURE__*/new WeakMap();
-var _value = /*#__PURE__*/new WeakMap();
-var _numberType = /*#__PURE__*/new WeakMap();
-var _precision = /*#__PURE__*/new WeakMap();
-var _limitMinimum = /*#__PURE__*/new WeakMap();
-var _limitMaximum = /*#__PURE__*/new WeakMap();
-var _NumberLimiter_brand = /*#__PURE__*/new WeakSet();
-var NumberLimiter = /*#__PURE__*/function () {
-  function NumberLimiter(minimum, maximum, initialValue) {
-    var numberType = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-    var precision = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 2;
-    _classCallCheck(this, NumberLimiter);
-    _classPrivateMethodInitSpec(this, _NumberLimiter_brand);
-    _classPrivateFieldInitSpec(this, _minimum, void 0);
-    _classPrivateFieldInitSpec(this, _maximum, void 0);
-    _classPrivateFieldInitSpec(this, _value, void 0);
-    _classPrivateFieldInitSpec(this, _numberType, void 0);
-    _classPrivateFieldInitSpec(this, _precision, void 0);
-    _classPrivateFieldInitSpec(this, _limitMinimum, void 0);
-    _classPrivateFieldInitSpec(this, _limitMaximum, void 0);
-    _classPrivateFieldSet2(_minimum, this, minimum);
-    _classPrivateFieldSet2(_maximum, this, maximum);
-    _classPrivateFieldSet2(_value, this, initialValue);
-    _classPrivateFieldSet2(_numberType, this, numberType);
-    _classPrivateFieldSet2(_precision, this, precision);
-    _assertClassBrand(_NumberLimiter_brand, this, _initLimits).call(this);
-    this.setValue(_classPrivateFieldGet2(_value, this));
+  generateHsl(saturation, brightness) {
+    let hash = 0;
+    for (let i = 0; i < this.type.length; i++) {
+      hash = this.type.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    for (let i = 0; i < this.other.length; i++) {
+      hash = this.other.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    const hue = Math.abs(hash) % 360;
+
+    return `hsl(${hue}, ${saturation}%, ${brightness}%)`;
   }
-  return _createClass(NumberLimiter, [{
-    key: "setValue",
-    value: function setValue(newValue) {
-      if (_assertClassBrand(_NumberLimiter_brand, this, _shouldAdjust).call(this, newValue)) {
-        newValue += 1;
-      }
-      newValue = parseFloat(newValue.toFixed(_classPrivateFieldGet2(_precision, this)));
-      _classPrivateFieldSet2(_value, this, Math.min(Math.max(newValue, _classPrivateFieldGet2(_limitMinimum, this)), _classPrivateFieldGet2(_limitMaximum, this)));
-    }
-  }, {
-    key: "incrementBy",
-    value: function incrementBy(amount) {
-      if (_assertClassBrand(_NumberLimiter_brand, this, _shouldAdjust).call(this, _classPrivateFieldGet2(_value, this) + amount)) {
-        amount += 1;
-      }
-      this.setValue(_classPrivateFieldGet2(_value, this) + amount);
-    }
-  }, {
-    key: "decrementBy",
-    value: function decrementBy(amount) {
-      if (_assertClassBrand(_NumberLimiter_brand, this, _shouldAdjust).call(this, _classPrivateFieldGet2(_value, this) - amount)) {
-        amount += 1;
-      }
-      this.setValue(_classPrivateFieldGet2(_value, this) - amount);
-    }
-  }, {
-    key: "getValue",
-    value: function getValue() {
-      return _classPrivateFieldGet2(_value, this);
-    }
-  }]);
-}();
-function _shouldAdjust(number) {
-  if (_classPrivateFieldGet2(_numberType, this) === "odd" && number % 2 === 0) return true;
-  if (_classPrivateFieldGet2(_numberType, this) === "even" && number % 2 !== 0) return true;
-  return false;
-}
-function _adjustLimit(limit, adjustment) {
-  return _assertClassBrand(_NumberLimiter_brand, this, _shouldAdjust).call(this, limit) ? limit + adjustment : limit;
-}
-function _initLimits() {
-  _classPrivateFieldSet2(_limitMinimum, this, _assertClassBrand(_NumberLimiter_brand, this, _adjustLimit).call(this, _classPrivateFieldGet2(_minimum, this), 1));
-  _classPrivateFieldSet2(_limitMaximum, this, _assertClassBrand(_NumberLimiter_brand, this, _adjustLimit).call(this, _classPrivateFieldGet2(_maximum, this), -1));
+
+  getLabelColor() {
+    return this.generateHsl(this.LABEL_SATURATION, this.LABEL_BRIGHTNESS);
+  }
+
+  getValueColor() {
+    return this.generateHsl(this.VALUE_SATURATION, this.VALUE_BRIGHTNESS);
+  }
+
+  getBorderColor() {
+    return this.generateHsl(this.BORDER_SATURATION, this.BORDER_BRIGHTNESS);
+  }
+
+  getBackgroundColor() {
+    return this.generateHsl(
+      this.BACKGROUND_SATURATION,
+      this.BACKGROUND_BRIGHTNESS
+    );
+  }
 }
 
-var WILDCARD = "*";
-var DISPLAY = "display";
-var CONTROL = "control";
-var _parent = /*#__PURE__*/new WeakMap();
-var _content = /*#__PURE__*/new WeakMap();
-var DisplayWidget = /*#__PURE__*/function () {
-  function DisplayWidget(name, parent) {
-    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    _classCallCheck(this, DisplayWidget);
-    _classPrivateFieldInitSpec(this, _parent, null);
-    _classPrivateFieldInitSpec(this, _content, null);
+class NumberLimiter {
+  #minimum;
+  #maximum;
+  #value;
+  #numberType;
+  #precision;
+  #limitMinimum;
+  #limitMaximum;
+
+  constructor(
+    minimum,
+    maximum,
+    initialValue,
+    numberType = null,
+    precision = 2
+  ) {
+    this.#minimum = minimum;
+    this.#maximum = maximum;
+    this.#value = initialValue;
+    this.#numberType = numberType;
+    this.#precision = precision;
+
+    this.#initLimits();
+    this.setValue(this.#value);
+  }
+
+  #shouldAdjust(number) {
+    if (this.#numberType === "odd" && number % 2 === 0) return true;
+    if (this.#numberType === "even" && number % 2 !== 0) return true;
+    return false;
+  }
+
+  #adjustLimit(limit, adjustment) {
+    return this.#shouldAdjust(limit) ? limit + adjustment : limit;
+  }
+
+  #initLimits() {
+    this.#limitMinimum = this.#adjustLimit(this.#minimum, 1);
+    this.#limitMaximum = this.#adjustLimit(this.#maximum, -1);
+  }
+
+  setValue(newValue) {
+    if (this.#shouldAdjust(newValue)) {
+      newValue += 1;
+    }
+    newValue = parseFloat(newValue.toFixed(this.#precision));
+    this.#value = Math.min(
+      Math.max(newValue, this.#limitMinimum),
+      this.#limitMaximum
+    );
+  }
+
+  incrementBy(amount) {
+    if (this.#shouldAdjust(this.#value + amount)) {
+      amount += 1;
+    }
+    this.setValue(this.#value + amount);
+  }
+
+  decrementBy(amount) {
+    if (this.#shouldAdjust(this.#value - amount)) {
+      amount += 1;
+    }
+    this.setValue(this.#value - amount);
+  }
+
+  getValue() {
+    return this.#value;
+  }
+}
+
+const WILDCARD = "*";
+const DISPLAY = "display";
+const CONTROL = "control";
+
+class DisplayWidget {
+  static capability = DISPLAY;
+
+  #parent = null;
+  #content = null;
+
+  constructor(name, parent, options = {}) {
     this.options = options;
     this.name = name;
-    _classPrivateFieldSet2(_parent, this, parent);
-    _classPrivateFieldSet2(_content, this, options.content);
+
+    this.#parent = parent;
+    this.#content = options.content;
+
     this.registerForContentUpdates();
   }
-  return _createClass(DisplayWidget, [{
-    key: "onContentUpdate",
-    value: function onContentUpdate(value) {}
-  }, {
-    key: "registerForContentUpdates",
-    value: function registerForContentUpdates() {
-      var _this = this;
-      if (!_classPrivateFieldGet2(_content, this) || !_classPrivateFieldGet2(_parent, this)) return;
-      _classPrivateFieldGet2(_parent, this).on("nodeStatusUpdated", function (status) {
-        var _status$contents, _classPrivateFieldGet2$1;
-        var value = (_status$contents = status.contents) === null || _status$contents === void 0 || (_status$contents = _status$contents.find(function (content) {
-          return content.name === _classPrivateFieldGet2(_content, _this).name;
-        })) === null || _status$contents === void 0 ? void 0 : _status$contents.value;
-        _this.onContentUpdate(value);
-        (_classPrivateFieldGet2$1 = _classPrivateFieldGet2(_parent, _this)) === null || _classPrivateFieldGet2$1 === void 0 || _classPrivateFieldGet2$1.setDirtyCanvas(true, true);
-      });
-    }
-  }, {
-    key: "triggerParentResetSize",
-    value: function triggerParentResetSize() {
-      if (_classPrivateFieldGet2(_parent, this)) _classPrivateFieldGet2(_parent, this).resetSize();
-    }
-  }]);
-}();
-_defineProperty(DisplayWidget, "capability", DISPLAY);
-var _parent2 = /*#__PURE__*/new WeakMap();
-var _property = /*#__PURE__*/new WeakMap();
-var _parameter = /*#__PURE__*/new WeakMap();
-var ControlWidget = /*#__PURE__*/function () {
-  function ControlWidget(name, parent) {
-    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    _classCallCheck(this, ControlWidget);
-    _classPrivateFieldInitSpec(this, _parent2, null);
-    _classPrivateFieldInitSpec(this, _property, null);
-    _classPrivateFieldInitSpec(this, _parameter, null);
+
+  onContentUpdate(value) {}
+
+  registerForContentUpdates() {
+    if (!this.#content || !this.#parent) return;
+    this.#parent.on("nodeStatusUpdated", (status) => {
+      const value = status.contents?.find(
+        (content) => content.name === this.#content.name
+      )?.value;
+      this.onContentUpdate(value);
+      this.#parent?.setDirtyCanvas(true, true);
+    });
+  }
+
+  triggerParentResetSize() {
+    if (this.#parent) this.#parent.resetSize();
+  }
+}
+
+class ControlWidget {
+  static capability = CONTROL;
+
+  #parent = null;
+  #property = null;
+  #parameter = null;
+
+  constructor(name, parent, options = {}) {
     this.value = null;
     this.options = options;
     this.name = name;
-    _classPrivateFieldSet2(_parent2, this, parent);
-    _classPrivateFieldSet2(_property, this, options.property);
-    _classPrivateFieldSet2(_parameter, this, options.parameter);
-  }
-  return _createClass(ControlWidget, [{
-    key: "setValue",
-    value: function setValue(value) {
-      this.value = value;
-      if (_classPrivateFieldGet2(_parent2, this) && _classPrivateFieldGet2(_property, this) && _classPrivateFieldGet2(_property, this).name) {
-        var _classPrivateFieldGet3, _classPrivateFieldGet4;
-        (_classPrivateFieldGet3 = _classPrivateFieldGet2(_parent2, this)) === null || _classPrivateFieldGet3 === void 0 || _classPrivateFieldGet3.setProperty(_classPrivateFieldGet2(_property, this).name, value);
-        (_classPrivateFieldGet4 = _classPrivateFieldGet2(_parent2, this)) === null || _classPrivateFieldGet4 === void 0 || _classPrivateFieldGet4.setDirtyCanvas(true, true);
-      }
-    }
-  }, {
-    key: "getValue",
-    value: function getValue() {
-      return this.value;
-    }
-  }, {
-    key: "setDefaultValue",
-    value: function setDefaultValue(value) {
-      this.value = value;
-      if (_classPrivateFieldGet2(_parent2, this) && _classPrivateFieldGet2(_property, this) && _classPrivateFieldGet2(_property, this).name) {
-        var _classPrivateFieldGet5, _classPrivateFieldGet6;
-        (_classPrivateFieldGet5 = _classPrivateFieldGet2(_parent2, this)) === null || _classPrivateFieldGet5 === void 0 || _classPrivateFieldGet5.setPropertyDefaultValue(_classPrivateFieldGet2(_property, this).name, value);
-        (_classPrivateFieldGet6 = _classPrivateFieldGet2(_parent2, this)) === null || _classPrivateFieldGet6 === void 0 || _classPrivateFieldGet6.setDirtyCanvas(true, true);
-      }
-    }
-  }, {
-    key: "triggerParentResetSize",
-    value: function triggerParentResetSize() {
-      if (_classPrivateFieldGet2(_parent2, this)) _classPrivateFieldGet2(_parent2, this).resetSize();
-    }
-  }]);
-}();
-_defineProperty(ControlWidget, "capability", CONTROL);
 
-var Widgets = /*#__PURE__*/function () {
-  function Widgets() {
-    _classCallCheck(this, Widgets);
+    this.#parent = parent;
+    this.#property = options.property;
+    this.#parameter = options.parameter;
+  }
+
+  setValue(value) {
+    this.value = value;
+
+    if (this.#parent && this.#property && this.#property.name) {
+      this.#parent?.setProperty(this.#property.name, value);
+      this.#parent?.setDirtyCanvas(true, true);
+    }
+  }
+
+  getValue() {
+    return this.value;
+  }
+
+  setDefaultValue(value) {
+    this.value = value;
+
+    if (this.#parent && this.#property && this.#property.name) {
+      this.#parent?.setPropertyDefaultValue(this.#property.name, value);
+      this.#parent?.setDirtyCanvas(true, true);
+    }
+  }
+
+  triggerParentResetSize() {
+    if (this.#parent) this.#parent.resetSize();
+  }
+}
+
+class Widgets {
+  constructor() {
     this.widgets = new Map();
   }
-  return _createClass(Widgets, [{
-    key: "_createKey",
-    value: function _createKey(type, capability) {
-      var identifier = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
-      return "".concat(type, ":").concat(capability).concat(identifier ? ":".concat(identifier) : "");
-    }
-  }, {
-    key: "add",
-    value: function add(widgetClass, type) {
-      var identifier = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
-      var capability = widgetClass.capability;
-      var key = this._createKey(type, capability, identifier);
-      if (!this.widgets.has(key)) {
-        this.widgets.set(key, new Set()); // Use Set to automatically handle unique insertion
-      }
-      this.widgets.get(key).add(widgetClass);
-    }
-  }, {
-    key: "_getWidgetsByKey",
-    value: function _getWidgetsByKey(key) {
-      return Array.from(this.widgets.get(key) || []);
-    }
-  }, {
-    key: "get",
-    value: function get(type, capability) {
-      var identifier = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
-      var specificKey = this._createKey(type, capability, identifier);
-      var wildcardKey = this._createKey(type, capability, WILDCARD);
-      var specificWidgets = this._getWidgetsByKey(specificKey);
-      var wildcardWidgets = this._getWidgetsByKey(wildcardKey);
-      return Array.from(new Set([].concat(_toConsumableArray(specificWidgets), _toConsumableArray(wildcardWidgets))));
-    }
-  }, {
-    key: "getDisplaysOfType",
-    value: function getDisplaysOfType(type) {
-      var identifier = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
-      return this.get(type, DISPLAY, identifier);
-    }
-  }, {
-    key: "getControlsOfType",
-    value: function getControlsOfType(type) {
-      var identifier = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
-      return this.get(type, CONTROL, identifier);
-    }
-  }, {
-    key: "has",
-    value: function has(type, capability) {
-      var identifier = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
-      var specificKey = this._createKey(type, capability, identifier);
-      var wildcardKey = this._createKey(type, capability, WILDCARD);
-      return this.widgets.has(specificKey) || this.widgets.has(wildcardKey);
-    }
-  }, {
-    key: "hasDisplay",
-    value: function hasDisplay(type, identifier) {
-      return this.has(type, DISPLAY, identifier);
-    }
-  }, {
-    key: "hasControl",
-    value: function hasControl(type, identifier) {
-      return this.has(type, CONTROL, identifier);
-    }
-  }, {
-    key: "remove",
-    value: function remove(type, capability) {
-      var identifier = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : undefined;
-      var specificKey = this._createKey(type, capability, identifier);
-      var wildcardKey = this._createKey(type, capability, WILDCARD);
-      this.widgets["delete"](specificKey);
-      this.widgets["delete"](wildcardKey);
-    }
-  }, {
-    key: Symbol.iterator,
-    value: function value() {
-      var iterator = this.widgets.entries();
-      return {
-        next: function next() {
-          var _iterator$next = iterator.next(),
-            done = _iterator$next.done,
-            value = _iterator$next.value;
-          if (done) {
-            return {
-              done: done
-            };
-          }
-          var _value = _slicedToArray(value, 2),
-            key = _value[0],
-            widgetSet = _value[1];
-          var _key$split = key.split(":"),
-            _key$split2 = _slicedToArray(_key$split, 3),
-            type = _key$split2[0],
-            capability = _key$split2[1],
-            identifier = _key$split2[2];
-          return {
-            value: [type, capability, identifier, Array.from(widgetSet)],
-            done: false
-          };
-        }
-      };
-    }
-  }]);
-}();
 
-var NodeBlueprintHandlers = /*#__PURE__*/function () {
-  function NodeBlueprintHandlers() {
-    _classCallCheck(this, NodeBlueprintHandlers);
+  _createKey(type, capability, identifier = undefined) {
+    return `${type}:${capability}${identifier ? `:${identifier}` : ""}`;
+  }
+
+  add(widgetClass, type, identifier = undefined) {
+    const capability = widgetClass.capability;
+    const key = this._createKey(type, capability, identifier);
+    if (!this.widgets.has(key)) {
+      this.widgets.set(key, new Set()); // Use Set to automatically handle unique insertion
+    }
+    this.widgets.get(key).add(widgetClass);
+  }
+
+  _getWidgetsByKey(key) {
+    return Array.from(this.widgets.get(key) || []);
+  }
+
+  get(type, capability, identifier = undefined) {
+    const specificKey = this._createKey(type, capability, identifier);
+    const wildcardKey = this._createKey(type, capability, WILDCARD);
+    const specificWidgets = this._getWidgetsByKey(specificKey);
+    const wildcardWidgets = this._getWidgetsByKey(wildcardKey);
+    return Array.from(new Set([...specificWidgets, ...wildcardWidgets]));
+  }
+
+  getDisplaysOfType(type, identifier = undefined) {
+    return this.get(type, DISPLAY, identifier);
+  }
+
+  getControlsOfType(type, identifier = undefined) {
+    return this.get(type, CONTROL, identifier);
+  }
+
+  has(type, capability, identifier = undefined) {
+    const specificKey = this._createKey(type, capability, identifier);
+    const wildcardKey = this._createKey(type, capability, WILDCARD);
+    return this.widgets.has(specificKey) || this.widgets.has(wildcardKey);
+  }
+
+  hasDisplay(type, identifier) {
+    return this.has(type, DISPLAY, identifier);
+  }
+
+  hasControl(type, identifier) {
+    return this.has(type, CONTROL, identifier);
+  }
+
+  remove(type, capability, identifier = undefined) {
+    const specificKey = this._createKey(type, capability, identifier);
+    const wildcardKey = this._createKey(type, capability, WILDCARD);
+    this.widgets.delete(specificKey);
+    this.widgets.delete(wildcardKey);
+  }
+
+  [Symbol.iterator]() {
+    const iterator = this.widgets.entries();
+    return {
+      next: () => {
+        const { done, value } = iterator.next();
+        if (done) {
+          return { done };
+        }
+        const [key, widgetSet] = value;
+        const [type, capability, identifier] = key.split(":");
+        return {
+          value: [type, capability, identifier, Array.from(widgetSet)],
+          done: false,
+        };
+      },
+    };
+  }
+}
+
+class NodeBlueprintHandlers {
+  constructor() {
     this.handlers = [];
   }
-  return _createClass(NodeBlueprintHandlers, [{
-    key: "addHandler",
-    value: function addHandler(handler) {
-      this.handlers.push(handler);
-    }
-  }, {
-    key: "removeHandler",
-    value: function removeHandler(handler) {
-      var index = this.handlers.indexOf(handler);
-      if (index > -1) {
-        this.handlers.splice(index, 1);
-      }
-    }
-  }, {
-    key: "handle",
-    value: function handle(node, blueprint) {
-      var _this = this;
-      var index = 0;
-      var _next = function next() {
-        if (index < _this.handlers.length) {
-          var handler = _this.handlers[index++];
-          handler.handle(node, blueprint, _next);
-        }
-      };
-      _next();
-    }
-  }]);
-}();
-var NodeBlueprintHandler = /*#__PURE__*/function () {
-  function NodeBlueprintHandler() {
-    _classCallCheck(this, NodeBlueprintHandler);
+
+  addHandler(handler) {
+    this.handlers.push(handler);
   }
-  return _createClass(NodeBlueprintHandler, [{
-    key: "handle",
-    value: function handle(node, blueprint, next) {
-      next();
+
+  removeHandler(handler) {
+    const index = this.handlers.indexOf(handler);
+    if (index > -1) {
+      this.handlers.splice(index, 1);
     }
-  }]);
-}();
+  }
+
+  handle(node, blueprint) {
+    let index = 0;
+    const next = () => {
+      if (index < this.handlers.length) {
+        const handler = this.handlers[index++];
+        handler.handle(node, blueprint, next);
+      }
+    };
+    next();
+  }
+}
+
+class NodeBlueprintHandler {
+  handle(node, blueprint, next) {
+    next();
+  }
+}
 
 // Helper function to recursively gather types and base types
 function getType(datatype) {
-  var typeString = datatype.identifier ? "".concat(datatype.typeName, " (").concat(datatype.identifier, ")") : datatype.typeName;
+  let typeString = datatype.identifier
+    ? `${datatype.typeName} (${datatype.identifier})`
+    : datatype.typeName;
 
   // Check if there's a baseDatatype and append it recursively
   if (datatype.baseDatatype) {
-    typeString += ",".concat(getType(datatype.baseDatatype));
+    typeString += `,${getType(datatype.baseDatatype)}`;
   }
+
   return typeString;
 }
-var NodeInputPortBlueprintHandler = /*#__PURE__*/function (_NodeBlueprintHandler) {
-  function NodeInputPortBlueprintHandler() {
-    _classCallCheck(this, NodeInputPortBlueprintHandler);
-    return _callSuper(this, NodeInputPortBlueprintHandler, arguments);
-  }
-  _inherits(NodeInputPortBlueprintHandler, _NodeBlueprintHandler);
-  return _createClass(NodeInputPortBlueprintHandler, [{
-    key: "handle",
-    value: function handle(node, blueprint, next) {
-      if (blueprint.inputPorts) {
-        blueprint.inputPorts.forEach(function (input) {
-          var type = getType(input.datatype);
-          node.addInput(input.name, type);
-        });
-      }
-      next();
-    }
-  }]);
-}(NodeBlueprintHandler);
-var NodeOutputPortBlueprintHandler = /*#__PURE__*/function (_NodeBlueprintHandler2) {
-  function NodeOutputPortBlueprintHandler() {
-    _classCallCheck(this, NodeOutputPortBlueprintHandler);
-    return _callSuper(this, NodeOutputPortBlueprintHandler, arguments);
-  }
-  _inherits(NodeOutputPortBlueprintHandler, _NodeBlueprintHandler2);
-  return _createClass(NodeOutputPortBlueprintHandler, [{
-    key: "handle",
-    value: function handle(node, blueprint, next) {
-      if (blueprint.outputPorts) {
-        blueprint.outputPorts.forEach(function (output) {
-          var type = getType(output.datatype);
-          node.addOutput(output.name, type);
-        });
-      }
-      next();
-    }
-  }]);
-}(NodeBlueprintHandler);
-var NodeParametersBlueprintHandler = /*#__PURE__*/function (_NodeBlueprintHandler3) {
-  function NodeParametersBlueprintHandler(widgets) {
-    var _this2;
-    _classCallCheck(this, NodeParametersBlueprintHandler);
-    _this2 = _callSuper(this, NodeParametersBlueprintHandler);
-    _this2.widgets = widgets;
-    return _this2;
-  }
-  _inherits(NodeParametersBlueprintHandler, _NodeBlueprintHandler3);
-  return _createClass(NodeParametersBlueprintHandler, [{
-    key: "handle",
-    value: function handle(node, blueprint, next) {
-      var _this3 = this;
-      var contentNames = new Set(blueprint.contents ? blueprint.contents.map(function (c) {
-        return c.name;
-      }) : []);
-      if (blueprint.parameters) {
-        blueprint.parameters.forEach(function (parameter) {
-          var name = parameter.name;
-          var typeName = parameter.datatype.typeName;
-          var identifier = parameter.datatype.identifier;
-          var type = parameter.datatype.identifier ? "".concat(parameter.datatype.typeName, " (").concat(parameter.datatype.identifier, ")") : parameter.datatype.typeName;
-          var default_value = parameter.defaultValue;
-          var prop = node.addProperty(name, default_value, type);
-          var content;
-          if (contentNames.has(name)) {
-            content = blueprint.contents.find(function (c) {
-              return c.name === name;
-            });
-          }
-          var widgetClasses = _this3.widgets.getControlsOfType(typeName, identifier);
-          if (!widgetClasses.length) {
-            throw new Error("Unable to find widget of type :  ".concat(type));
-          }
-          var widget = new widgetClasses[0](name, node, {
-            property: prop,
-            parameter: parameter,
-            content: content
-          });
-          node.addCustomWidget(widget);
-        });
-      }
-      next();
-    }
-  }]);
-}(NodeBlueprintHandler);
-var NodeContentsBlueprintHandler = /*#__PURE__*/function (_NodeBlueprintHandler4) {
-  function NodeContentsBlueprintHandler(widgets) {
-    var _this4;
-    _classCallCheck(this, NodeContentsBlueprintHandler);
-    _this4 = _callSuper(this, NodeContentsBlueprintHandler);
-    _this4.widgets = widgets;
-    return _this4;
-  }
-  _inherits(NodeContentsBlueprintHandler, _NodeBlueprintHandler4);
-  return _createClass(NodeContentsBlueprintHandler, [{
-    key: "handle",
-    value: function handle(node, blueprint, next) {
-      var _this5 = this;
-      var parameterNames = new Set(blueprint.parameters ? blueprint.parameters.map(function (parameter) {
-        return parameter.name;
-      }) : []);
-      if (blueprint.contents) {
-        blueprint.contents.forEach(function (content) {
-          if (parameterNames.has(content.name)) return; // already processed by NodeParametersBlueprint
-          var name = content.name;
-          var typeName = content.datatype.typeName;
-          var identifier = content.datatype.identifier || "";
-          var type = content.datatype.identifier ? "".concat(content.datatype.typeName, " (").concat(content.datatype.identifier, ")") : content.datatype.typeName;
-          var widgetClasses = _this5.widgets.getDisplaysOfType(typeName, identifier);
-          if (!widgetClasses.length) {
-            throw new Error("Unable to find widget of type :  ".concat(type));
-          }
-          var widget = new widgetClasses[0](name, node, {
-            content: content
-          });
-          node.addCustomWidget(widget);
-        });
-      }
-      next();
-    }
-  }]);
-}(NodeBlueprintHandler);
 
-var _eventEmitter = /*#__PURE__*/new WeakMap();
-var Node = /*#__PURE__*/function (_LGraphNode) {
-  function Node(title) {
-    var _this;
-    _classCallCheck(this, Node);
-    _this = _callSuper(this, Node, [title]);
-    _classPrivateFieldInitSpec(_this, _eventEmitter, new EventEmitter());
-    _this._shape = 2;
-    return _this;
-  }
-  _inherits(Node, _LGraphNode);
-  return _createClass(Node, [{
-    key: "addCustomWidget",
-    value: function addCustomWidget(widget) {
-      _superPropGet(Node, "addCustomWidget", this, 3)([widget]);
-      if (widget.registerWithParent) {
-        widget.registerWithParent(this);
-      }
-    }
-  }, {
-    key: "on",
-    value: function on(eventName, listener) {
-      _classPrivateFieldGet2(_eventEmitter, this).on(eventName, listener);
-    }
-  }, {
-    key: "off",
-    value: function off(eventName, listener) {
-      _classPrivateFieldGet2(_eventEmitter, this).off(eventName, listener);
-    }
-  }, {
-    key: "update",
-    value: function update(status) {
-      _classPrivateFieldGet2(_eventEmitter, this).emit("nodeStatusUpdated", status);
-    }
-  }, {
-    key: "setPropertyDefaultValue",
-    value: function setPropertyDefaultValue(name, value) {
-      var _this$widgets;
-      this.properties || (this.properties = {});
-      if (value === this.properties[name]) {
-        return;
-      }
-      this.properties[name] = value;
-      var widgetToUpdate = (_this$widgets = this.widgets) === null || _this$widgets === void 0 ? void 0 : _this$widgets.find(function (widget) {
-        var _widget$options;
-        return widget && ((_widget$options = widget.options) === null || _widget$options === void 0 ? void 0 : _widget$options.property) === name;
+class NodeInputPortBlueprintHandler extends NodeBlueprintHandler {
+  handle(node, blueprint, next) {
+    if (blueprint.inputPorts) {
+      blueprint.inputPorts.forEach((input) => {
+        const type = getType(input.datatype);
+        node.addInput(input.name, type);
       });
-      if (widgetToUpdate) {
-        widgetToUpdate.value = value;
-      }
     }
-  }, {
-    key: "resetSize",
-    value: function resetSize() {
-      this.setSize(this.computeSize());
+    next();
+  }
+}
+
+class NodeOutputPortBlueprintHandler extends NodeBlueprintHandler {
+  handle(node, blueprint, next) {
+    if (blueprint.outputPorts) {
+      blueprint.outputPorts.forEach((output) => {
+        const type = getType(output.datatype);
+        node.addOutput(output.name, type);
+      });
     }
-  }, {
-    key: "onDropFile",
-    value: function onDropFile(file) {
-      var widgetName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-      if (this.widgets && this.widgets.length) {
-        if (widgetName !== null) {
-          var widget = this.widgets.find(function (w) {
-            return w.name === widgetName;
-          });
-          if (widget && widget.onDropFile && widget.onDropFile(file)) {
+    next();
+  }
+}
+
+class NodeParametersBlueprintHandler extends NodeBlueprintHandler {
+  constructor(widgets) {
+    super();
+    this.widgets = widgets;
+  }
+
+  handle(node, blueprint, next) {
+    const contentNames = new Set(
+      blueprint.contents ? blueprint.contents.map((c) => c.name) : []
+    );
+
+    if (blueprint.parameters) {
+      blueprint.parameters.forEach((parameter) => {
+        const name = parameter.name;
+        const typeName = parameter.datatype.typeName;
+        const identifier = parameter.datatype.identifier;
+        const type = parameter.datatype.identifier
+          ? `${parameter.datatype.typeName} (${parameter.datatype.identifier})`
+          : parameter.datatype.typeName;
+        const default_value = parameter.defaultValue;
+        const prop = node.addProperty(name, default_value, type);
+
+        let content;
+        if (contentNames.has(name)) {
+          content = blueprint.contents.find((c) => c.name === name);
+        }
+
+        const widgetClasses = this.widgets.getControlsOfType(
+          typeName,
+          identifier
+        );
+        if (!widgetClasses.length) {
+          throw new Error(`Unable to find widget of type :  ${type}`);
+        }
+        const widget = new widgetClasses[0](name, node, {
+          property: prop,
+          parameter,
+          content,
+        });
+
+        node.addCustomWidget(widget);
+      });
+    }
+    next();
+  }
+}
+
+class NodeContentsBlueprintHandler extends NodeBlueprintHandler {
+  constructor(widgets) {
+    super();
+    this.widgets = widgets;
+  }
+  handle(node, blueprint, next) {
+    const parameterNames = new Set(
+      blueprint.parameters
+        ? blueprint.parameters.map((parameter) => parameter.name)
+        : []
+    );
+
+    if (blueprint.contents) {
+      blueprint.contents.forEach((content) => {
+        if (parameterNames.has(content.name)) return; // already processed by NodeParametersBlueprint
+        const name = content.name;
+        const typeName = content.datatype.typeName;
+        const identifier = content.datatype.identifier || "";
+        const type = content.datatype.identifier
+          ? `${content.datatype.typeName} (${content.datatype.identifier})`
+          : content.datatype.typeName;
+        const widgetClasses = this.widgets.getDisplaysOfType(
+          typeName,
+          identifier
+        );
+        if (!widgetClasses.length) {
+          throw new Error(`Unable to find widget of type :  ${type}`);
+        }
+        const widget = new widgetClasses[0](name, node, { content });
+
+        node.addCustomWidget(widget);
+      });
+    }
+    next();
+  }
+}
+
+class Node extends mobjectLitegraph.LGraphNode {
+  eventEmitter = new EventEmitter();
+
+  constructor(title) {
+    super(title);
+    this._shape = 2;
+
+    this.registerCallbackHandlers();
+  }
+
+  addCustomWidget(widget) {
+    super.addCustomWidget(widget);
+    if (widget.registerWithParent) {
+      widget.registerWithParent(this);
+    }
+  }
+
+  on(eventName, listener) {
+    this.eventEmitter.on(eventName, listener);
+  }
+
+  off(eventName, listener) {
+    this.eventEmitter.off(eventName, listener);
+  }
+
+  update(status) {
+    this.eventEmitter.emit("nodeStatusUpdated", status);
+  }
+
+  setPropertyDefaultValue(name, value) {
+    this.properties ||= {};
+
+    if (value === this.properties[name]) {
+      return;
+    }
+
+    this.properties[name] = value;
+    const widgetToUpdate = this.widgets?.find(
+      (widget) => widget && widget.options?.property === name
+    );
+
+    if (widgetToUpdate) {
+      widgetToUpdate.value = value;
+    }
+  }
+
+  resetSize() {
+    this.setSize(this.computeSize());
+  }
+
+  onDropFile(file, widgetName = null) {
+    if (this.widgets && this.widgets.length) {
+      if (widgetName !== null) {
+        const widget = this.widgets.find((w) => w.name === widgetName);
+        if (widget && widget.onDropFile && widget.onDropFile(file)) {
+          return;
+        }
+      } else {
+        for (const widget of this.widgets) {
+          if (widget.onDropFile && widget.onDropFile(file)) {
             return;
-          }
-        } else {
-          var _iterator = _createForOfIteratorHelper(this.widgets),
-            _step;
-          try {
-            for (_iterator.s(); !(_step = _iterator.n()).done;) {
-              var _widget = _step.value;
-              if (_widget.onDropFile && _widget.onDropFile(file)) {
-                return;
-              }
-            }
-          } catch (err) {
-            _iterator.e(err);
-          } finally {
-            _iterator.f();
           }
         }
       }
-      mobjectLitegraph.LiteGraph.log_warn("Node ".concat(this.type, " was registered to handle a dropped file, but failed to handle it."));
     }
-  }]);
-}(mobjectLitegraph.LGraphNode);
+    mobjectLitegraph.LiteGraph.log_warn(
+      `Node ${this.type} was registered to handle a dropped file, but failed to handle it.`
+    );
+  }
 
-var NodeClassFactory = /*#__PURE__*/function () {
-  function NodeClassFactory(widgets) {
-    _classCallCheck(this, NodeClassFactory);
+  registerCallbackHandlers() {
+    this.registerCallbackHandler("onAdded", (oCbInfo) => {
+      this.eventEmitter.emit("added", this);
+    });
+
+    this.registerCallbackHandler("onRemoved", (oCbInfo) => {
+      this.eventEmitter.emit("removed", this);
+    });
+
+    // this.registerCallbackHandler(
+    //   "onDrawForeground",
+    //   (oCbInfo, ctx, visible_rect) => {
+    //     this.eventEmitter.emit("drawForeground", this, ctx, visible_rect);
+    //   }
+    // );
+
+    // this.registerCallbackHandler(
+    //   "onDrawBackground",
+    //   (oCbInfo, ctx, visible_area) => {
+    //     this.eventEmitter.emit("drawBackground", this, ctx, visible_area);
+    //   }
+    // );
+
+    this.registerCallbackHandler(
+      "onPropertyChanged",
+      (oCbInfo, name, value, prevValue) => {
+        this.eventEmitter.emit("propertyChanged", this, name, value, prevValue);
+      }
+    );
+  }
+}
+
+class NodeClassFactory {
+  constructor(widgets) {
     this.widgets = widgets;
     this.handlers = new NodeBlueprintHandlers();
   }
-  return _createClass(NodeClassFactory, [{
-    key: "registerHandler",
-    value: function registerHandler(handler) {
-      this.handlers.addHandler(handler);
-    }
-  }, {
-    key: "removeHandler",
-    value: function removeHandler(handler) {
-      this.handlers.removeHandler(handler);
-    }
-  }, {
-    key: "validateBlueprint",
-    value: function validateBlueprint(blueprint) {
-      var validations = [this.checkBlueprintHasPath.bind(this), this.checkBlueprintParametersAreSupported.bind(this), this.checkBlueprintContentsAreSupported.bind(this)];
-      return validations.every(function (validation) {
-        return validation(blueprint);
-      });
-    }
-  }, {
-    key: "getNodeNameFromBlueprint",
-    value: function getNodeNameFromBlueprint(blueprint) {
-      return blueprint.path.split("/").pop();
-    }
-  }, {
-    key: "getNodePathFromBlueprint",
-    value: function getNodePathFromBlueprint(blueprint) {
-      var path = blueprint.path.split("/").slice(0, -1).join("/");
-      return path;
-    }
-  }, {
-    key: "getNodeTypeFromBlueprint",
-    value: function getNodeTypeFromBlueprint(blueprint) {
-      return blueprint.path;
-    }
-  }, {
-    key: "checkBlueprintHasPath",
-    value: function checkBlueprintHasPath(blueprint) {
-      return blueprint.path;
-    }
-  }, {
-    key: "checkBlueprintParametersAreSupported",
-    value: function checkBlueprintParametersAreSupported(blueprint) {
-      var _this = this;
-      if (!blueprint.node.parameters) return true;
-      return blueprint.node.parameters.every(function (parameter) {
-        var _parameter$datatype = parameter.datatype,
-          typeName = _parameter$datatype.typeName,
-          identifier = _parameter$datatype.identifier;
-        return _this.widgets.hasControl(typeName, identifier);
-      });
-    }
-  }, {
-    key: "checkBlueprintContentsAreSupported",
-    value: function checkBlueprintContentsAreSupported(blueprint) {
-      var _blueprint$node,
-        _this2 = this;
-      if (!blueprint.node.contents) return true;
-      var parameterSet = new Set((((_blueprint$node = blueprint.node) === null || _blueprint$node === void 0 ? void 0 : _blueprint$node.parameters) || []).map(function (p) {
-        return "".concat(p.datatype.typeName, "-").concat(p.datatype.identifier);
-      }));
-      return blueprint.node.contents.every(function (content) {
-        var _content$datatype = content.datatype,
-          typeName = _content$datatype.typeName,
-          identifier = _content$datatype.identifier;
-        var key = "".concat(typeName, "-").concat(identifier);
-        if (parameterSet.has(key) && _this2.widgets.hasControl(typeName, identifier)) {
-          return true;
-        }
-        return _this2.widgets.hasDisplay(typeName, identifier);
-      });
-    }
-  }, {
-    key: "create",
-    value: function create(blueprint) {
-      var _Class;
-      if (!this.validateBlueprint(blueprint)) {
-        return;
-      }
-      var factory = this;
-      var nodeName = factory.getNodeNameFromBlueprint(blueprint);
-      var nodeClass = (_Class = /*#__PURE__*/function (_Node) {
-        function nodeClass() {
-          var _this3;
-          _classCallCheck(this, nodeClass);
-          _this3 = _callSuper(this, nodeClass, [nodeName]);
-          factory.handlers.handle(_this3, blueprint.node);
-          return _this3;
-        }
-        _inherits(nodeClass, _Node);
-        return _createClass(nodeClass);
-      }(Node), _defineProperty(_Class, "title", nodeName), _defineProperty(_Class, "desc", ""), _Class);
-      return nodeClass;
-    }
-  }]);
-}();
 
-var GraphFramework = /*#__PURE__*/function () {
-  function GraphFramework() {
-    _classCallCheck(this, GraphFramework);
+  registerHandler(handler) {
+    this.handlers.addHandler(handler);
+  }
+
+  removeHandler(handler) {
+    this.handlers.removeHandler(handler);
+  }
+
+  validateBlueprint(blueprint) {
+    const validations = [
+      this.checkBlueprintHasPath.bind(this),
+      this.checkBlueprintParametersAreSupported.bind(this),
+      this.checkBlueprintContentsAreSupported.bind(this),
+    ];
+
+    return validations.every((validation) => validation(blueprint));
+  }
+
+  getNodeNameFromBlueprint(blueprint) {
+    return blueprint.path.split("/").pop();
+  }
+
+  getNodePathFromBlueprint(blueprint) {
+    let path = blueprint.path.split("/").slice(0, -1).join("/");
+    return path;
+  }
+
+  getNodeTypeFromBlueprint(blueprint) {
+    return blueprint.path;
+  }
+
+  checkBlueprintHasPath(blueprint) {
+    return blueprint.path;
+  }
+
+  checkBlueprintParametersAreSupported(blueprint) {
+    if (!blueprint.node.parameters) return true;
+
+    return blueprint.node.parameters.every((parameter) => {
+      const { typeName, identifier } = parameter.datatype;
+      return this.widgets.hasControl(typeName, identifier);
+    });
+  }
+
+  checkBlueprintContentsAreSupported(blueprint) {
+    if (!blueprint.node.contents) return true;
+
+    const parameterSet = new Set(
+      (blueprint.node?.parameters || []).map(
+        (p) => `${p.datatype.typeName}-${p.datatype.identifier}`
+      )
+    );
+
+    return blueprint.node.contents.every((content) => {
+      const { typeName, identifier } = content.datatype;
+      const key = `${typeName}-${identifier}`;
+      if (
+        parameterSet.has(key) &&
+        this.widgets.hasControl(typeName, identifier)
+      ) {
+        return true;
+      }
+      return this.widgets.hasDisplay(typeName, identifier);
+    });
+  }
+
+  create(blueprint) {
+    if (!this.validateBlueprint(blueprint)) {
+      return;
+    }
+
+    const factory = this;
+    const nodeName = factory.getNodeNameFromBlueprint(blueprint);
+
+    const nodeClass = class extends Node {
+      static title = nodeName;
+      static desc = "";
+
+      constructor() {
+        super(nodeName);
+        factory.handlers.handle(this, blueprint.node);
+      }
+    };
+
+    return nodeClass;
+  }
+}
+
+class GraphFramework {
+  static instance;
+
+  constructor() {
     if (GraphFramework.instance) {
       return GraphFramework.instance;
     }
+
     if (typeof mobjectLitegraph.LiteGraph === "undefined") {
       throw new Error("LiteGraph is not available in the global scope.");
     }
+
     this.liteGraph = mobjectLitegraph.LiteGraph;
     this.liteGraph.initialize();
+
     this.nodeExtensions = [];
     this.canvasExtensions = [];
     this.editorExtensions = [];
     this.widgets = new Widgets();
+
     this.nodeClassFactory = new NodeClassFactory(this.widgets);
     this.nodeClassFactory.registerHandler(new NodeInputPortBlueprintHandler());
     this.nodeClassFactory.registerHandler(new NodeOutputPortBlueprintHandler());
-    this.nodeClassFactory.registerHandler(new NodeParametersBlueprintHandler(this.widgets));
-    this.nodeClassFactory.registerHandler(new NodeContentsBlueprintHandler(this.widgets));
+    this.nodeClassFactory.registerHandler(
+      new NodeParametersBlueprintHandler(this.widgets)
+    );
+    this.nodeClassFactory.registerHandler(
+      new NodeContentsBlueprintHandler(this.widgets)
+    );
+
     this.liteGraph.computeTextWidth = function (text, fontSize) {
       if (!text) {
         return 0;
       }
-      var t = text.toString();
-      if (typeof fontSize === "undefined") return this.NODE_TEXT_SIZE * t.length * 0.6;
+
+      let t = text.toString();
+
+      if (typeof fontSize === "undefined")
+        return this.NODE_TEXT_SIZE * t.length * 0.6;
+
       return this.NODE_TEXT_SIZE * t.length * fontSize;
     };
+
     GraphFramework.instance = new Proxy(this, {
-      get: function get(target, property, receiver) {
+      get: (target, property, receiver) => {
         if (Reflect.has(target, property)) {
           return Reflect.get(target, property, receiver);
         } else {
-          return function () {
+          return (...args) => {
             if (typeof target.liteGraph[property] === "function") {
-              for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-                args[_key] = arguments[_key];
-              }
               return target.liteGraph[property].apply(target.liteGraph, args);
             } else {
               return target.liteGraph[property];
             }
           };
         }
-      }
+      },
     });
+
     return GraphFramework.instance;
   }
-  return _createClass(GraphFramework, [{
-    key: "install",
-    value: function install(graphPack, options) {
-      graphPack.install(this, options);
-    }
-  }, {
-    key: "installNodeBlueprints",
-    value: function installNodeBlueprints(blueprints) {
-      var _this = this;
-      if (blueprints && Array.isArray(blueprints)) {
-        blueprints.forEach(function (blueprint) {
-          _this.installNodeBlueprint(blueprint);
-        });
-      }
-    }
-  }, {
-    key: "installNodeBlueprint",
-    value: function installNodeBlueprint(blueprint) {
-      if (blueprint) {
-        var nodeType = this.nodeClassFactory.getNodeTypeFromBlueprint(blueprint);
-        if (!nodeType) {
-          this.log_warn("Failed to determine node type from blueprint.");
-          return;
-        }
-        var nodeClass = this.nodeClassFactory.create(blueprint);
-        if (!nodeClass) {
-          this.log_warn("Unable to create node class from blueprint.", nodeType, blueprint);
-          return;
-        }
-        this.registerNodeType(nodeType, nodeClass);
-      } else {
-        this.log_warn("No blueprint provided to installNodeBlueprint.");
-      }
-    }
-  }, {
-    key: "registerWidgetType",
-    value: function registerWidgetType(Widget, type, identifier) {
-      this.widgets.add(Widget, type, identifier);
-    }
-  }, {
-    key: "registerFileAssociation",
-    value: function registerFileAssociation(fileExtensions, nodeType) {
-      var widgetName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-      var _iterator = _createForOfIteratorHelper(fileExtensions),
-        _step;
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var fileExtension = _step.value;
-          if (fileExtension && typeof fileExtension === "string") {
-            this.liteGraph.node_types_by_file_extension[fileExtension.toLowerCase()] = {
-              type: nodeType,
-              widgetName: widgetName
-            };
-          }
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
-      }
-    }
-  }, {
-    key: "registerNodeExtension",
-    value: function registerNodeExtension(extension) {
-      this.nodeExtensions.push(extension);
-    }
-  }, {
-    key: "registerCanvasExtension",
-    value: function registerCanvasExtension(extension) {
-      this.canvasExtensions.push(extension);
-    }
-  }, {
-    key: "registerEditorExtension",
-    value: function registerEditorExtension(extension) {
-      this.editorExtensions.push(extension);
-    }
-  }, {
-    key: "applyExtensions",
-    value: function applyExtensions(type, instance) {
-      var extensions;
-      switch (type) {
-        case "node":
-          extensions = this.nodeExtensions;
-          break;
-        case "canvas":
-          extensions = this.canvasExtensions;
-          break;
-        case "editor":
-          extensions = this.editorExtensions;
-          break;
-        default:
-          throw new Error("Unknown extension type: ".concat(type));
-      }
-      extensions.forEach(function (extension) {
-        return instance.applyExtension(extension);
+
+  install(graphPack, options) {
+    graphPack.install(this, options);
+  }
+
+  installNodeBlueprints(blueprints) {
+    if (blueprints && Array.isArray(blueprints)) {
+      blueprints.forEach((blueprint) => {
+        this.installNodeBlueprint(blueprint);
       });
     }
-  }, {
-    key: "getVersion",
-    value: function getVersion() {
-      return this.liteGraph.VERSION;
-    }
-  }]);
-}();
-_defineProperty(GraphFramework, "instance", void 0);
-
-var _uuid = /*#__PURE__*/new WeakMap();
-var Graph = /*#__PURE__*/function (_LGraph) {
-  function Graph(o) {
-    var _this;
-    _classCallCheck(this, Graph);
-    _this = _callSuper(this, Graph, [o]);
-    _classPrivateFieldInitSpec(_this, _uuid, null);
-    _classPrivateFieldSet2(_uuid, _this, _this.generateNewUuid());
-    _this.registerCallbackHandler("onSerialize", function (oCbInfo, data) {
-      data.uuid = _classPrivateFieldGet2(_uuid, _this);
-    });
-    return _this;
   }
-  _inherits(Graph, _LGraph);
-  return _createClass(Graph, [{
-    key: "uuid",
-    get: function get() {
-      return _classPrivateFieldGet2(_uuid, this);
+
+  installNodeBlueprint(blueprint) {
+    if (blueprint) {
+      const nodeType =
+        this.nodeClassFactory.getNodeTypeFromBlueprint(blueprint);
+      if (!nodeType) {
+        this.log_warn("Failed to determine node type from blueprint.");
+        return;
+      }
+
+      const nodeClass = this.nodeClassFactory.create(blueprint);
+      if (!nodeClass) {
+        this.log_warn(
+          "Unable to create node class from blueprint.",
+          nodeType,
+          blueprint
+        );
+        return;
+      }
+      this.registerNodeType(nodeType, nodeClass);
+    } else {
+      this.log_warn("No blueprint provided to installNodeBlueprint.");
     }
-  }, {
-    key: "generateNewUuid",
-    value: function generateNewUuid() {
-      _classPrivateFieldSet2(_uuid, this, mobjectLitegraph.LiteGraph.uuidv4());
-      return _classPrivateFieldGet2(_uuid, this);
-    }
-  }, {
-    key: "update",
-    value: function update(status) {
-      var _this2 = this;
-      if (status && Array.isArray(status.nodes)) {
-        status.nodes.forEach(function (nodeStatus) {
-          var node = _this2.getNodeById(nodeStatus.id);
-          if (node) {
-            node.update(nodeStatus);
-          }
-        });
+  }
+
+  registerWidgetType(Widget, type, identifier) {
+    this.widgets.add(Widget, type, identifier);
+  }
+
+  registerFileAssociation(fileExtensions, nodeType, widgetName = null) {
+    for (let fileExtension of fileExtensions) {
+      if (fileExtension && typeof fileExtension === "string") {
+        this.liteGraph.node_types_by_file_extension[
+          fileExtension.toLowerCase()
+        ] = {
+          type: nodeType,
+          widgetName,
+        };
       }
     }
-  }, {
-    key: "exportForBackend",
-    value: function exportForBackend() {}
-  }, {
-    key: "beforeChange",
-    value: function beforeChange() {
-      // before a graph change
-    }
-  }, {
-    key: "afterChange",
-    value: function afterChange() {
-      // after a graph change
-    }
-  }]);
-}(mobjectLitegraph.LGraph);
+  }
 
-var GraphEditor = /*#__PURE__*/function () {
-  function GraphEditor(containerId, connection) {
-    _classCallCheck(this, GraphEditor);
+  registerNodeExtension(extension) {
+    this.nodeExtensions.push(extension);
+  }
+
+  registerCanvasExtension(extension) {
+    this.canvasExtensions.push(extension);
+  }
+
+  registerEditorExtension(extension) {
+    this.editorExtensions.push(extension);
+  }
+
+  applyExtensions(type, instance) {
+    let extensions;
+    switch (type) {
+      case "node":
+        extensions = this.nodeExtensions;
+        break;
+      case "canvas":
+        extensions = this.canvasExtensions;
+        break;
+      case "editor":
+        extensions = this.editorExtensions;
+        break;
+      default:
+        throw new Error(`Unknown extension type: ${type}`);
+    }
+
+    extensions.forEach((extension) => instance.applyExtension(extension));
+  }
+
+  getVersion() {
+    return this.liteGraph.VERSION;
+  }
+}
+
+// class used to convert the standard serialization of litegraph, to mobject-graph version for use
+// in the backend.
+// this will only contain information that is needed by the backend, whereas the serialize will
+// provide all information
+
+class LiteGraphConverter {
+  static Convert(graph) {
+    const liteGraphData = JSON.parse(JSON.stringify(graph.serialize()));
+    const nodesWithConvertedIds = this.#convertNodeIdsToStrings(
+      liteGraphData.nodes
+    );
+
+    const transformedLinks = this.#transformLinks(
+      nodesWithConvertedIds,
+      liteGraphData.links
+    );
+
+    return this.#removeUnwantedProperties({
+      ...liteGraphData,
+      nodes: nodesWithConvertedIds,
+      links: transformedLinks,
+    });
+  }
+
+  static #convertNodeIdsToStrings(nodes) {
+    return nodes.map((node) => ({
+      ...node,
+      id: String(node.id),
+    }));
+  }
+
+  static #transformLinks(nodes, links) {
+    return links.map((link) => {
+      const [
+        linkId,
+        sourceNodeId,
+        sourceOutputIndex,
+        targetNodeId,
+        targetInputIndex,
+        type,
+      ] = link;
+
+      const linkIdStr = String(linkId);
+      const sourceNodeIdStr = String(sourceNodeId);
+      const targetNodeIdStr = String(targetNodeId);
+
+      const sourceNode = nodes.find((node) => node.id === sourceNodeIdStr);
+      const targetNode = nodes.find((node) => node.id === targetNodeIdStr);
+
+      const sourceOutputName = sourceNode
+        ? sourceNode.outputs[sourceOutputIndex]?.name || "unknown"
+        : "unknown";
+      const targetInputName = targetNode
+        ? targetNode.inputs[targetInputIndex]?.name || "unknown"
+        : "unknown";
+
+      return [
+        linkIdStr,
+        sourceNodeIdStr,
+        sourceOutputName,
+        targetNodeIdStr,
+        targetInputName,
+        type,
+      ];
+    });
+  }
+
+  static #removeUnwantedProperties(graphData) {
+    const {
+      extra,
+      version,
+      config,
+      last_node_id,
+      last_link_id,
+      ...cleanGraph
+    } = graphData;
+
+    cleanGraph.nodes = cleanGraph.nodes.map((node) => {
+      const {
+        flags,
+        shape,
+        size,
+        pos,
+        properties,
+        inputs,
+        outputs,
+        ...cleanNode
+      } = node;
+
+      if (properties && Object.keys(properties).length) {
+        cleanNode.properties = properties;
+      }
+      if (inputs && inputs.length) {
+        cleanNode.inputs = inputs;
+      }
+      if (outputs && outputs.length) {
+        cleanNode.outputs = outputs;
+      }
+
+      return cleanNode;
+    });
+
+    return cleanGraph;
+  }
+}
+
+class Graph extends mobjectLitegraph.LGraph {
+  #uuid = null;
+
+  constructor(o) {
+    super(o);
+    this.eventEmitter = new EventEmitter();
+    this.#uuid = null;
+    this.updateGraphUuid();
+  }
+
+  on(eventName, listener) {
+    this.eventEmitter.on(eventName, listener);
+  }
+
+  off(eventName, listener) {
+    this.eventEmitter.off(eventName, listener);
+  }
+
+  get uuid() {
+    return this.#uuid;
+  }
+
+  get isEmpty() {
+    return this._nodes.length === 0;
+  }
+
+  updateGraphUuid() {
+    this.#uuid = mobjectLitegraph.LiteGraph.uuidv4();
+  }
+
+  update(status) {
+    if (status && Array.isArray(status.nodes)) {
+      status.nodes.forEach((nodeStatus) => {
+        const node = this.getNodeById(nodeStatus.id);
+        if (node) {
+          node.update(nodeStatus);
+        }
+      });
+    }
+  }
+
+  serialize() {
+    let data = super.serialize();
+    data.uuid = this.#uuid;
+    return data;
+  }
+
+  exportForBackend() {
+    return LiteGraphConverter.Convert(this);
+  }
+
+  onNodeAdded(node) {
+    this.updateGraphUuid();
+    node.on("propertyChanged", this.emitOnNodePropertyChange.bind(this));
+    this.eventEmitter.emit("nodeAdded", this, node);
+  }
+
+  onNodeRemoved(node) {
+    this.updateGraphUuid();
+    node.off("propertyChanged", this.emitOnNodePropertyChange.bind(this));
+    this.eventEmitter.emit("nodeRemoved", this, node);
+  }
+
+  onConnectionChange(node) {
+    this.updateGraphUuid();
+    this.eventEmitter.emit("connectionChange", this, node);
+  }
+
+  onBeforeChange() {
+    this.eventEmitter.emit("beforeChange", this);
+  }
+
+  onAfterChange() {
+    this.eventEmitter.emit("afterChange", this);
+  }
+
+  emitOnNodePropertyChange(node, name, value, prevValue) {
+    this.eventEmitter.emit(
+      "nodePropertyChanged",
+      this,
+      node,
+      name,
+      value,
+      prevValue
+    );
+  }
+}
+
+class GraphEditor {
+  constructor(containerId, connection) {
     this.eventEmitter = new EventEmitter();
     this.connection = connection;
     this.rootElement = null;
@@ -2316,560 +1791,313 @@ var GraphEditor = /*#__PURE__*/function () {
     this.graphCanvas = null;
     this.graph = new Graph();
     this.extensions = [];
-    var graphFramework = new GraphFramework();
+
+    const graphFramework = new GraphFramework();
     graphFramework.applyExtensions("editor", this);
+
     this.makeEditorWindow(containerId);
     this.setGraph(this.graph);
+
     this.eventEmitter.emit("instantiated", this);
     return this.graph;
   }
-  return _createClass(GraphEditor, [{
-    key: "getConnection",
-    value: function getConnection() {
-      return this.connection;
-    }
-  }, {
-    key: "getGraph",
-    value: function getGraph() {
-      return this.graph;
-    }
-  }, {
-    key: "setGraph",
-    value: function setGraph(graph) {
-      if (this.graph) {
-        this.eventEmitter.emit("graphReplaced", this.graph);
-      }
-      this.graph = graph;
-      this.graphCanvas.setGraph(this.graph, true);
-      this.eventEmitter.emit("graphSet", this.graph);
-      return graph;
-    }
-  }, {
-    key: "on",
-    value: function on(eventName, listener) {
-      this.eventEmitter.on(eventName, listener);
-    }
-  }, {
-    key: "off",
-    value: function off(eventName, listener) {
-      this.eventEmitter.off(eventName, listener);
-    }
-  }, {
-    key: "applyExtension",
-    value: function applyExtension(extension) {
-      this.eventEmitter.emit("applyExtension", extension);
-      try {
-        var instance = new extension(this);
-        this.extensions.push(instance);
-      } catch (error) {
-        if (_typeof(extension) === "object" && typeof extension.apply === "function") {
-          extension.apply(this);
-          this.extensions.push(extension);
-        } else {
-          throw new Error("Extension must be a class or an object with an apply method");
-        }
-      }
-    }
-  }, {
-    key: "makeEditorWindow",
-    value: function makeEditorWindow(container_id) {
-      var root = this.rootElement = document.createElement("div");
-      root.className = "mgui-editor";
-      root.innerHTML = "\n    <div class=\"mgui-editor-toolbar\">\n        <div class=\"mgui-editor-tools mgui-editor-tools-left\"></div>\n        <div class=\"mgui-editor-tools mgui-editor-tools-right\"></div>\n    </div>\n    <div class=\"mgui-editor-main-window\">\n        <div class=\"editor-area\">\n            <canvas class=\"mgui-editor-graphcanvas\" width=\"1000\" height=\"500\" tabindex=\"10\"></canvas>\n        </div>\n    </div>\n    <div class=\"mgui-editor-footer\">\n        <div class=\"mgui-editor-tools mgui-editor-tools-left\"></div>\n        <div class=\"mgui-editor-tools mgui-editor-tools-right\"></div>\n    </div>";
-      this.toolbarElement = root.querySelector(".mgui-editor-toolbar");
-      this.mainWindowElement = root.querySelector(".mgui-editor-main-window");
-      this.footerElement = root.querySelector(".mgui-editor-footer");
-      var canvas = this.canvasElement = root.querySelector(".mgui-editor-graphcanvas");
-      this.graphCanvas = new mobjectLitegraph.LGraphCanvas(canvas);
-      this.parentDiv = document.getElementById(container_id);
-      if (this.parentDiv) {
-        var _this$parentDiv;
-        (_this$parentDiv = this.parentDiv) === null || _this$parentDiv === void 0 || _this$parentDiv.appendChild(root);
-      } else {
-        throw new Error("Editor has no parentElement to bind to");
-      }
-    }
-  }]);
-}();
 
-var MobjectGraphTransformer = /*#__PURE__*/function () {
-  function MobjectGraphTransformer() {
-    _classCallCheck(this, MobjectGraphTransformer);
+  getConnection() {
+    return this.connection;
   }
-  return _createClass(MobjectGraphTransformer, null, [{
-    key: "Convert",
-    value:
-    // Public method to be used by class consumers
-    function Convert(graph) {
-      var liteGraphData = JSON.parse(JSON.stringify(graph.serialize()));
-      // First, convert node IDs to strings
-      var nodesWithConvertedIds = _assertClassBrand(MobjectGraphTransformer, this, _convertNodeIdsToStrings).call(this, liteGraphData.nodes);
 
-      // Then, transform the links
-      var transformedLinks = _assertClassBrand(MobjectGraphTransformer, this, _transformLinks).call(this, nodesWithConvertedIds, liteGraphData.links);
+  getGraph() {
+    return this.graph;
+  }
 
-      // Return the transformed data with nodes and links processed
-      return _objectSpread2(_objectSpread2({}, liteGraphData), {}, {
-        nodes: nodesWithConvertedIds,
-        links: transformedLinks
-      });
+  setGraph(graph) {
+    if (this.graph) {
+      this.eventEmitter.emit("graphReplaced", this.graph);
     }
+    this.graph = graph;
+    this.graphCanvas.setGraph(this.graph, true);
 
-    // Private method to convert node IDs to strings
-  }]);
-}();
-function _convertNodeIdsToStrings(nodes) {
-  return nodes.map(function (node) {
-    return _objectSpread2(_objectSpread2({}, node), {}, {
-      id: String(node.id)
-    });
-  });
-}
-// Private method to transform links
-function _transformLinks(nodes, links) {
-  return links.map(function (link) {
-    var _sourceNode$outputs$s, _targetNode$inputs$ta;
-    var _link = _slicedToArray(link, 6),
-      linkId = _link[0],
-      sourceNodeId = _link[1],
-      sourceOutputIndex = _link[2],
-      targetNodeId = _link[3],
-      targetInputIndex = _link[4],
-      type = _link[5];
-    var linkIdStr = String(linkId);
-    var sourceNodeIdStr = String(sourceNodeId);
-    var targetNodeIdStr = String(targetNodeId);
-    var sourceNode = nodes.find(function (node) {
-      return node.id === sourceNodeIdStr;
-    });
-    var targetNode = nodes.find(function (node) {
-      return node.id === targetNodeIdStr;
-    });
-    var sourceOutputName = sourceNode ? ((_sourceNode$outputs$s = sourceNode.outputs[sourceOutputIndex]) === null || _sourceNode$outputs$s === void 0 ? void 0 : _sourceNode$outputs$s.name) || "unknown" : "unknown";
-    var targetInputName = targetNode ? ((_targetNode$inputs$ta = targetNode.inputs[targetInputIndex]) === null || _targetNode$inputs$ta === void 0 ? void 0 : _targetNode$inputs$ta.name) || "unknown" : "unknown";
-    return [linkIdStr, sourceNodeIdStr, sourceOutputName, targetNodeIdStr, targetInputName, type];
-  });
+    this.eventEmitter.emit("graphSet", this.graph);
+
+    return graph;
+  }
+
+  on(eventName, listener) {
+    this.eventEmitter.on(eventName, listener);
+  }
+
+  off(eventName, listener) {
+    this.eventEmitter.off(eventName, listener);
+  }
+
+  applyExtension(extension) {
+    this.eventEmitter.emit("applyExtension", extension);
+    try {
+      const instance = new extension(this);
+      this.extensions.push(instance);
+    } catch (error) {
+      if (
+        typeof extension === "object" &&
+        typeof extension.apply === "function"
+      ) {
+        extension.apply(this);
+        this.extensions.push(extension);
+      } else {
+        throw new Error(
+          "Extension must be a class or an object with an apply method"
+        );
+      }
+    }
+  }
+
+  makeEditorWindow(container_id, options = {}) {
+    const root = (this.rootElement = document.createElement("div"));
+    root.className = "mgui-editor";
+    root.innerHTML = `
+    <div class="mgui-editor-toolbar">
+        <div class="mgui-editor-tools mgui-editor-tools-left"></div>
+        <div class="mgui-editor-tools mgui-editor-tools-right"></div>
+    </div>
+    <div class="mgui-editor-main-window">
+        <div class="editor-area">
+            <canvas class="mgui-editor-graphcanvas" width="1000" height="500" tabindex="10"></canvas>
+        </div>
+    </div>
+    <div class="mgui-editor-footer">
+        <div class="mgui-editor-tools mgui-editor-tools-left"></div>
+        <div class="mgui-editor-tools mgui-editor-tools-right"></div>
+    </div>`;
+
+    this.toolbarElement = root.querySelector(".mgui-editor-toolbar");
+    this.mainWindowElement = root.querySelector(".mgui-editor-main-window");
+    this.footerElement = root.querySelector(".mgui-editor-footer");
+
+    const canvas = (this.canvasElement = root.querySelector(
+      ".mgui-editor-graphcanvas"
+    ));
+
+    this.graphCanvas = new mobjectLitegraph.LGraphCanvas(canvas);
+
+    this.parentDiv = document.getElementById(container_id);
+    if (this.parentDiv) {
+      this.parentDiv?.appendChild(root);
+    } else {
+      throw new Error("Editor has no parentElement to bind to");
+    }
+  }
 }
 
-var EditorAutoUpdateExtension = /*#__PURE__*/function () {
-  function EditorAutoUpdateExtension(editor) {
-    var _this = this;
-    _classCallCheck(this, EditorAutoUpdateExtension);
-    this.graphTimeout = null;
-    this.statusTimeout = null;
-    this.isCreatingGraph = false;
-    this.isUpdatingStatus = false;
+class EditorAutoUpdateExtension {
+  constructor(editor) {
     this.editor = editor;
     this.connection = editor.getConnection();
-    this.editor.on("graphReplaced", function (graph) {
-      _this.unregisterCallbacksFromGraph(graph);
-    });
-    this.editor.on("graphSet", function (graph) {
-      _this.registerCallbacksWithGraph(graph);
-    });
+    this.currentGraph = null;
+    this.pollingTimeoutId = null;
+    this.pollingPeriodInMs = 1000;
+    this.requestQueue = [];
+    this.processingRequest = false;
+    this.setupEditorListeners();
   }
-  return _createClass(EditorAutoUpdateExtension, [{
-    key: "unregisterCallbacksFromGraph",
-    value: function unregisterCallbacksFromGraph(graph) {}
-  }, {
-    key: "registerCallbacksWithGraph",
-    value: function registerCallbacksWithGraph(graph) {
-      var _this2 = this;
-      if (!graph) {
-        return;
-      }
-      graph.registerCallbackHandler("onConnectionChange", /*#__PURE__*/function () {
-        var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(oCbInfo, node) {
-          return _regeneratorRuntime().wrap(function _callee$(_context) {
-            while (1) switch (_context.prev = _context.next) {
-              case 0:
-                _context.next = 2;
-                return _this2.callCreateGraph(graph);
-              case 2:
-              case "end":
-                return _context.stop();
-            }
-          }, _callee);
-        }));
-        return function (_x, _x2) {
-          return _ref.apply(this, arguments);
-        };
-      }());
-      graph.registerCallbackHandler("onNodeAdded", /*#__PURE__*/function () {
-        var _ref2 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3(oCbInfo, node) {
-          return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-            while (1) switch (_context3.prev = _context3.next) {
-              case 0:
-                node.registerCallbackHandler("onPropertyChanged", /*#__PURE__*/function () {
-                  var _ref3 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2(oCbInfo, name, value, prevValue) {
-                    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-                      while (1) switch (_context2.prev = _context2.next) {
-                        case 0:
-                          _context2.prev = 0;
-                          _context2.next = 3;
-                          return _this2.waitForGraphCreationToComplete();
-                        case 3:
-                          _context2.next = 5;
-                          return _this2.waitForStatusUpdateToComplete();
-                        case 5:
-                          console.log("api update parameter, graphid:", graph.uuid, "nodeId:", node.id, "parameterName:", name, "parameterValue:", value);
-                          _context2.next = 8;
-                          return _this2.connection.send("UpdateParameterValue", {
-                            graphUuid: graph.uuid,
-                            nodeId: node.id,
-                            parameterName: name,
-                            parameterValue: value
-                          });
-                        case 8:
-                          _context2.sent;
-                          _context2.next = 14;
-                          break;
-                        case 11:
-                          _context2.prev = 11;
-                          _context2.t0 = _context2["catch"](0);
-                          console.log(_context2.t0);
-                        case 14:
-                        case "end":
-                          return _context2.stop();
-                      }
-                    }, _callee2, null, [[0, 11]]);
-                  }));
-                  return function (_x5, _x6, _x7, _x8) {
-                    return _ref3.apply(this, arguments);
-                  };
-                }());
-                _context3.next = 3;
-                return _this2.callCreateGraph(graph);
-              case 3:
-              case "end":
-                return _context3.stop();
-            }
-          }, _callee3);
-        }));
-        return function (_x3, _x4) {
-          return _ref2.apply(this, arguments);
-        };
-      }());
-      graph.registerCallbackHandler("onNodeRemoved", /*#__PURE__*/function () {
-        var _ref4 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4(oCbInfo, node) {
-          return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-            while (1) switch (_context4.prev = _context4.next) {
-              case 0:
-                _context4.next = 2;
-                return _this2.callCreateGraph(graph);
-              case 2:
-              case "end":
-                return _context4.stop();
-            }
-          }, _callee4);
-        }));
-        return function (_x9, _x10) {
-          return _ref4.apply(this, arguments);
-        };
-      }());
-    }
-  }, {
-    key: "waitForGraphCreationToComplete",
-    value: function () {
-      var _waitForGraphCreationToComplete = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
-            case 0:
-              if (!this.isCreatingGraph) {
-                _context5.next = 6;
-                break;
-              }
-              console.log("Waiting for Graph creation to complete...");
-              _context5.next = 4;
-              return new Promise(function (resolve) {
-                return setTimeout(resolve, 100);
-              });
-            case 4:
-              _context5.next = 0;
-              break;
-            case 6:
-            case "end":
-              return _context5.stop();
-          }
-        }, _callee5, this);
-      }));
-      function waitForGraphCreationToComplete() {
-        return _waitForGraphCreationToComplete.apply(this, arguments);
-      }
-      return waitForGraphCreationToComplete;
-    }()
-  }, {
-    key: "waitForStatusUpdateToComplete",
-    value: function () {
-      var _waitForStatusUpdateToComplete = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-          while (1) switch (_context6.prev = _context6.next) {
-            case 0:
-              if (!this.isUpdatingStatus) {
-                _context6.next = 6;
-                break;
-              }
-              console.log("Waiting for Status update to complete...");
-              _context6.next = 4;
-              return new Promise(function (resolve) {
-                return setTimeout(resolve, 100);
-              });
-            case 4:
-              _context6.next = 0;
-              break;
-            case 6:
-            case "end":
-              return _context6.stop();
-          }
-        }, _callee6, this);
-      }));
-      function waitForStatusUpdateToComplete() {
-        return _waitForStatusUpdateToComplete.apply(this, arguments);
-      }
-      return waitForStatusUpdateToComplete;
-    }()
-  }, {
-    key: "callCreateGraph",
-    value: function () {
-      var _callCreateGraph = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7(graph) {
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-          while (1) switch (_context7.prev = _context7.next) {
-            case 0:
-              _context7.prev = 0;
-              this.stopGraphUpdate();
-              this.stopStatusUpdates();
-              _context7.next = 5;
-              return this.waitForStatusUpdateToComplete();
-            case 5:
-              this.isCreatingGraph = true;
-              graph.generateNewUuid();
-              console.log("New Graph Uuid > ", graph.uuid);
-              this.startGraphUpdate(graph);
-              _context7.next = 14;
-              break;
-            case 11:
-              _context7.prev = 11;
-              _context7.t0 = _context7["catch"](0);
-              console.log(_context7.t0);
-            case 14:
-            case "end":
-              return _context7.stop();
-          }
-        }, _callee7, this, [[0, 11]]);
-      }));
-      function callCreateGraph(_x11) {
-        return _callCreateGraph.apply(this, arguments);
-      }
-      return callCreateGraph;
-    }()
-  }, {
-    key: "startGraphUpdate",
-    value: function startGraphUpdate(graph) {
-      this.stopGraphUpdate();
-      this.scheduleNextGraphUpdate(graph);
-    }
-  }, {
-    key: "stopGraphUpdate",
-    value: function stopGraphUpdate() {
-      if (this.graphTimeout) {
-        clearTimeout(this.graphTimeout);
-        this.graphTimeout = null;
-      }
-    }
-  }, {
-    key: "scheduleNextGraphUpdate",
-    value: function () {
-      var _scheduleNextGraphUpdate = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9(graph) {
-        var _this3 = this;
-        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
-          while (1) switch (_context9.prev = _context9.next) {
-            case 0:
-              this.graphTimeout = setTimeout(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
-                var graphPayload, status;
-                return _regeneratorRuntime().wrap(function _callee8$(_context8) {
-                  while (1) switch (_context8.prev = _context8.next) {
-                    case 0:
-                      _context8.prev = 0;
-                      graphPayload = MobjectGraphTransformer.Convert(graph);
-                      console.log("api create graph", graphPayload);
-                      _context8.next = 5;
-                      return _this3.connection.send("CreateGraph", {
-                        graph: graphPayload
-                      });
-                    case 5:
-                      status = _context8.sent;
-                      console.log("api create graph reply >", status);
-                      if (!(status.uuid !== graph.uuid)) {
-                        _context8.next = 9;
-                        break;
-                      }
-                      throw new Error("Uuid mismatch after Graph generation.");
-                    case 9:
-                      graph.update(status);
-                      _this3.isCreatingGraph = false;
-                      _this3.startStatusUpdates(graph);
-                      _context8.next = 18;
-                      break;
-                    case 14:
-                      _context8.prev = 14;
-                      _context8.t0 = _context8["catch"](0);
-                      console.log(_context8.t0);
-                      _this3.stopGraphUpdate();
-                    case 18:
-                      _context8.prev = 18;
-                      _this3.isCreatingGraph = false;
-                      return _context8.finish(18);
-                    case 21:
-                    case "end":
-                      return _context8.stop();
-                  }
-                }, _callee8, null, [[0, 14, 18, 21]]);
-              })), 100);
-            case 1:
-            case "end":
-              return _context9.stop();
-          }
-        }, _callee9, this);
-      }));
-      function scheduleNextGraphUpdate(_x12) {
-        return _scheduleNextGraphUpdate.apply(this, arguments);
-      }
-      return scheduleNextGraphUpdate;
-    }()
-  }, {
-    key: "startStatusUpdates",
-    value: function startStatusUpdates(graph) {
-      this.stopStatusUpdates();
-      this.scheduleNextStatusUpdate(graph);
-    }
-  }, {
-    key: "stopStatusUpdates",
-    value: function stopStatusUpdates() {
-      if (this.statusTimeout) {
-        clearTimeout(this.statusTimeout);
-        this.statusTimeout = null;
-      }
-    }
-  }, {
-    key: "scheduleNextStatusUpdate",
-    value: function () {
-      var _scheduleNextStatusUpdate = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee11(graph) {
-        var _this4 = this;
-        return _regeneratorRuntime().wrap(function _callee11$(_context11) {
-          while (1) switch (_context11.prev = _context11.next) {
-            case 0:
-              this.statusTimeout = setTimeout(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
-                var status;
-                return _regeneratorRuntime().wrap(function _callee10$(_context10) {
-                  while (1) switch (_context10.prev = _context10.next) {
-                    case 0:
-                      _context10.prev = 0;
-                      _context10.next = 3;
-                      return _this4.waitForGraphCreationToComplete();
-                    case 3:
-                      _this4.isUpdatingStatus = true;
-                      console.log("api get status", graph.uuid);
-                      _context10.next = 7;
-                      return _this4.connection.send("GetStatus", {
-                        graphUuid: graph.uuid
-                      });
-                    case 7:
-                      status = _context10.sent;
-                      console.log("api get status reply >", status);
-                      if (!(status.uuid !== graph.uuid)) {
-                        _context10.next = 11;
-                        break;
-                      }
-                      throw new Error("Uuid mismatch after Status update.");
-                    case 11:
-                      graph.update(status);
-                      _this4.isUpdatingStatus = false;
-                      _this4.scheduleNextStatusUpdate(graph);
-                      _context10.next = 20;
-                      break;
-                    case 16:
-                      _context10.prev = 16;
-                      _context10.t0 = _context10["catch"](0);
-                      console.log(_context10.t0);
-                      _this4.stopStatusUpdates();
-                    case 20:
-                      _context10.prev = 20;
-                      _this4.isUpdatingStatus = false;
-                      return _context10.finish(20);
-                    case 23:
-                    case "end":
-                      return _context10.stop();
-                  }
-                }, _callee10, null, [[0, 16, 20, 23]]);
-              })), 1000);
-            case 1:
-            case "end":
-              return _context11.stop();
-          }
-        }, _callee11, this);
-      }));
-      function scheduleNextStatusUpdate(_x13) {
-        return _scheduleNextStatusUpdate.apply(this, arguments);
-      }
-      return scheduleNextStatusUpdate;
-    }()
-  }]);
-}();
 
-var DefaultPack = /*#__PURE__*/function () {
-  function DefaultPack() {
-    _classCallCheck(this, DefaultPack);
+  setupEditorListeners() {
+    this.editor.on("graphSet", (newGraph) => {
+      this.switchGraph(newGraph);
+    });
   }
-  return _createClass(DefaultPack, [{
-    key: "install",
-    value: function install() {
-      var graphFramework = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new GraphFramework();
-      var options = arguments.length > 1 ? arguments[1] : undefined;
-      this.registerBundledPacks(graphFramework, options);
-      this.registerGraphExtensions(graphFramework, options);
-      this.registerCanvasExtensions(graphFramework, options);
-      this.registerEditorExtensions(graphFramework, options);
-      this.registerNodeExtensions(graphFramework, options);
-      this.registerWidgets(graphFramework, options);
+
+  switchGraph(newGraph) {
+    if (this.currentGraph) {
+      this.unregisterGraphListeners(this.currentGraph);
     }
-  }, {
-    key: "registerBundledPacks",
-    value: function registerBundledPacks(graphFramework) {
-    } // you can ship other packs within packs.  we call these bundled packs.
+
+    this.currentGraph = newGraph;
+    this.registerGraphListeners(newGraph);
+  }
+
+  unregisterGraphListeners(graph) {
+    graph.off("connectionChange", this.handleConnectionChange.bind(this));
+    graph.off("nodeAdded", this.handleNodeAdded.bind(this));
+    graph.off("nodeRemoved", this.handleNodeRemoved.bind(this));
+    graph.off("nodePropertyChanged", this.handlePropertyChange.bind(this));
+  }
+
+  registerGraphListeners(graph) {
+    graph.on("connectionChange", this.handleConnectionChange.bind(this));
+    graph.on("nodeAdded", this.handleNodeAdded.bind(this));
+    graph.on("nodeRemoved", this.handleNodeRemoved.bind(this));
+    graph.on("nodePropertyChanged", this.handlePropertyChange.bind(this));
+  }
+
+  enqueueRequest(requestFunction, ...args) {
+    this.requestQueue.push({ requestFunction, args });
+    this.processRequests();
+  }
+
+  async processRequests() {
+    if (this.processingRequest || this.requestQueue.length === 0) {
+      return;
+    }
+
+    this.processingRequest = true;
+    const { requestFunction, args } = this.requestQueue.shift();
+
+    try {
+      await requestFunction.apply(this, args);
+    } finally {
+      this.processingRequest = false;
+      this.processRequests();
+    }
+  }
+
+  handleConnectionChange(graph, node) {
+    if (graph.uuid != this.currentGraph.uuid) {
+      return;
+    }
+    this.enqueueRequest(this.createGraph, graph);
+  }
+
+  handleNodeAdded(graph, node) {
+    if (graph.uuid != this.currentGraph.uuid) {
+      return;
+    }
+    this.enqueueRequest(this.createGraph, graph);
+  }
+
+  handleNodeRemoved(graph, node) {
+    if (graph.uuid != this.currentGraph.uuid) {
+      return;
+    }
+    this.enqueueRequest(this.createGraph, graph);
+  }
+
+  handlePropertyChange(graph, node, name, value) {
+    if (graph.uuid != this.currentGraph.uuid) {
+      return;
+    }
+    this.enqueueRequest(this.updateParameterValue, graph, node, name, value);
+  }
+
+  async createGraph(graph) {
+    this.stopPolling();
+    const graphPayload = graph.exportForBackend();
+    console.log("api create graph", graph.uuid, graphPayload);
+
+    try {
+      const status = await this.connection.send("CreateGraph", {
+        graph: graphPayload,
+      });
+      if (status.uuid === graph.uuid) {
+        graph.update(status);
+        this.startPolling();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async updateParameterValue(graph, node, name, value) {
+    this.stopPolling();
+    console.log("api update property", node, name, value);
+    try {
+      const reply = await this.connection.send("UpdateParameterValue", {
+        graphUuid: graph.uuid,
+        nodeId: node.id,
+        parameterName: name,
+        parameterValue: value,
+      });
+      this.startPolling();
+    } catch (error) {
+      if (error.message.includes("Invalid or missing graphUuid")) {
+        console.log(
+          "api update property failed due to unknown graphUuid, triggering update graph"
+        );
+        await this.createGraph(graph);
+      } else {
+        console.error("Update parameter value failed:", error);
+      }
+    }
+  }
+
+  stopPolling() {
+    if (this.pollingTimeoutId) {
+      clearInterval(this.pollingTimeoutId);
+      this.pollingTimeoutId = null;
+      console.log("polling stopped.");
+    }
+  }
+
+  startPolling() {
+    if (this.currentGraph.isEmpty) {
+      this.stopPolling();
+      return;
+    }
+
+    if (this.pollingTimeoutId) {
+      return;
+    }
+
+    console.log("polling started.");
+    this.pollingTimeoutId = setInterval(async () => {
+      try {
+        const status = await this.connection.send("GetStatus", {
+          graphUuid: this.currentGraph.uuid,
+        });
+        console.log("poll status reply >", status);
+        if (status.uuid !== this.currentGraph.uuid) {
+          throw new Error("mismatched UUIDs, stopping polling.");
+        }
+      } catch (error) {
+        console.error("polling error:", error);
+        this.stopPolling();
+      }
+    }, this.pollingPeriodInMs);
+  }
+}
+
+class DefaultPack {
+  install(graphFramework = new GraphFramework(), options) {
+    this.registerBundledPacks(graphFramework, options);
+    this.registerGraphExtensions(graphFramework, options);
+    this.registerCanvasExtensions(graphFramework, options);
+    this.registerEditorExtensions(graphFramework, options);
+    this.registerNodeExtensions(graphFramework, options);
+    this.registerWidgets(graphFramework, options);
+  }
+
+  registerBundledPacks(graphFramework, options = {}) {
+    // you can ship other packs within packs.  we call these bundled packs.
     // this just triggers install on the bundled pack.
-  }, {
-    key: "registerGraphExtensions",
-    value: function registerGraphExtensions(graphFramework) {
-    } // add any default graph extensions here.  It's good practice to make
+  }
+
+  registerGraphExtensions(graphFramework, options = {}) {
+    // add any default graph extensions here.  It's good practice to make
     // these switchable via the options object.
     // graphFramework.registerNodeExtensions(...);
-  }, {
-    key: "registerCanvasExtensions",
-    value: function registerCanvasExtensions(graphFramework) {
-    } // add any default canvas extensions here.  It's good practice to make
+  }
+
+  registerCanvasExtensions(graphFramework, options = {}) {
+    // add any default canvas extensions here.  It's good practice to make
     // these switchable via the options object.
     // graphFramework.registerCanvasExtension(...);
-  }, {
-    key: "registerEditorExtensions",
-    value: function registerEditorExtensions(graphFramework) {
-      // add any default editor extensions here.  It's good practice to make
-      // these switchable via the options object.
-      graphFramework.registerEditorExtension(EditorAutoUpdateExtension);
-    }
-  }, {
-    key: "registerNodeExtensions",
-    value: function registerNodeExtensions(graphFramework) {
-    } // add any default node extensions here.  It's good practice to make
+  }
+
+  registerEditorExtensions(graphFramework, options = {}) {
+    // add any default editor extensions here.  It's good practice to make
+    // these switchable via the options object.
+    graphFramework.registerEditorExtension(EditorAutoUpdateExtension);
+  }
+
+  registerNodeExtensions(graphFramework, options = {}) {
+    // add any default node extensions here.  It's good practice to make
     // these switchable via the options object.
     // graphFramework.registerNodeExtensions(...);
-  }, {
-    key: "registerWidgets",
-    value: function registerWidgets(graphFramework) {
-    } // add any default widgets here.  It's good practice to make
+  }
+  registerWidgets(graphFramework, options = {}) {
+    // add any default widgets here.  It's good practice to make
     // these switchable via the options object.
     // graphFramework.registerWidgetType(...);
-  }]);
-}();
+  }
+}
 
 exports.CheckboxComponent = CheckboxComponent;
 exports.ColorGenerator = ColorGenerator;

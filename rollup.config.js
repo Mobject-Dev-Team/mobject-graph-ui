@@ -1,5 +1,4 @@
 import { nodeResolve } from "@rollup/plugin-node-resolve";
-import babel from "@rollup/plugin-babel";
 import { terser } from "rollup-plugin-terser";
 import fs from "fs";
 import path from "path";
@@ -54,11 +53,6 @@ export default {
   external: ["mobject-litegraph"],
   plugins: [
     nodeResolve(),
-    babel({
-      babelHelpers: "bundled",
-      exclude: /node_modules/,
-      presets: ["@babel/preset-env"],
-    }),
     css({
       output: "mobject-graph-ui.css",
     }),

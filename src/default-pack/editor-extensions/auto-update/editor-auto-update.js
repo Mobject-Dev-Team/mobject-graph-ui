@@ -1,184 +1,166 @@
-import { MobjectGraphTransformer } from "../../../utils/litegraph-converter.js";
-
 export class EditorAutoUpdateExtension {
   constructor(editor) {
-    this.graphTimeout = null;
-    this.statusTimeout = null;
-    this.isCreatingGraph = false;
-    this.isUpdatingStatus = false;
-
     this.editor = editor;
     this.connection = editor.getConnection();
+    this.currentGraph = null;
+    this.pollingTimeoutId = null;
+    this.pollingPeriodInMs = 1000;
+    this.requestQueue = [];
+    this.processingRequest = false;
+    this.setupEditorListeners();
+  }
 
-    this.editor.on("graphReplaced", (graph) => {
-      this.unregisterCallbacksFromGraph(graph);
-    });
-
-    this.editor.on("graphSet", (graph) => {
-      this.registerCallbacksWithGraph(graph);
+  setupEditorListeners() {
+    this.editor.on("graphSet", (newGraph) => {
+      this.switchGraph(newGraph);
     });
   }
 
-  unregisterCallbacksFromGraph(graph) {}
+  switchGraph(newGraph) {
+    if (this.currentGraph) {
+      this.unregisterGraphListeners(this.currentGraph);
+    }
 
-  registerCallbacksWithGraph(graph) {
-    if (!graph) {
+    this.currentGraph = newGraph;
+    this.registerGraphListeners(newGraph);
+  }
+
+  unregisterGraphListeners(graph) {
+    graph.off("connectionChange", this.handleConnectionChange.bind(this));
+    graph.off("nodeAdded", this.handleNodeAdded.bind(this));
+    graph.off("nodeRemoved", this.handleNodeRemoved.bind(this));
+    graph.off("nodePropertyChanged", this.handlePropertyChange.bind(this));
+  }
+
+  registerGraphListeners(graph) {
+    graph.on("connectionChange", this.handleConnectionChange.bind(this));
+    graph.on("nodeAdded", this.handleNodeAdded.bind(this));
+    graph.on("nodeRemoved", this.handleNodeRemoved.bind(this));
+    graph.on("nodePropertyChanged", this.handlePropertyChange.bind(this));
+  }
+
+  enqueueRequest(requestFunction, ...args) {
+    this.requestQueue.push({ requestFunction, args });
+    this.processRequests();
+  }
+
+  async processRequests() {
+    if (this.processingRequest || this.requestQueue.length === 0) {
       return;
     }
 
-    graph.registerCallbackHandler(
-      "onConnectionChange",
-      async (oCbInfo, node) => {
-        await this.callCreateGraph(graph);
-      }
-    );
+    this.processingRequest = true;
+    const { requestFunction, args } = this.requestQueue.shift();
 
-    graph.registerCallbackHandler("onNodeAdded", async (oCbInfo, node) => {
-      node.registerCallbackHandler(
-        "onPropertyChanged",
-        async (oCbInfo, name, value, prevValue) => {
-          try {
-            await this.waitForGraphCreationToComplete();
-            await this.waitForStatusUpdateToComplete();
-
-            console.log(
-              "api update parameter, graphid:",
-              graph.uuid,
-              "nodeId:",
-              node.id,
-              "parameterName:",
-              name,
-              "parameterValue:",
-              value
-            );
-
-            const reply = await this.connection.send("UpdateParameterValue", {
-              graphUuid: graph.uuid,
-              nodeId: node.id,
-              parameterName: name,
-              parameterValue: value,
-            });
-          } catch (e) {
-            console.log(e);
-          }
-        }
-      );
-      await this.callCreateGraph(graph);
-    });
-
-    graph.registerCallbackHandler("onNodeRemoved", async (oCbInfo, node) => {
-      await this.callCreateGraph(graph);
-    });
-  }
-
-  async waitForGraphCreationToComplete() {
-    while (this.isCreatingGraph) {
-      console.log("Waiting for Graph creation to complete...");
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-  }
-
-  async waitForStatusUpdateToComplete() {
-    while (this.isUpdatingStatus) {
-      console.log("Waiting for Status update to complete...");
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-  }
-
-  async callCreateGraph(graph) {
     try {
-      this.stopGraphUpdate();
-      this.stopStatusUpdates();
-      await this.waitForStatusUpdateToComplete();
-
-      this.isCreatingGraph = true;
-
-      graph.generateNewUuid();
-      console.log("New Graph Uuid > ", graph.uuid);
-
-      this.startGraphUpdate(graph);
-    } catch (e) {
-      console.log(e);
+      await requestFunction.apply(this, args);
+    } finally {
+      this.processingRequest = false;
+      this.processRequests();
     }
   }
 
-  startGraphUpdate(graph) {
-    this.stopGraphUpdate();
-    this.scheduleNextGraphUpdate(graph);
-  }
-
-  stopGraphUpdate() {
-    if (this.graphTimeout) {
-      clearTimeout(this.graphTimeout);
-      this.graphTimeout = null;
+  handleConnectionChange(graph, node) {
+    if (graph.uuid != this.currentGraph.uuid) {
+      return;
     }
+    this.enqueueRequest(this.createGraph, graph);
   }
 
-  async scheduleNextGraphUpdate(graph) {
-    this.graphTimeout = setTimeout(async () => {
-      try {
-        const graphPayload = MobjectGraphTransformer.Convert(graph);
+  handleNodeAdded(graph, node) {
+    if (graph.uuid != this.currentGraph.uuid) {
+      return;
+    }
+    this.enqueueRequest(this.createGraph, graph);
+  }
 
-        console.log("api create graph", graphPayload);
-        const status = await this.connection.send("CreateGraph", {
-          graph: graphPayload,
-        });
+  handleNodeRemoved(graph, node) {
+    if (graph.uuid != this.currentGraph.uuid) {
+      return;
+    }
+    this.enqueueRequest(this.createGraph, graph);
+  }
 
-        console.log("api create graph reply >", status);
-        if (status.uuid !== graph.uuid) {
-          throw new Error("Uuid mismatch after Graph generation.");
-        }
+  handlePropertyChange(graph, node, name, value) {
+    if (graph.uuid != this.currentGraph.uuid) {
+      return;
+    }
+    this.enqueueRequest(this.updateParameterValue, graph, node, name, value);
+  }
 
+  async createGraph(graph) {
+    this.stopPolling();
+    const graphPayload = graph.exportForBackend();
+    console.log("api create graph", graph.uuid, graphPayload);
+
+    try {
+      const status = await this.connection.send("CreateGraph", {
+        graph: graphPayload,
+      });
+      if (status.uuid === graph.uuid) {
         graph.update(status);
-
-        this.isCreatingGraph = false;
-        this.startStatusUpdates(graph);
-      } catch (error) {
-        console.log(error);
-        this.stopGraphUpdate();
-      } finally {
-        this.isCreatingGraph = false;
+        this.startPolling();
       }
-    }, 100);
-  }
-
-  startStatusUpdates(graph) {
-    this.stopStatusUpdates();
-    this.scheduleNextStatusUpdate(graph);
-  }
-
-  stopStatusUpdates() {
-    if (this.statusTimeout) {
-      clearTimeout(this.statusTimeout);
-      this.statusTimeout = null;
+    } catch (error) {
+      console.error(error);
     }
   }
 
-  async scheduleNextStatusUpdate(graph) {
-    this.statusTimeout = setTimeout(async () => {
-      try {
-        await this.waitForGraphCreationToComplete();
-        this.isUpdatingStatus = true;
+  async updateParameterValue(graph, node, name, value) {
+    this.stopPolling();
+    console.log("api update property", node, name, value);
+    try {
+      const reply = await this.connection.send("UpdateParameterValue", {
+        graphUuid: graph.uuid,
+        nodeId: node.id,
+        parameterName: name,
+        parameterValue: value,
+      });
+      this.startPolling();
+    } catch (error) {
+      if (error.message.includes("Invalid or missing graphUuid")) {
+        console.log(
+          "api update property failed due to unknown graphUuid, triggering update graph"
+        );
+        await this.createGraph(graph);
+      } else {
+        console.error("Update parameter value failed:", error);
+      }
+    }
+  }
 
-        console.log("api get status", graph.uuid);
+  stopPolling() {
+    if (this.pollingTimeoutId) {
+      clearInterval(this.pollingTimeoutId);
+      this.pollingTimeoutId = null;
+      console.log("polling stopped.");
+    }
+  }
+
+  startPolling() {
+    if (this.currentGraph.isEmpty) {
+      this.stopPolling();
+      return;
+    }
+
+    if (this.pollingTimeoutId) {
+      return;
+    }
+
+    console.log("polling started.");
+    this.pollingTimeoutId = setInterval(async () => {
+      try {
         const status = await this.connection.send("GetStatus", {
-          graphUuid: graph.uuid,
+          graphUuid: this.currentGraph.uuid,
         });
-
-        console.log("api get status reply >", status);
-        if (status.uuid !== graph.uuid) {
-          throw new Error("Uuid mismatch after Status update.");
+        console.log("poll status reply >", status);
+        if (status.uuid !== this.currentGraph.uuid) {
+          throw new Error("mismatched UUIDs, stopping polling.");
         }
-
-        graph.update(status);
-        this.isUpdatingStatus = false;
-        this.scheduleNextStatusUpdate(graph);
       } catch (error) {
-        console.log(error);
-        this.stopStatusUpdates();
-      } finally {
-        this.isUpdatingStatus = false;
+        console.error("polling error:", error);
+        this.stopPolling();
       }
-    }, 1000);
+    }, this.pollingPeriodInMs);
   }
 }
