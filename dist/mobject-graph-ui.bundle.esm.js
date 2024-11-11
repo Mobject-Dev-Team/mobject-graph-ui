@@ -1964,11 +1964,7 @@ class EditorAutoUpdateExtension {
   }
 
   setupToolbarControls() {
-    const myButton = new ToolbarButton("myButton", "Test", null, () => {
-      console.log(this);
-    });
-
-    this.editor.addToolbarControl(myButton);
+    // todo, add enable / disable auto update
   }
 
   switchGraph(newGraph) {
