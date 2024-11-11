@@ -1954,6 +1954,7 @@ class EditorAutoUpdateExtension {
     this.processingRequest = false;
     this.setupEditorListeners();
     this.setupToolbarControls();
+    this.switchGraph(this.editor.getGraph());
   }
 
   setupEditorListeners() {
@@ -1976,7 +1977,10 @@ class EditorAutoUpdateExtension {
     }
 
     this.currentGraph = newGraph;
-    this.registerGraphListeners(newGraph);
+
+    if (this.currentGraph) {
+      this.registerGraphListeners(newGraph);
+    }
   }
 
   unregisterGraphListeners(graph) {
