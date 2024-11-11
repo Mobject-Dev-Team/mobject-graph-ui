@@ -137,6 +137,10 @@ export class EditorAutoUpdateExtension {
     }
   }
 
+  isPolling() {
+    return Boolean(this.pollingTimeoutId);
+  }
+
   startPolling() {
     if (this.currentGraph.isEmpty) {
       this.stopPolling();
@@ -153,10 +157,16 @@ export class EditorAutoUpdateExtension {
         const status = await this.connection.send("GetStatus", {
           graphUuid: this.currentGraph.uuid,
         });
+
+        if (!this.isPolling()) return;
+
         console.log("poll status reply >", status);
         if (status.uuid !== this.currentGraph.uuid) {
-          throw new Error("mismatched UUIDs, stopping polling.");
+          console.log("poll status reply rejected as graph updated ");
+          this.stopPolling();
+          return;
         }
+        this.currentGraph.update(status);
       } catch (error) {
         console.error("polling error:", error);
         this.stopPolling();

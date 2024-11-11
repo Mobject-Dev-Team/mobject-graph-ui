@@ -2022,6 +2022,10 @@ class EditorAutoUpdateExtension {
     }
   }
 
+  isPolling() {
+    return Boolean(this.pollingTimeoutId);
+  }
+
   startPolling() {
     if (this.currentGraph.isEmpty) {
       this.stopPolling();
@@ -2038,10 +2042,16 @@ class EditorAutoUpdateExtension {
         const status = await this.connection.send("GetStatus", {
           graphUuid: this.currentGraph.uuid,
         });
+
+        if (!this.isPolling()) return;
+
         console.log("poll status reply >", status);
         if (status.uuid !== this.currentGraph.uuid) {
-          throw new Error("mismatched UUIDs, stopping polling.");
+          console.log("poll status reply rejected as graph updated ");
+          this.stopPolling();
+          return;
         }
+        this.currentGraph.update(status);
       } catch (error) {
         console.error("polling error:", error);
         this.stopPolling();
@@ -2092,6 +2102,16 @@ class DefaultPack {
     // add any default widgets here.  It's good practice to make
     // these switchable via the options object.
     // graphFramework.registerWidgetType(...);
+  }
+
+  registerFileAssociation(graphFramework, options = {}) {
+    // add any default fill associations here.  It's good practice to make
+    // these switchable via the options object.
+    // graphFramework.registerFileAssociation(
+    //   ["jpg", "png", "bmp"], // array of file types
+    //   "Demo/MyNode", // node which will handle the drop
+    //   "myParameter" // parameter which will handle the drop
+    // );
   }
 }
 
