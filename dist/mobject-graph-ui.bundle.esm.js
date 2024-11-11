@@ -1890,6 +1890,7 @@ class EditorAutoUpdateExtension {
     this.currentGraph = null;
     this.pollingTimeoutId = null;
     this.pollingPeriodInMs = 1000;
+    this.requestQueueMaxSize = 1;
     this.requestQueue = [];
     this.processingRequest = false;
     this.setupEditorListeners();
@@ -1925,6 +1926,11 @@ class EditorAutoUpdateExtension {
   }
 
   enqueueRequest(requestFunction, ...args) {
+    if (this.requestQueue.length >= this.requestQueueMaxSize) {
+      this.requestQueue = this.requestQueue.slice(
+        -this.requestQueueMaxSize + 1
+      );
+    }
     this.requestQueue.push({ requestFunction, args });
     this.processRequests();
   }
