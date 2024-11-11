@@ -44,4 +44,14 @@ export class DefaultPack {
     // these switchable via the options object.
     // graphFramework.registerWidgetType(...);
   }
+
+  registerFileAssociation(graphFramework, options = {}) {
+    // add any default fill associations here.  It's good practice to make
+    // these switchable via the options object.
+    // graphFramework.registerFileAssociation(
+    //   ["jpg", "png", "bmp"], // array of file types
+    //   "Demo/MyNode", // node which will handle the drop
+    //   "myParameter" // parameter which will handle the drop
+    // );
+  }
 }
