@@ -1,3 +1,5 @@
+import { ToolbarButton } from "../../../editor-controls/toolbar-button.js";
+
 export class EditorAutoUpdateExtension {
   constructor(editor) {
     this.editor = editor;
@@ -9,12 +11,21 @@ export class EditorAutoUpdateExtension {
     this.requestQueue = [];
     this.processingRequest = false;
     this.setupEditorListeners();
+    this.setupToolbarControls();
   }
 
   setupEditorListeners() {
     this.editor.on("graphSet", (newGraph) => {
       this.switchGraph(newGraph);
     });
+  }
+
+  setupToolbarControls() {
+    const myButton = new ToolbarButton("myButton", "Test", null, () => {
+      console.log(this);
+    });
+
+    this.editor.addToolbarControl(myButton);
   }
 
   switchGraph(newGraph) {

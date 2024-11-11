@@ -1,4 +1,5 @@
 import { GraphFramework } from "../core/graph-framework.js";
+import { GetBlueprintsExtension } from "./editor-extensions/get-blueprints/get-blueprints.js";
 import { EditorAutoUpdateExtension } from "./editor-extensions/auto-update/editor-auto-update.js";
 
 export class DefaultPack {
@@ -31,6 +32,7 @@ export class DefaultPack {
   registerEditorExtensions(graphFramework, options = {}) {
     // add any default editor extensions here.  It's good practice to make
     // these switchable via the options object.
+    graphFramework.registerEditorExtension(GetBlueprintsExtension);
     graphFramework.registerEditorExtension(EditorAutoUpdateExtension);
   }
 

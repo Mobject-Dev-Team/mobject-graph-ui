@@ -15,13 +15,14 @@ export class GraphEditor {
     this.canvasElement = null;
     this.graphCanvas = null;
     this.graph = new Graph();
+    this.toolbarControls = [];
     this.extensions = [];
-
-    const graphFramework = new GraphFramework();
-    graphFramework.applyExtensions("editor", this);
 
     this.makeEditorWindow(containerId);
     this.setGraph(this.graph);
+
+    const graphFramework = new GraphFramework();
+    graphFramework.applyExtensions("editor", this);
 
     this.eventEmitter.emit("instantiated", this);
     return this.graph;
@@ -53,6 +54,12 @@ export class GraphEditor {
 
   off(eventName, listener) {
     this.eventEmitter.off(eventName, listener);
+  }
+
+  addToolbarControl(toolbarControl) {
+    this.toolbarControls.push(toolbarControl);
+    const controlElement = toolbarControl.render();
+    this.toolbarElement.appendChild(controlElement);
   }
 
   applyExtension(extension) {

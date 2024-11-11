@@ -1790,13 +1790,14 @@
       this.canvasElement = null;
       this.graphCanvas = null;
       this.graph = new Graph();
+      this.toolbarControls = [];
       this.extensions = [];
-
-      const graphFramework = new GraphFramework();
-      graphFramework.applyExtensions("editor", this);
 
       this.makeEditorWindow(containerId);
       this.setGraph(this.graph);
+
+      const graphFramework = new GraphFramework();
+      graphFramework.applyExtensions("editor", this);
 
       this.eventEmitter.emit("instantiated", this);
       return this.graph;
@@ -1828,6 +1829,12 @@
 
     off(eventName, listener) {
       this.eventEmitter.off(eventName, listener);
+    }
+
+    addToolbarControl(toolbarControl) {
+      this.toolbarControls.push(toolbarControl);
+      const controlElement = toolbarControl.render();
+      this.toolbarElement.appendChild(controlElement);
     }
 
     applyExtension(extension) {
@@ -1887,6 +1894,58 @@
     }
   }
 
+  class ToolbarButton {
+    constructor(id, label, iconUrl, onClick) {
+      this.id = id;
+      this.label = label;
+      this.iconUrl = iconUrl;
+      this.onClick = onClick;
+    }
+
+    render() {
+      const button = document.createElement("button");
+      button.id = this.id;
+      button.classList.add("mgui-toolbar-button");
+      if (this.iconUrl) {
+        button.innerHTML = `<img src="${this.iconUrl}" alt="${this.label} icon"/> `;
+      }
+      button.innerHTML += this.label;
+      if (this.onClick) {
+        button.addEventListener("click", this.onClick);
+      }
+      return button;
+    }
+  }
+
+  class GetBlueprintsExtension {
+    constructor(editor) {
+      this.editor = editor;
+      this.connection = editor.getConnection();
+      this.setupToolbarControls();
+    }
+
+    setupToolbarControls() {
+      const graphFramework = new GraphFramework();
+      const getBlueprintsButton = new ToolbarButton(
+        "GetBlueprints",
+        "Get Blueprints",
+        null,
+        async () => {
+          console.log("api get blueprints");
+          try {
+            const result = await this.connection.send("GetBlueprints");
+            console.log("api get blueprints reply", result);
+            graphFramework.installNodeBlueprints(result.blueprints);
+          } catch (error) {
+            console.error("api get blueprints failed:", error);
+          }
+        }
+      );
+
+      this.editor.addToolbarControl(getBlueprintsButton);
+    }
+  }
+
   class EditorAutoUpdateExtension {
     constructor(editor) {
       this.editor = editor;
@@ -1898,12 +1957,21 @@
       this.requestQueue = [];
       this.processingRequest = false;
       this.setupEditorListeners();
+      this.setupToolbarControls();
     }
 
     setupEditorListeners() {
       this.editor.on("graphSet", (newGraph) => {
         this.switchGraph(newGraph);
       });
+    }
+
+    setupToolbarControls() {
+      const myButton = new ToolbarButton("myButton", "Test", null, () => {
+        console.log(this);
+      });
+
+      this.editor.addToolbarControl(myButton);
     }
 
     switchGraph(newGraph) {
@@ -2100,6 +2168,7 @@
     registerEditorExtensions(graphFramework, options = {}) {
       // add any default editor extensions here.  It's good practice to make
       // these switchable via the options object.
+      graphFramework.registerEditorExtension(GetBlueprintsExtension);
       graphFramework.registerEditorExtension(EditorAutoUpdateExtension);
     }
 
