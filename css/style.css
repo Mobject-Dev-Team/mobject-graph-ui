@@ -1,51 +1,65 @@
-﻿.litegraph .dialog .dialog-content table {
-  margin: 10px;
+﻿.mgui-editor {
+  font-family: "Arial", sans-serif;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  width: 100%;
 }
 
-a {
-  color: lightblue;
-}
-
-.link-button-rounded {
-  background-color: dimgray;
-  color: white;
-  display: block;
-  padding: 10px 10px;
-  text-align: center;
-  text-decoration: none;
-  border-radius: 8px;
-}
-
-.link-button-rounded {
-  -webkit-border-radius: 8px;
-  -moz-border-radius: 8px;
-  -ms-border-radius: 8px;
-  -o-border-radius: 8px;
-}
-
-.link-button-rounded:hover {
-  background-color: grey;
-}
-
-.litegraph .graphdialog {
-  display: flex;
+.mgui-editor-toolbar {
+  top: 0;
+  padding: 10px;
+  width: 100%;
+  background-color: #3a3a3a;
+  border-bottom: 1px solid #929292;
   align-items: center;
-  border-radius: 5px;
-  padding: 4px 10px;
-  position: fixed;
+}
+
+.mgui-editor-footer {
+  padding: 10px;
+  width: 100%;
+  background-color: #3a3a3a;
+  border-top: 1px solid #e1e1e1;
+  align-items: center;
+}
+
+.mgui-editor-main-window {
+  padding: 0px;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.mgui-editor-graphcanvas {
+  padding: 0px;
+  background-color: #303030;
+  height: 100%;
+  width: 100%;
+}
+
+.mgui-toolbar-button {
+  padding: 5px 10px;
+  border: none;
+  background-color: #007bff;
   color: white;
-  font-family: "Courier New", Courier, monospace;
-}
-
-.litegraph .graphdialog button {
-  padding: 4px 18px;
-  border-radius: 2px;
+  margin-right: 5px;
+  border-radius: 3px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.graphdialog button {
-  margin-top: 3px;
-  vertical-align: top;
-  background-color: #999;
-  border: 0;
+.mgui-toolbar-button:hover {
+  background-color: #0056b3;
+}
+
+.mgui-toolbar-button img {
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
 }

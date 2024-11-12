@@ -60,6 +60,7 @@ export class GraphEditor {
     this.toolbarControls.push(toolbarControl);
     const controlElement = toolbarControl.render();
     this.toolbarElement.appendChild(controlElement);
+    this.resizeCanvas();
   }
 
   applyExtension(extension) {
@@ -91,9 +92,7 @@ export class GraphEditor {
         <div class="mgui-editor-tools mgui-editor-tools-right"></div>
     </div>
     <div class="mgui-editor-main-window">
-        <div class="editor-area">
-            <canvas class="mgui-editor-graphcanvas" width="1000" height="500" tabindex="10"></canvas>
-        </div>
+        <canvas class="mgui-editor-graphcanvas"></canvas>    
     </div>
     <div class="mgui-editor-footer">
         <div class="mgui-editor-tools mgui-editor-tools-left"></div>
@@ -109,12 +108,26 @@ export class GraphEditor {
     ));
 
     this.graphCanvas = new LGraphCanvas(canvas);
+    this.graphCanvas.render_canvas_border = false;
 
     this.parentDiv = document.getElementById(container_id);
     if (this.parentDiv) {
       this.parentDiv?.appendChild(root);
+      this.resizeCanvas();
+      window.addEventListener("resize", this.resizeCanvas.bind(this));
     } else {
       throw new Error("Editor has no parentElement to bind to");
     }
+  }
+
+  resizeCanvas() {
+    const availableHeight =
+      this.parentDiv.clientHeight -
+      this.toolbarElement.offsetHeight -
+      this.footerElement.offsetHeight;
+    this.mainWindowElement.style.height = availableHeight + "px";
+    this.canvasElement.height = availableHeight;
+    this.canvasElement.style.height = availableHeight + "px";
+    this.graphCanvas.resize();
   }
 }
