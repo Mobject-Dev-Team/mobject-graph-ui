@@ -1840,6 +1840,10 @@
       return this.graph;
     }
 
+    getGraphCanvas() {
+      return this.graphCanvas;
+    }
+
     setGraph(graph) {
       if (this.graph) {
         this.eventEmitter.emit("graphReplaced", this.graph);
@@ -2180,6 +2184,29 @@
     }
   }
 
+  class ShowExecuteOrderExtension {
+    constructor(editor) {
+      this.editor = editor;
+      this.editorCanvas = editor.getGraphCanvas();
+      this.setupToolbarControls();
+    }
+
+    setupToolbarControls() {
+      const getBlueprintsButton = new ToolbarButton(
+        "ToggleExecuteOrder",
+        "Toggle Execution Order",
+        null,
+        () => {
+          this.editorCanvas.render_execution_order =
+            !this.editorCanvas.render_execution_order;
+          this.editorCanvas.setDirty(true, true);
+        }
+      );
+
+      this.editor.addToolbarControl(getBlueprintsButton);
+    }
+  }
+
   class PreExecutionCheckExtension {
     constructor(node) {
       this.node = node;
@@ -2268,6 +2295,7 @@
       // these switchable via the options object.
       graphFramework.registerEditorExtension(GetBlueprintsExtension);
       graphFramework.registerEditorExtension(EditorAutoUpdateExtension);
+      graphFramework.registerEditorExtension(ShowExecuteOrderExtension);
     }
 
     registerNodeExtensions(graphFramework, options = {}) {

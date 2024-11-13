@@ -1,6 +1,7 @@
 import { GraphFramework } from "../core/graph-framework.js";
 import { GetBlueprintsExtension } from "./editor-extensions/get-blueprints/get-blueprints.js";
 import { EditorAutoUpdateExtension } from "./editor-extensions/auto-update/editor-auto-update.js";
+import { ShowExecuteOrderExtension } from "./editor-extensions/show-execute-order/show-execute-order.js";
 import { PreExecutionCheckExtension } from "./node-extensions/pre-execution-check/pre-execution-check.js";
 
 export class DefaultPack {
@@ -35,6 +36,7 @@ export class DefaultPack {
     // these switchable via the options object.
     graphFramework.registerEditorExtension(GetBlueprintsExtension);
     graphFramework.registerEditorExtension(EditorAutoUpdateExtension);
+    graphFramework.registerEditorExtension(ShowExecuteOrderExtension);
   }
 
   registerNodeExtensions(graphFramework, options = {}) {

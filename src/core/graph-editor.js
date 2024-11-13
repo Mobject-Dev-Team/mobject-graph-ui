@@ -36,6 +36,10 @@ export class GraphEditor {
     return this.graph;
   }
 
+  getGraphCanvas() {
+    return this.graphCanvas;
+  }
+
   setGraph(graph) {
     if (this.graph) {
       this.eventEmitter.emit("graphReplaced", this.graph);
