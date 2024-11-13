@@ -49,8 +49,21 @@
   transition: background-color 0.3s ease;
 }
 
+.mgui-toolbar-button.disabled,
+.mgui-toolbar-button:disabled {
+  background-color: #aaa;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .mgui-toolbar-button:hover {
   background-color: #0056b3;
+}
+
+.mgui-toolbar-button.disabled:hover,
+.mgui-toolbar-button:disabled:hover {
+  background-color: #aaa;
 }
 
 .mgui-toolbar-button img {

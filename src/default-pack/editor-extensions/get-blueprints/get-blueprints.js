@@ -16,12 +16,15 @@ export class GetBlueprintsExtension {
       null,
       async () => {
         console.log("api get blueprints");
+        getBlueprintsButton.disable();
         try {
           const result = await this.connection.send("GetBlueprints");
           console.log("api get blueprints reply", result);
           graphFramework.installNodeBlueprints(result.blueprints);
         } catch (error) {
           console.error("api get blueprints failed:", error);
+        } finally {
+          getBlueprintsButton.enable();
         }
       }
     );
