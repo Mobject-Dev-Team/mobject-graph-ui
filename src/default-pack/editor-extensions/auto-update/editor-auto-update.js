@@ -148,9 +148,9 @@ export class EditorAutoUpdateExtension {
 
   stopPolling() {
     if (this.pollingTimeoutId) {
-      clearInterval(this.pollingTimeoutId);
+      clearTimeout(this.pollingTimeoutId);
       this.pollingTimeoutId = null;
-      console.log("polling stopped.");
+      console.log("polling stopped");
     }
   }
 
@@ -164,30 +164,30 @@ export class EditorAutoUpdateExtension {
       return;
     }
 
-    if (this.pollingTimeoutId) {
-      return;
-    }
+    const poll = async () => {
+      if (!this.isPolling()) return;
 
-    console.log("polling started.");
-    this.pollingTimeoutId = setInterval(async () => {
       try {
         const status = await this.connection.send("GetStatus", {
           graphUuid: this.currentGraph.uuid,
         });
 
-        if (!this.isPolling()) return;
-
-        console.log("poll status reply >", status);
+        console.log("polling reply >", status);
         if (status.uuid !== this.currentGraph.uuid) {
-          console.log("poll status reply rejected as graph updated ");
+          console.log("polling reply rejected as graph uuid mismatch");
           this.stopPolling();
           return;
         }
+
         this.currentGraph.update(status);
+        this.pollingTimeoutId = setTimeout(poll, this.pollingPeriodInMs);
       } catch (error) {
-        console.error("polling error:", error);
+        console.error("polling error", error);
         this.stopPolling();
       }
-    }, this.pollingPeriodInMs);
+    };
+
+    console.log("polling started");
+    this.pollingTimeoutId = setTimeout(poll, this.pollingPeriodInMs);
   }
 }
