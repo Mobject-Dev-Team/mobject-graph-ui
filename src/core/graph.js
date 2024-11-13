@@ -32,15 +32,29 @@ export class Graph extends LGraph {
     this.#uuid = LiteGraph.uuidv4();
   }
 
+  // update(status) {
+  //   if (status && Array.isArray(status.nodes)) {
+  //     status.nodes.forEach((nodeStatus) => {
+  //       const node = this.getNodeById(nodeStatus.id);
+  //       if (node) {
+  //         node.update(nodeStatus);
+  //       }
+  //     });
+  //   }
+  // }
+
   update(status) {
-    if (status && Array.isArray(status.nodes)) {
-      status.nodes.forEach((nodeStatus) => {
-        const node = this.getNodeById(nodeStatus.id);
-        if (node) {
-          node.update(nodeStatus);
-        }
-      });
-    }
+    // Create a map for quick access to status by node ID, if status exists and contains nodes
+    const statusMap =
+      status && Array.isArray(status.nodes)
+        ? new Map(status.nodes.map((nodeStatus) => [nodeStatus.id, nodeStatus]))
+        : new Map();
+
+    // Iterate over all nodes and call update with either the corresponding status or an empty object
+    this._nodes.forEach((node) => {
+      const nodeStatus = statusMap.get(node.id) || {};
+      node.update(nodeStatus);
+    });
   }
 
   serialize() {

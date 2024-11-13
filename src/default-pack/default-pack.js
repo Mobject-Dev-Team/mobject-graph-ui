@@ -1,6 +1,7 @@
 import { GraphFramework } from "../core/graph-framework.js";
 import { GetBlueprintsExtension } from "./editor-extensions/get-blueprints/get-blueprints.js";
 import { EditorAutoUpdateExtension } from "./editor-extensions/auto-update/editor-auto-update.js";
+import { PreExecutionCheckExtension } from "./node-extensions/pre-execution-check/pre-execution-check.js";
 
 export class DefaultPack {
   install(graphFramework = new GraphFramework(), options) {
@@ -20,7 +21,7 @@ export class DefaultPack {
   registerGraphExtensions(graphFramework, options = {}) {
     // add any default graph extensions here.  It's good practice to make
     // these switchable via the options object.
-    // graphFramework.registerNodeExtensions(...);
+    // graphFramework.registerGraphExtension(...);
   }
 
   registerCanvasExtensions(graphFramework, options = {}) {
@@ -39,7 +40,7 @@ export class DefaultPack {
   registerNodeExtensions(graphFramework, options = {}) {
     // add any default node extensions here.  It's good practice to make
     // these switchable via the options object.
-    // graphFramework.registerNodeExtensions(...);
+    graphFramework.registerNodeExtension(PreExecutionCheckExtension);
   }
   registerWidgets(graphFramework, options = {}) {
     // add any default widgets here.  It's good practice to make

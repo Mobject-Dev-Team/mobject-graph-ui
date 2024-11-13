@@ -1243,8 +1243,14 @@
     constructor(title) {
       super(title);
       this._shape = 2;
+      this.extensions = [];
 
       this.registerCallbackHandlers();
+
+      const graphFramework = new GraphFramework();
+      graphFramework.applyExtensions("node", this);
+
+      this.eventEmitter.emit("constructorComplete", this);
     }
 
     addCustomWidget(widget) {
@@ -1252,6 +1258,7 @@
       if (widget.registerWithParent) {
         widget.registerWithParent(this);
       }
+      this.eventEmitter.emit("customWidgetAdded", widget);
     }
 
     on(eventName, listener) {
@@ -1292,11 +1299,13 @@
         if (widgetName !== null) {
           const widget = this.widgets.find((w) => w.name === widgetName);
           if (widget && widget.onDropFile && widget.onDropFile(file)) {
+            this.eventEmitter.emit("dropFileHandledByWidget", file, widget);
             return;
           }
         } else {
           for (const widget of this.widgets) {
             if (widget.onDropFile && widget.onDropFile(file)) {
+              this.eventEmitter.emit("dropFileHandledByWidget", file, widget);
               return;
             }
           }
@@ -1316,26 +1325,32 @@
         this.eventEmitter.emit("removed", this);
       });
 
-      // this.registerCallbackHandler(
-      //   "onDrawForeground",
-      //   (oCbInfo, ctx, visible_rect) => {
-      //     this.eventEmitter.emit("drawForeground", this, ctx, visible_rect);
-      //   }
-      // );
-
-      // this.registerCallbackHandler(
-      //   "onDrawBackground",
-      //   (oCbInfo, ctx, visible_area) => {
-      //     this.eventEmitter.emit("drawBackground", this, ctx, visible_area);
-      //   }
-      // );
-
       this.registerCallbackHandler(
         "onPropertyChanged",
         (oCbInfo, name, value, prevValue) => {
           this.eventEmitter.emit("propertyChanged", this, name, value, prevValue);
         }
       );
+    }
+
+    applyExtension(extension) {
+      this.eventEmitter.emit("applyExtension", extension);
+      try {
+        const instance = new extension(this);
+        this.extensions.push(instance);
+      } catch (error) {
+        if (
+          typeof extension === "object" &&
+          typeof extension.apply === "function"
+        ) {
+          extension.apply(this);
+          this.extensions.push(extension);
+        } else {
+          throw new Error(
+            "Extension must be a class or an object with an apply method"
+          );
+        }
+      }
     }
   }
 
@@ -1720,15 +1735,29 @@
       this.#uuid = mobjectLitegraph.LiteGraph.uuidv4();
     }
 
+    // update(status) {
+    //   if (status && Array.isArray(status.nodes)) {
+    //     status.nodes.forEach((nodeStatus) => {
+    //       const node = this.getNodeById(nodeStatus.id);
+    //       if (node) {
+    //         node.update(nodeStatus);
+    //       }
+    //     });
+    //   }
+    // }
+
     update(status) {
-      if (status && Array.isArray(status.nodes)) {
-        status.nodes.forEach((nodeStatus) => {
-          const node = this.getNodeById(nodeStatus.id);
-          if (node) {
-            node.update(nodeStatus);
-          }
-        });
-      }
+      // Create a map for quick access to status by node ID, if status exists and contains nodes
+      const statusMap =
+        status && Array.isArray(status.nodes)
+          ? new Map(status.nodes.map((nodeStatus) => [nodeStatus.id, nodeStatus]))
+          : new Map();
+
+      // Iterate over all nodes and call update with either the corresponding status or an empty object
+      this._nodes.forEach((node) => {
+        const nodeStatus = statusMap.get(node.id) || {};
+        node.update(nodeStatus);
+      });
     }
 
     serialize() {
@@ -2151,6 +2180,62 @@
     }
   }
 
+  class PreExecutionCheckExtension {
+    constructor(node) {
+      this.node = node;
+      this.defaultColor = node.color;
+      this.defaultBgColor = node.bgcolor;
+      this.defaultTooltip = node.properties.tooltip;
+      this.errorStyle = { bgcolor: "#96000c", color: "#750000" };
+      node.on("nodeStatusUpdated", this.handleStatusUpdate.bind(this));
+    }
+
+    hasPrecheckAlarms(nodeStatus) {
+      if (Array.isArray(nodeStatus.extensions)) {
+        for (let extension of nodeStatus.extensions) {
+          if (
+            extension.name === "precheck" &&
+            Array.isArray(extension.alarms) &&
+            extension.alarms.length > 0
+          ) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    getFirstAlarm(nodeStatus) {
+      for (const extension of nodeStatus.extensions ?? []) {
+        if (extension.name === "precheck" && extension.alarms?.length > 0) {
+          const firstAlarm = extension.alarms[0];
+          return `${firstAlarm.message} : ${firstAlarm.reason}`;
+        }
+      }
+
+      return null;
+    }
+
+    handleStatusUpdate(status) {
+      const color = this.node.color;
+      const bgcolor = this.node.bgcolor;
+
+      if (this.hasPrecheckAlarms(status)) {
+        this.node.color = this.errorStyle.color;
+        this.node.bgcolor = this.errorStyle.bgcolor;
+        this.node.properties.tooltip = this.getFirstAlarm(status);
+      } else {
+        this.node.color = this.defaultColor;
+        this.node.bgcolor = this.defaultBgColor;
+        this.node.properties.tooltip = this.defaultTooltip;
+      }
+
+      if (color !== this.node.color || bgcolor !== this.node.bgcolor) {
+        this.node.setDirtyCanvas(true, true);
+      }
+    }
+  }
+
   class DefaultPack {
     install(graphFramework = new GraphFramework(), options) {
       this.registerBundledPacks(graphFramework, options);
@@ -2169,7 +2254,7 @@
     registerGraphExtensions(graphFramework, options = {}) {
       // add any default graph extensions here.  It's good practice to make
       // these switchable via the options object.
-      // graphFramework.registerNodeExtensions(...);
+      // graphFramework.registerGraphExtension(...);
     }
 
     registerCanvasExtensions(graphFramework, options = {}) {
@@ -2188,7 +2273,7 @@
     registerNodeExtensions(graphFramework, options = {}) {
       // add any default node extensions here.  It's good practice to make
       // these switchable via the options object.
-      // graphFramework.registerNodeExtensions(...);
+      graphFramework.registerNodeExtension(PreExecutionCheckExtension);
     }
     registerWidgets(graphFramework, options = {}) {
       // add any default widgets here.  It's good practice to make
