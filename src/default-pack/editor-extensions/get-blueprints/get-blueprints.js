@@ -1,5 +1,6 @@
 import { ToolbarButton } from "../../../editor-controls/toolbar-button.js";
 import { GraphFramework } from "../../../core/graph-framework.js";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 export class GetBlueprintsExtension {
   constructor(editor) {
@@ -13,7 +14,7 @@ export class GetBlueprintsExtension {
     const getBlueprintsButton = new ToolbarButton(
       "GetBlueprints",
       "Get Blueprints",
-      null,
+      "fa-solid fa-layer-group",
       async () => {
         console.log("api get blueprints");
         getBlueprintsButton.disable();

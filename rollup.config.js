@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import license from "rollup-plugin-license";
 import css from "rollup-plugin-css-only";
+import copy from "rollup-plugin-copy";
 
 export default {
   input: "./src/index.js",
@@ -55,6 +56,18 @@ export default {
     nodeResolve(),
     css({
       output: "mobject-graph-ui.css",
+    }),
+    copy({
+      targets: [
+        {
+          src: "node_modules/@fortawesome/fontawesome-free/webfonts/*",
+          dest: "dist/webfonts",
+        },
+        {
+          src: "node_modules/@fortawesome/fontawesome-free/LICENSE.txt",
+          dest: "dist/webfonts",
+        },
+      ],
     }),
     cssLicenseBanner(),
     license({
