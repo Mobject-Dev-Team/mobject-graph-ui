@@ -1761,6 +1761,7 @@ class Graph extends LGraph {
     super(o);
     this.eventEmitter = new EventEmitter();
     this.#uuid = null;
+    this.isConfiguring = false;
     this.updateGraphUuid();
   }
 
@@ -1800,6 +1801,14 @@ class Graph extends LGraph {
     });
   }
 
+  configure(data, keep_old) {
+    this.eventEmitter.emit("beforeGraphConfigure", this);
+    this.isConfiguring = true;
+    super.configure(data, keep_old);
+    this.isConfiguring = false;
+    this.eventEmitter.emit("graphConfigure", this);
+  }
+
   serialize() {
     let data = super.serialize();
     data.uuid = this.#uuid;
@@ -1812,26 +1821,32 @@ class Graph extends LGraph {
 
   clear() {
     super.clear();
-    if (!this.eventEmitter) {
-      return;
-    } // this may be called before the class has been constructed
-    this.eventEmitter.emit("clear", this);
+    if (this.eventEmitter) {
+      this.eventEmitter.emit("clear", this);
+    }
   }
 
   onNodeAdded(node) {
-    this.updateGraphUuid();
+    if (!this.isConfiguring) {
+      this.updateGraphUuid();
+    }
+
     node.on("propertyChanged", this.emitOnNodePropertyChange.bind(this));
     this.eventEmitter.emit("nodeAdded", this, node);
   }
 
   onNodeRemoved(node) {
-    this.updateGraphUuid();
+    if (!this.isConfiguring) {
+      this.updateGraphUuid();
+    }
     node.off("propertyChanged", this.emitOnNodePropertyChange.bind(this));
     this.eventEmitter.emit("nodeRemoved", this, node);
   }
 
   onConnectionChange(node) {
-    this.updateGraphUuid();
+    if (!this.isConfiguring) {
+      this.updateGraphUuid();
+    }
     this.eventEmitter.emit("connectionChange", this, node);
   }
 
@@ -2172,6 +2187,7 @@ class EditorAutoUpdateExtension {
     this.editor = editor;
     this.connection = editor.getConnection();
     this.currentGraph = null;
+    this.graphIsConfiguring = false;
     this.pollingTimeoutId = null;
     this.pollingPeriodInMs = 1000;
     this.requestQueueMaxSize = 1;
@@ -2210,6 +2226,11 @@ class EditorAutoUpdateExtension {
     graph.off("nodeAdded", this.handleNodeAdded.bind(this));
     graph.off("nodeRemoved", this.handleNodeRemoved.bind(this));
     graph.off("nodePropertyChanged", this.handlePropertyChange.bind(this));
+    graph.off(
+      "beforeGraphConfigure",
+      this.handleBeforeGraphConfigure.bind(this)
+    );
+    graph.off("graphConfigure", this.handleGraphConfigure.bind(this));
   }
 
   registerGraphListeners(graph) {
@@ -2218,6 +2239,11 @@ class EditorAutoUpdateExtension {
     graph.on("nodeAdded", this.handleNodeAdded.bind(this));
     graph.on("nodeRemoved", this.handleNodeRemoved.bind(this));
     graph.on("nodePropertyChanged", this.handlePropertyChange.bind(this));
+    graph.on(
+      "beforeGraphConfigure",
+      this.handleBeforeGraphConfigure.bind(this)
+    );
+    graph.on("graphConfigure", this.handleGraphConfigure.bind(this));
   }
 
   enqueueRequest(requestFunction, ...args) {
@@ -2246,7 +2272,19 @@ class EditorAutoUpdateExtension {
     }
   }
 
+  handleBeforeGraphConfigure(graph) {
+    this.graphIsConfiguring = true;
+  }
+
+  handleGraphConfigure(graph) {
+    this.graphIsConfiguring = false;
+    this.enqueueRequest(this.createGraph, graph);
+  }
+
   handleClear(graph) {
+    if (this.graphIsConfiguring) {
+      return;
+    }
     if (graph.uuid != this.currentGraph.uuid) {
       return;
     }
@@ -2254,6 +2292,9 @@ class EditorAutoUpdateExtension {
   }
 
   handleConnectionChange(graph, node) {
+    if (this.graphIsConfiguring) {
+      return;
+    }
     if (graph.uuid != this.currentGraph.uuid) {
       return;
     }
@@ -2261,6 +2302,9 @@ class EditorAutoUpdateExtension {
   }
 
   handleNodeAdded(graph, node) {
+    if (this.graphIsConfiguring) {
+      return;
+    }
     if (graph.uuid != this.currentGraph.uuid) {
       return;
     }
@@ -2268,6 +2312,9 @@ class EditorAutoUpdateExtension {
   }
 
   handleNodeRemoved(graph, node) {
+    if (this.graphIsConfiguring) {
+      return;
+    }
     if (graph.uuid != this.currentGraph.uuid) {
       return;
     }
@@ -2275,6 +2322,9 @@ class EditorAutoUpdateExtension {
   }
 
   handlePropertyChange(graph, node, name, value) {
+    if (this.graphIsConfiguring) {
+      return;
+    }
     if (graph.uuid != this.currentGraph.uuid) {
       return;
     }

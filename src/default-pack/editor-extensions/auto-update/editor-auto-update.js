@@ -5,6 +5,7 @@ export class EditorAutoUpdateExtension {
     this.editor = editor;
     this.connection = editor.getConnection();
     this.currentGraph = null;
+    this.graphIsConfiguring = false;
     this.pollingTimeoutId = null;
     this.pollingPeriodInMs = 1000;
     this.requestQueueMaxSize = 1;
@@ -43,6 +44,11 @@ export class EditorAutoUpdateExtension {
     graph.off("nodeAdded", this.handleNodeAdded.bind(this));
     graph.off("nodeRemoved", this.handleNodeRemoved.bind(this));
     graph.off("nodePropertyChanged", this.handlePropertyChange.bind(this));
+    graph.off(
+      "beforeGraphConfigure",
+      this.handleBeforeGraphConfigure.bind(this)
+    );
+    graph.off("graphConfigure", this.handleGraphConfigure.bind(this));
   }
 
   registerGraphListeners(graph) {
@@ -51,6 +57,11 @@ export class EditorAutoUpdateExtension {
     graph.on("nodeAdded", this.handleNodeAdded.bind(this));
     graph.on("nodeRemoved", this.handleNodeRemoved.bind(this));
     graph.on("nodePropertyChanged", this.handlePropertyChange.bind(this));
+    graph.on(
+      "beforeGraphConfigure",
+      this.handleBeforeGraphConfigure.bind(this)
+    );
+    graph.on("graphConfigure", this.handleGraphConfigure.bind(this));
   }
 
   enqueueRequest(requestFunction, ...args) {
@@ -79,7 +90,19 @@ export class EditorAutoUpdateExtension {
     }
   }
 
+  handleBeforeGraphConfigure(graph) {
+    this.graphIsConfiguring = true;
+  }
+
+  handleGraphConfigure(graph) {
+    this.graphIsConfiguring = false;
+    this.enqueueRequest(this.createGraph, graph);
+  }
+
   handleClear(graph) {
+    if (this.graphIsConfiguring) {
+      return;
+    }
     if (graph.uuid != this.currentGraph.uuid) {
       return;
     }
@@ -87,6 +110,9 @@ export class EditorAutoUpdateExtension {
   }
 
   handleConnectionChange(graph, node) {
+    if (this.graphIsConfiguring) {
+      return;
+    }
     if (graph.uuid != this.currentGraph.uuid) {
       return;
     }
@@ -94,6 +120,9 @@ export class EditorAutoUpdateExtension {
   }
 
   handleNodeAdded(graph, node) {
+    if (this.graphIsConfiguring) {
+      return;
+    }
     if (graph.uuid != this.currentGraph.uuid) {
       return;
     }
@@ -101,6 +130,9 @@ export class EditorAutoUpdateExtension {
   }
 
   handleNodeRemoved(graph, node) {
+    if (this.graphIsConfiguring) {
+      return;
+    }
     if (graph.uuid != this.currentGraph.uuid) {
       return;
     }
@@ -108,6 +140,9 @@ export class EditorAutoUpdateExtension {
   }
 
   handlePropertyChange(graph, node, name, value) {
+    if (this.graphIsConfiguring) {
+      return;
+    }
     if (graph.uuid != this.currentGraph.uuid) {
       return;
     }

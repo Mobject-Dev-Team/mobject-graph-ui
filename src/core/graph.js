@@ -9,6 +9,7 @@ export class Graph extends LGraph {
     super(o);
     this.eventEmitter = new EventEmitter();
     this.#uuid = null;
+    this.isConfiguring = false;
     this.updateGraphUuid();
   }
 
@@ -48,6 +49,14 @@ export class Graph extends LGraph {
     });
   }
 
+  configure(data, keep_old) {
+    this.eventEmitter.emit("beforeGraphConfigure", this);
+    this.isConfiguring = true;
+    super.configure(data, keep_old);
+    this.isConfiguring = false;
+    this.eventEmitter.emit("graphConfigure", this);
+  }
+
   serialize() {
     let data = super.serialize();
     data.uuid = this.#uuid;
@@ -60,26 +69,32 @@ export class Graph extends LGraph {
 
   clear() {
     super.clear();
-    if (!this.eventEmitter) {
-      return;
-    } // this may be called before the class has been constructed
-    this.eventEmitter.emit("clear", this);
+    if (this.eventEmitter) {
+      this.eventEmitter.emit("clear", this);
+    }
   }
 
   onNodeAdded(node) {
-    this.updateGraphUuid();
+    if (!this.isConfiguring) {
+      this.updateGraphUuid();
+    }
+
     node.on("propertyChanged", this.emitOnNodePropertyChange.bind(this));
     this.eventEmitter.emit("nodeAdded", this, node);
   }
 
   onNodeRemoved(node) {
-    this.updateGraphUuid();
+    if (!this.isConfiguring) {
+      this.updateGraphUuid();
+    }
     node.off("propertyChanged", this.emitOnNodePropertyChange.bind(this));
     this.eventEmitter.emit("nodeRemoved", this, node);
   }
 
   onConnectionChange(node) {
-    this.updateGraphUuid();
+    if (!this.isConfiguring) {
+      this.updateGraphUuid();
+    }
     this.eventEmitter.emit("connectionChange", this, node);
   }
 
