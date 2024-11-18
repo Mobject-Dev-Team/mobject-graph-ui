@@ -105,7 +105,7 @@ export class NodeParametersBlueprintHandler extends NodeBlueprintHandler {
           throw new Error(`Unable to find widget of type :  ${type}`);
         }
         const widget = new widgetClasses[0](name, node, {
-          property: prop,
+          property: name,
           parameter,
           content,
         });

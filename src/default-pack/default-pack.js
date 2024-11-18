@@ -1,5 +1,6 @@
 import { GraphFramework } from "../core/graph-framework.js";
 import { GetBlueprintsExtension } from "./editor-extensions/get-blueprints/get-blueprints.js";
+import { FileOperationsExtension } from "./editor-extensions/file-operations/file-operations.js";
 import { EditorAutoUpdateExtension } from "./editor-extensions/auto-update/editor-auto-update.js";
 import { ShowExecuteOrderExtension } from "./editor-extensions/show-execute-order/show-execute-order.js";
 import { PreExecutionCheckExtension } from "./node-extensions/pre-execution-check/pre-execution-check.js";
@@ -32,17 +33,43 @@ export class DefaultPack {
   }
 
   registerEditorExtensions(graphFramework, options = {}) {
-    // add any default editor extensions here.  It's good practice to make
+    // default settings
+    const defaults = {
+      GetBlueprintsExtension: true,
+      FileOperationsExtension: true,
+      EditorAutoUpdateExtension: true,
+      ShowExecuteOrderExtension: true,
+    };
+    const settings = { ...defaults, ...options };
+
+    // add any default canvas extensions here.  It's good practice to make
     // these switchable via the options object.
-    graphFramework.registerEditorExtension(GetBlueprintsExtension);
-    graphFramework.registerEditorExtension(EditorAutoUpdateExtension);
-    graphFramework.registerEditorExtension(ShowExecuteOrderExtension);
+    if (settings.GetBlueprintsExtension) {
+      graphFramework.registerEditorExtension(GetBlueprintsExtension);
+    }
+    if (settings.FileOperationsExtension) {
+      graphFramework.registerEditorExtension(FileOperationsExtension);
+    }
+    if (settings.EditorAutoUpdateExtension) {
+      graphFramework.registerEditorExtension(EditorAutoUpdateExtension);
+    }
+    if (settings.ShowExecuteOrderExtension) {
+      graphFramework.registerEditorExtension(ShowExecuteOrderExtension);
+    }
   }
 
   registerNodeExtensions(graphFramework, options = {}) {
+    // default settings
+    const defaults = {
+      PreExecutionCheckExtension: true,
+    };
+    const settings = { ...defaults, ...options };
+
     // add any default node extensions here.  It's good practice to make
     // these switchable via the options object.
-    graphFramework.registerNodeExtension(PreExecutionCheckExtension);
+    if (settings.PreExecutionCheckExtension) {
+      graphFramework.registerNodeExtension(PreExecutionCheckExtension);
+    }
   }
   registerWidgets(graphFramework, options = {}) {
     // add any default widgets here.  It's good practice to make

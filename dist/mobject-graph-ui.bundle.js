@@ -921,86 +921,118 @@
     }
   }
 
+  function deepEqual(object1, object2) {
+    if (object1 === object2) {
+      return true;
+    }
+
+    if (
+      object1 == null ||
+      object2 == null ||
+      typeof object1 !== "object" ||
+      typeof object2 !== "object"
+    ) {
+      return false;
+    }
+
+    const keys1 = Object.keys(object1);
+    const keys2 = Object.keys(object2);
+
+    if (keys1.length !== keys2.length) {
+      return false;
+    }
+
+    for (const key of keys1) {
+      if (!keys2.includes(key) || !deepEqual(object1[key], object2[key])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   const WILDCARD = "*";
   const DISPLAY = "display";
   const CONTROL = "control";
 
-  class DisplayWidget {
-    static capability = DISPLAY;
+  class WidgetBase {
+    eventEmitter = new EventEmitter();
+    _value = null;
+    parent = null;
 
-    #parent = null;
-    #content = null;
-
-    constructor(name, parent, options = {}) {
-      this.options = options;
+    constructor(name, parent, options) {
       this.name = name;
-
-      this.#parent = parent;
-      this.#content = options.content;
-
-      this.registerForContentUpdates();
+      this.parent = parent;
+      this.options = options;
     }
 
-    onContentUpdate(value) {}
+    get value() {
+      return this._value;
+    }
 
-    registerForContentUpdates() {
-      if (!this.#content || !this.#parent) return;
-      this.#parent.on("nodeStatusUpdated", (status) => {
-        const value = status.contents?.find(
-          (content) => content.name === this.#content.name
-        )?.value;
-        this.onContentUpdate(value);
-        this.#parent?.setDirtyCanvas(true, true);
-      });
+    set value(newValue) {
+      if (!deepEqual(newValue, this._value)) {
+        const oldValue = this._value;
+        this._value = newValue;
+        this.eventEmitter.emit("valueChanged", newValue, oldValue);
+        if (this.parent && this.options && this.options.property) {
+          this.parent.setProperty(this.options.property, newValue);
+        }
+        this.parent?.setDirtyCanvas(true, true);
+      }
+    }
+
+    on(eventName, listener) {
+      this.eventEmitter.on(eventName, listener);
+    }
+
+    off(eventName, listener) {
+      this.eventEmitter.off(eventName, listener);
     }
 
     triggerParentResetSize() {
-      if (this.#parent) this.#parent.resetSize();
+      if (this.parent) this.parent.resetSize();
     }
   }
 
-  class ControlWidget {
-    static capability = CONTROL;
-
-    #parent = null;
-    #property = null;
-    #parameter = null;
+  class DisplayWidget extends WidgetBase {
+    static capability = DISPLAY;
 
     constructor(name, parent, options = {}) {
-      this.value = null;
-      this.options = options;
-      this.name = name;
+      super(name, parent, options);
 
-      this.#parent = parent;
-      this.#property = options.property;
-      this.#parameter = options.parameter;
-    }
-
-    setValue(value) {
-      this.value = value;
-
-      if (this.#parent && this.#property && this.#property.name) {
-        this.#parent?.setProperty(this.#property.name, value);
-        this.#parent?.setDirtyCanvas(true, true);
+      if (options.content) {
+        this.registerForContentUpdates(parent, options.content);
       }
     }
 
-    getValue() {
-      return this.value;
+    registerForContentUpdates(parent, content) {
+      if (!content || !parent) return;
+      parent.on("nodeStatusUpdated", (status) => {
+        const value = status.contents?.find(
+          (contentUpdate) => contentUpdate.name === content.name
+        )?.value;
+        this.value = value;
+        parent?.setDirtyCanvas(true, true);
+      });
+    }
+  }
+
+  class ControlWidget extends WidgetBase {
+    static capability = CONTROL;
+
+    constructor(name, parent, options = {}) {
+      super(name, parent, options);
     }
 
-    setDefaultValue(value) {
-      this.value = value;
+    // setDefaultValue(value) {
+    //   this.value = value;
 
-      if (this.#parent && this.#property && this.#property.name) {
-        this.#parent?.setPropertyDefaultValue(this.#property.name, value);
-        this.#parent?.setDirtyCanvas(true, true);
-      }
-    }
-
-    triggerParentResetSize() {
-      if (this.#parent) this.#parent.resetSize();
-    }
+    //   if (this.#parent && this.#property) {
+    //     this.#parent?.setPropertyDefaultValue(this.#property, value);
+    //     this.#parent?.setDirtyCanvas(true, true);
+    //   }
+    // }
   }
 
   class Widgets {
@@ -1173,7 +1205,7 @@
             ? `${parameter.datatype.typeName} (${parameter.datatype.identifier})`
             : parameter.datatype.typeName;
           const default_value = parameter.defaultValue;
-          const prop = node.addProperty(name, default_value, type);
+          node.addProperty(name, default_value, type);
 
           let content;
           if (contentNames.has(name)) {
@@ -1188,7 +1220,7 @@
             throw new Error(`Unable to find widget of type :  ${type}`);
           }
           const widget = new widgetClasses[0](name, node, {
-            property: prop,
+            property: name,
             parameter,
             content,
           });
@@ -1274,21 +1306,25 @@
     }
 
     setPropertyDefaultValue(name, value) {
-      this.properties ||= {};
-
-      if (value === this.properties[name]) {
-        return;
-      }
-
-      this.properties[name] = value;
-      const widgetToUpdate = this.widgets?.find(
-        (widget) => widget && widget.options?.property === name
-      );
-
-      if (widgetToUpdate) {
-        widgetToUpdate.value = value;
-      }
+      console.log("tried setting default", name, value);
     }
+
+    // setPropertyDefaultValue(name, value) {
+    //   this.properties ||= {};
+
+    //   if (value === this.properties[name]) {
+    //     return;
+    //   }
+
+    //   this.properties[name] = value;
+    //   const widgetToUpdate = this.widgets?.find(
+    //     (widget) => widget && widget.options?.property === name
+    //   );
+
+    //   if (widgetToUpdate) {
+    //     widgetToUpdate.value = value;
+    //   }
+    // }
 
     resetSize() {
       this.setSize(this.computeSize());
@@ -1316,7 +1352,24 @@
       );
     }
 
+    onConfigure() {
+      if (this.widgets) {
+        this.widgets.forEach((widget) => {
+          if (!widget) {
+            return;
+          }
+          if (widget.postConfigure) {
+            widget.postConfigure();
+          }
+        });
+      }
+    }
+
     registerCallbackHandlers() {
+      this.registerCallbackHandler("onConfigure", (oCbInfo) => {
+        this.eventEmitter.emit("onConfigure", this);
+      });
+
       this.registerCallbackHandler("onAdded", (oCbInfo) => {
         this.eventEmitter.emit("added", this);
       });
@@ -1727,6 +1780,10 @@
       return this.#uuid;
     }
 
+    set uuid(uuid) {
+      this.#uuid = uuid;
+    }
+
     get isEmpty() {
       return this._nodes.length === 0;
     }
@@ -1735,25 +1792,12 @@
       this.#uuid = mobjectLitegraph.LiteGraph.uuidv4();
     }
 
-    // update(status) {
-    //   if (status && Array.isArray(status.nodes)) {
-    //     status.nodes.forEach((nodeStatus) => {
-    //       const node = this.getNodeById(nodeStatus.id);
-    //       if (node) {
-    //         node.update(nodeStatus);
-    //       }
-    //     });
-    //   }
-    // }
-
     update(status) {
-      // Create a map for quick access to status by node ID, if status exists and contains nodes
       const statusMap =
         status && Array.isArray(status.nodes)
           ? new Map(status.nodes.map((nodeStatus) => [nodeStatus.id, nodeStatus]))
           : new Map();
 
-      // Iterate over all nodes and call update with either the corresponding status or an empty object
       this._nodes.forEach((node) => {
         const nodeStatus = statusMap.get(node.id) || {};
         node.update(nodeStatus);
@@ -1768,6 +1812,14 @@
 
     exportForBackend() {
       return LiteGraphConverter.Convert(this);
+    }
+
+    clear() {
+      super.clear();
+      if (!this.eventEmitter) {
+        return;
+      } // this may be called before the class has been constructed
+      this.eventEmitter.emit("clear", this);
     }
 
     onNodeAdded(node) {
@@ -1941,11 +1993,12 @@
   }
 
   class ToolbarButton {
-    constructor(id, label, iconClass, onClick) {
+    constructor(id, label, iconClass, onClick, tooltip) {
       this.id = id;
       this.label = label;
       this.iconClass = iconClass;
       this.onClick = onClick;
+      this.tooltip = tooltip || label;
       this.button = null;
     }
 
@@ -1953,6 +2006,7 @@
       this.button = document.createElement("button");
       this.button.id = this.id;
       this.button.classList.add("mgui-toolbar-button");
+      this.button.title = this.tooltip; // Use the tooltip property
 
       if (this.iconClass) {
         this.button.innerHTML = `<i class="${this.iconClass}"></i> `;
@@ -2004,7 +2058,7 @@
       const graphFramework = new GraphFramework();
       const getBlueprintsButton = new ToolbarButton(
         "GetBlueprints",
-        "Get Blueprints",
+        "Blueprints",
         "fa-solid fa-layer-group",
         async () => {
           console.log("api get blueprints");
@@ -2018,10 +2072,102 @@
           } finally {
             getBlueprintsButton.enable();
           }
-        }
+        },
+        "Get Blueprints"
       );
 
       this.editor.addToolbarControl(getBlueprintsButton);
+    }
+  }
+
+  class FileOperationsExtension {
+    constructor(editor) {
+      this.editor = editor;
+      this.currentGraph = null;
+      this.editorCanvas = editor.getGraphCanvas();
+      this.setupEditorListeners();
+      this.setupToolbarControls();
+      this.switchGraph(this.editor.getGraph());
+    }
+
+    setupEditorListeners() {
+      this.editor.on("graphSet", (newGraph) => {
+        this.switchGraph(newGraph);
+      });
+    }
+
+    switchGraph(newGraph) {
+      this.currentGraph = newGraph;
+    }
+
+    setupToolbarControls() {
+      const newGraphButton = new ToolbarButton(
+        "New",
+        "New",
+        "fa-solid fa-file",
+        () => {
+          if (!this.currentGraph) {
+            return;
+          }
+          this.currentGraph.clear();
+        },
+        "New Graph"
+      );
+      const openGraphButton = new ToolbarButton(
+        "Open",
+        "Open",
+        "fa-solid fa-folder-open",
+        async () => {
+          try {
+            const [fileHandle] = await window.showOpenFilePicker({
+              types: [
+                {
+                  description: "Graph Files",
+                  accept: { "application/json": [".tcgraph"] },
+                },
+              ],
+              multiple: false,
+            });
+
+            const file = await fileHandle.getFile();
+            const contents = await file.text();
+            this.currentGraph.configure(JSON.parse(contents));
+          } catch (error) {
+            console.error(
+              "Failed to open file, check that the required blueprints are loaded"
+            );
+          }
+        },
+        "Open Graph"
+      );
+      const saveGraphButton = new ToolbarButton(
+        "Save",
+        "Save",
+        "fa-solid fa-floppy-disk",
+        async () => {
+          try {
+            const fileHandle = await window.showSaveFilePicker({
+              types: [
+                {
+                  description: "Graph Files",
+                  accept: { "application/json": [".tcgraph"] },
+                },
+              ],
+            });
+
+            const writable = await fileHandle.createWritable();
+            await writable.write(JSON.stringify(this.currentGraph.serialize()));
+            await writable.close();
+          } catch (error) {
+            console.error("Failed to save file:", error);
+          }
+        },
+        "Save Graph"
+      );
+
+      this.editor.addToolbarControl(newGraphButton);
+      this.editor.addToolbarControl(openGraphButton);
+      this.editor.addToolbarControl(saveGraphButton);
     }
   }
 
@@ -2063,6 +2209,7 @@
     }
 
     unregisterGraphListeners(graph) {
+      graph.off("clear", this.handleClear.bind(this));
       graph.off("connectionChange", this.handleConnectionChange.bind(this));
       graph.off("nodeAdded", this.handleNodeAdded.bind(this));
       graph.off("nodeRemoved", this.handleNodeRemoved.bind(this));
@@ -2070,6 +2217,7 @@
     }
 
     registerGraphListeners(graph) {
+      graph.on("clear", this.handleClear.bind(this));
       graph.on("connectionChange", this.handleConnectionChange.bind(this));
       graph.on("nodeAdded", this.handleNodeAdded.bind(this));
       graph.on("nodeRemoved", this.handleNodeRemoved.bind(this));
@@ -2100,6 +2248,13 @@
         this.processingRequest = false;
         this.processRequests();
       }
+    }
+
+    handleClear(graph) {
+      if (graph.uuid != this.currentGraph.uuid) {
+        return;
+      }
+      this.enqueueRequest(this.createGraph, graph);
     }
 
     handleConnectionChange(graph, node) {
@@ -2227,13 +2382,14 @@
     setupToolbarControls() {
       const getBlueprintsButton = new ToolbarButton(
         "ToggleExecuteOrder",
-        "Toggle Execution Order",
-        null,
+        "",
+        "fas fa-share-nodes",
         () => {
           this.editorCanvas.render_execution_order =
             !this.editorCanvas.render_execution_order;
           this.editorCanvas.setDirty(true, true);
-        }
+        },
+        "Toggle Execution Order Display"
       );
 
       this.editor.addToolbarControl(getBlueprintsButton);
@@ -2324,17 +2480,43 @@
     }
 
     registerEditorExtensions(graphFramework, options = {}) {
-      // add any default editor extensions here.  It's good practice to make
+      // default settings
+      const defaults = {
+        GetBlueprintsExtension: true,
+        FileOperationsExtension: true,
+        EditorAutoUpdateExtension: true,
+        ShowExecuteOrderExtension: true,
+      };
+      const settings = { ...defaults, ...options };
+
+      // add any default canvas extensions here.  It's good practice to make
       // these switchable via the options object.
-      graphFramework.registerEditorExtension(GetBlueprintsExtension);
-      graphFramework.registerEditorExtension(EditorAutoUpdateExtension);
-      graphFramework.registerEditorExtension(ShowExecuteOrderExtension);
+      if (settings.GetBlueprintsExtension) {
+        graphFramework.registerEditorExtension(GetBlueprintsExtension);
+      }
+      if (settings.FileOperationsExtension) {
+        graphFramework.registerEditorExtension(FileOperationsExtension);
+      }
+      if (settings.EditorAutoUpdateExtension) {
+        graphFramework.registerEditorExtension(EditorAutoUpdateExtension);
+      }
+      if (settings.ShowExecuteOrderExtension) {
+        graphFramework.registerEditorExtension(ShowExecuteOrderExtension);
+      }
     }
 
     registerNodeExtensions(graphFramework, options = {}) {
+      // default settings
+      const defaults = {
+        PreExecutionCheckExtension: true,
+      };
+      const settings = { ...defaults, ...options };
+
       // add any default node extensions here.  It's good practice to make
       // these switchable via the options object.
-      graphFramework.registerNodeExtension(PreExecutionCheckExtension);
+      if (settings.PreExecutionCheckExtension) {
+        graphFramework.registerNodeExtension(PreExecutionCheckExtension);
+      }
     }
     registerWidgets(graphFramework, options = {}) {
       // add any default widgets here.  It's good practice to make

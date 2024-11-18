@@ -13,7 +13,7 @@ export class GetBlueprintsExtension {
     const graphFramework = new GraphFramework();
     const getBlueprintsButton = new ToolbarButton(
       "GetBlueprints",
-      "Get Blueprints",
+      "Blueprints",
       "fa-solid fa-layer-group",
       async () => {
         console.log("api get blueprints");
@@ -27,7 +27,8 @@ export class GetBlueprintsExtension {
         } finally {
           getBlueprintsButton.enable();
         }
-      }
+      },
+      "Get Blueprints"
     );
 
     this.editor.addToolbarControl(getBlueprintsButton);

@@ -38,6 +38,7 @@ export class EditorAutoUpdateExtension {
   }
 
   unregisterGraphListeners(graph) {
+    graph.off("clear", this.handleClear.bind(this));
     graph.off("connectionChange", this.handleConnectionChange.bind(this));
     graph.off("nodeAdded", this.handleNodeAdded.bind(this));
     graph.off("nodeRemoved", this.handleNodeRemoved.bind(this));
@@ -45,6 +46,7 @@ export class EditorAutoUpdateExtension {
   }
 
   registerGraphListeners(graph) {
+    graph.on("clear", this.handleClear.bind(this));
     graph.on("connectionChange", this.handleConnectionChange.bind(this));
     graph.on("nodeAdded", this.handleNodeAdded.bind(this));
     graph.on("nodeRemoved", this.handleNodeRemoved.bind(this));
@@ -75,6 +77,13 @@ export class EditorAutoUpdateExtension {
       this.processingRequest = false;
       this.processRequests();
     }
+  }
+
+  handleClear(graph) {
+    if (graph.uuid != this.currentGraph.uuid) {
+      return;
+    }
+    this.enqueueRequest(this.createGraph, graph);
   }
 
   handleConnectionChange(graph, node) {

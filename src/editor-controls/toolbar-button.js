@@ -1,9 +1,10 @@
 export class ToolbarButton {
-  constructor(id, label, iconClass, onClick) {
+  constructor(id, label, iconClass, onClick, tooltip) {
     this.id = id;
     this.label = label;
     this.iconClass = iconClass;
     this.onClick = onClick;
+    this.tooltip = tooltip || label;
     this.button = null;
   }
 
@@ -11,6 +12,7 @@ export class ToolbarButton {
     this.button = document.createElement("button");
     this.button.id = this.id;
     this.button.classList.add("mgui-toolbar-button");
+    this.button.title = this.tooltip; // Use the tooltip property
 
     if (this.iconClass) {
       this.button.innerHTML = `<i class="${this.iconClass}"></i> `;

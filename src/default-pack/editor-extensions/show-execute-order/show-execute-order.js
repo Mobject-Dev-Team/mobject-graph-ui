@@ -10,13 +10,14 @@ export class ShowExecuteOrderExtension {
   setupToolbarControls() {
     const getBlueprintsButton = new ToolbarButton(
       "ToggleExecuteOrder",
-      "Toggle Execution Order",
-      null,
+      "",
+      "fas fa-share-nodes",
       () => {
         this.editorCanvas.render_execution_order =
           !this.editorCanvas.render_execution_order;
         this.editorCanvas.setDirty(true, true);
-      }
+      },
+      "Toggle Execution Order Display"
     );
 
     this.editor.addToolbarControl(getBlueprintsButton);

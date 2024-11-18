@@ -1,81 +1,86 @@
+import { EventEmitter } from "../utils/event-emitter.js";
+import { deepEqual } from "../utils/deep-equal.js";
+
 export const WILDCARD = "*";
 export const DISPLAY = "display";
 export const CONTROL = "control";
 
-export class DisplayWidget {
-  static capability = DISPLAY;
+export class WidgetBase {
+  eventEmitter = new EventEmitter();
+  _value = null;
+  parent = null;
 
-  #parent = null;
-  #content = null;
-
-  constructor(name, parent, options = {}) {
-    this.options = options;
+  constructor(name, parent, options) {
     this.name = name;
-
-    this.#parent = parent;
-    this.#content = options.content;
-
-    this.registerForContentUpdates();
+    this.parent = parent;
+    this.options = options;
   }
 
-  onContentUpdate(value) {}
+  get value() {
+    return this._value;
+  }
 
-  registerForContentUpdates() {
-    if (!this.#content || !this.#parent) return;
-    this.#parent.on("nodeStatusUpdated", (status) => {
-      const value = status.contents?.find(
-        (content) => content.name === this.#content.name
-      )?.value;
-      this.onContentUpdate(value);
-      this.#parent?.setDirtyCanvas(true, true);
-    });
+  set value(newValue) {
+    if (!deepEqual(newValue, this._value)) {
+      const oldValue = this._value;
+      this._value = newValue;
+      this.eventEmitter.emit("valueChanged", newValue, oldValue);
+      if (this.parent && this.options && this.options.property) {
+        this.parent.setProperty(this.options.property, newValue);
+      }
+      this.parent?.setDirtyCanvas(true, true);
+    }
+  }
+
+  on(eventName, listener) {
+    this.eventEmitter.on(eventName, listener);
+  }
+
+  off(eventName, listener) {
+    this.eventEmitter.off(eventName, listener);
   }
 
   triggerParentResetSize() {
-    if (this.#parent) this.#parent.resetSize();
+    if (this.parent) this.parent.resetSize();
   }
 }
 
-export class ControlWidget {
-  static capability = CONTROL;
-
-  #parent = null;
-  #property = null;
-  #parameter = null;
+export class DisplayWidget extends WidgetBase {
+  static capability = DISPLAY;
 
   constructor(name, parent, options = {}) {
-    this.value = null;
-    this.options = options;
-    this.name = name;
+    super(name, parent, options);
 
-    this.#parent = parent;
-    this.#property = options.property;
-    this.#parameter = options.parameter;
-  }
-
-  setValue(value) {
-    this.value = value;
-
-    if (this.#parent && this.#property && this.#property.name) {
-      this.#parent?.setProperty(this.#property.name, value);
-      this.#parent?.setDirtyCanvas(true, true);
+    if (options.content) {
+      this.registerForContentUpdates(parent, options.content);
     }
   }
 
-  getValue() {
-    return this.value;
+  registerForContentUpdates(parent, content) {
+    if (!content || !parent) return;
+    parent.on("nodeStatusUpdated", (status) => {
+      const value = status.contents?.find(
+        (contentUpdate) => contentUpdate.name === content.name
+      )?.value;
+      this.value = value;
+      parent?.setDirtyCanvas(true, true);
+    });
+  }
+}
+
+export class ControlWidget extends WidgetBase {
+  static capability = CONTROL;
+
+  constructor(name, parent, options = {}) {
+    super(name, parent, options);
   }
 
-  setDefaultValue(value) {
-    this.value = value;
+  // setDefaultValue(value) {
+  //   this.value = value;
 
-    if (this.#parent && this.#property && this.#property.name) {
-      this.#parent?.setPropertyDefaultValue(this.#property.name, value);
-      this.#parent?.setDirtyCanvas(true, true);
-    }
-  }
-
-  triggerParentResetSize() {
-    if (this.#parent) this.#parent.resetSize();
-  }
+  //   if (this.#parent && this.#property) {
+  //     this.#parent?.setPropertyDefaultValue(this.#property, value);
+  //     this.#parent?.setDirtyCanvas(true, true);
+  //   }
+  // }
 }
