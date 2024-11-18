@@ -43,7 +43,7 @@ export class FileOperationsExtension {
             types: [
               {
                 description: "Graph Files",
-                accept: { "application/json": [".tcgraph"] },
+                accept: { "application/mgraph": [".mgraph"] },
               },
             ],
             multiple: false,
@@ -70,7 +70,7 @@ export class FileOperationsExtension {
             types: [
               {
                 description: "Graph Files",
-                accept: { "application/json": [".tcgraph"] },
+                accept: { "application/mgraph": [".mgraph"] },
               },
             ],
           });
