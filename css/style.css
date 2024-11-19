@@ -1,4 +1,6 @@
-﻿.mgui-editor {
+﻿@charset "UTF-8";
+
+.mgui-editor {
   font-family: "Arial", sans-serif;
   border: 1px solid #ccc;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -39,40 +41,19 @@
 }
 
 .mgui-toolbar-button {
-  padding: 5px 10px;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  margin-right: 5px;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  margin: 5px !important;
 }
 
-.mgui-toolbar-button.disabled,
-.mgui-toolbar-button:disabled {
-  background-color: #aaa;
-  color: #666;
-  cursor: not-allowed;
-  opacity: 0.5;
+.mgui-editor-main-window {
+  position: relative;
 }
 
-.mgui-toolbar-button:hover {
-  background-color: #0056b3;
-}
-
-.mgui-toolbar-button.disabled:hover,
-.mgui-toolbar-button:disabled:hover {
-  background-color: #aaa;
-}
-
-.mgui-toolbar-button img {
-  vertical-align: middle;
-  margin-right: 5px;
-}
-
-*,
-*:before,
-*:after {
-  box-sizing: border-box;
+.toast-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+  width: 100%;
+  max-height: 100%;
+  padding: 10px;
 }

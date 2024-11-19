@@ -22,8 +22,15 @@ export class GetBlueprintsExtension {
           const result = await this.connection.send("GetBlueprints");
           console.log("api get blueprints reply", result);
           graphFramework.installNodeBlueprints(result.blueprints);
+
+          if (result?.blueprints?.length) {
+            this.editor.showSuccess(
+              "Blueprints loaded successfully",
+              `${result.blueprints.length} blueprints were received.`
+            );
+          }
         } catch (error) {
-          console.error("api get blueprints failed:", error);
+          this.editor.showError("Failed to get blueprints", error);
         } finally {
           getBlueprintsButton.enable();
         }

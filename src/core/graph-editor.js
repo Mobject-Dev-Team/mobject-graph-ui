@@ -13,6 +13,7 @@ export class GraphEditor {
     this.mainWindowElement = null;
     this.footerElement = null;
     this.canvasElement = null;
+    this.toastContainer = null;
     this.graphCanvas = null;
     this.graph = new Graph();
     this.toolbarControls = [];
@@ -89,14 +90,18 @@ export class GraphEditor {
 
   makeEditorWindow(container_id, options = {}) {
     const root = (this.rootElement = document.createElement("div"));
-    root.className = "mgui-editor";
+    root.className = "mgui mgui-editor";
     root.innerHTML = `
+    
     <div class="mgui-editor-toolbar">
-        <div class="mgui-editor-tools mgui-editor-tools-left"></div>
+        <div class="mgui-editor-tools mgui-editor-tools-left">
+        </div>
         <div class="mgui-editor-tools mgui-editor-tools-right"></div>
     </div>
     <div class="mgui-editor-main-window">
-        <canvas class="mgui-editor-graphcanvas"></canvas>    
+        <canvas class="mgui-editor-graphcanvas"></canvas>   
+        <div class="toast-container" aria-live="polite" aria-atomic="true">
+    </div>
     </div>
     <div class="mgui-editor-footer">
         <div class="mgui-editor-tools mgui-editor-tools-left"></div>
@@ -106,6 +111,7 @@ export class GraphEditor {
     this.toolbarElement = root.querySelector(".mgui-editor-toolbar");
     this.mainWindowElement = root.querySelector(".mgui-editor-main-window");
     this.footerElement = root.querySelector(".mgui-editor-footer");
+    this.toastContainer = root.querySelector(".toast-container");
 
     const canvas = (this.canvasElement = root.querySelector(
       ".mgui-editor-graphcanvas"
@@ -133,5 +139,83 @@ export class GraphEditor {
     this.canvasElement.height = availableHeight;
     this.canvasElement.style.height = availableHeight + "px";
     this.graphCanvas.resize();
+  }
+
+  generateToastId() {
+    const randomPart = Math.floor(Math.random() * 1000);
+    const id = `${new Date().getTime()}-${randomPart}-toast`;
+    return id;
+  }
+
+  showToast(title, message, toastType) {
+    const id = this.generateToastId();
+    let bgColor, textColor, btnColor;
+
+    switch (toastType) {
+      case "error":
+        bgColor = "bg-danger";
+        textColor = "text-white";
+        btnColor = "btn-close-white";
+        break;
+      case "warning":
+        bgColor = "bg-warning";
+        textColor = "text-black";
+        btnColor = "btn-close-black";
+        break;
+      case "success":
+        bgColor = "bg-success";
+        textColor = "text-white";
+        btnColor = "btn-close-white";
+        break;
+      case "info":
+        bgColor = "bg-info";
+        textColor = "text-black";
+        btnColor = "btn-close-black";
+        break;
+      default:
+        bgColor = "bg-secondary";
+        textColor = "text-white";
+        btnColor = "btn-close-white";
+    }
+
+    const toastHtml = `
+        <div id="${id}" class="toast ${bgColor} ${textColor}" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="true" data-bs-delay="4000">
+            <div class="toast-header ${bgColor} ${textColor}">
+                <strong class="me-auto">${title}</strong>
+                <button type="button" class="btn-close ${btnColor}" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body ${textColor}">${message}</div>
+        </div>
+    `;
+
+    let toastNode = document.createElement("div");
+    toastNode.innerHTML = toastHtml;
+
+    this.toastContainer.appendChild(toastNode);
+
+    $(`#${id}`).toast("show");
+    $(`#${id}`).on("hidden.bs.toast", function () {
+      this.remove();
+    });
+  }
+
+  showWarning(title, message) {
+    this.showToast(title, message, "warning");
+  }
+
+  showError(title, message) {
+    this.showToast(title, message, "error");
+  }
+
+  showSuccess(title, message) {
+    this.showToast(title, message, "success");
+  }
+
+  showInfo(title, message) {
+    this.showToast(title, message, "info");
+  }
+
+  showMessage(title, message) {
+    this.showToast(title, message, "");
   }
 }

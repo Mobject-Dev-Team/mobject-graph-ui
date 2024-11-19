@@ -11,8 +11,8 @@ export class ToolbarButton {
   render() {
     this.button = document.createElement("button");
     this.button.id = this.id;
-    this.button.classList.add("mgui-toolbar-button");
-    this.button.title = this.tooltip; // Use the tooltip property
+    this.button.className = "mgui mgui-toolbar-button btn btn-primary";
+    this.button.title = this.tooltip;
 
     if (this.iconClass) {
       this.button.innerHTML = `<i class="${this.iconClass}"></i> `;

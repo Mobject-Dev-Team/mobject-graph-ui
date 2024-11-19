@@ -53,8 +53,9 @@ export class FileOperationsExtension {
           const contents = await file.text();
           this.currentGraph.configure(JSON.parse(contents));
         } catch (error) {
-          console.error(
-            "Failed to open file, check that the required blueprints are loaded"
+          this.editor.showError(
+            "Failed to open file",
+            "Check that the required blueprints are loaded"
           );
         }
       },

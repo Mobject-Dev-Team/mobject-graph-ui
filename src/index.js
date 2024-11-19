@@ -1,5 +1,7 @@
 import "../css/style.css";
+import "../build/scoped-bootstrap.css";
 import "./core/defaults.js";
+import "bootstrap";
 
 // visual components
 export { LedComponent } from "./components/led-component.js";

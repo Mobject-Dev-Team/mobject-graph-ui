@@ -39,6 +39,9 @@
     "@babel/preset-env": "^7.26.0",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-node-resolve": "^15.3.0",
+    "postcss": "^8.4.49",
+    "postcss-discard-duplicates": "^7.0.1",
+    "postcss-prefix-selector": "^2.1.0",
     "rollup": "^2.79.2",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-css-only": "^4.5.2",
@@ -49,6 +52,7 @@
     "mobject-litegraph": "^0.1.7"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.6.0"
+    "@fortawesome/fontawesome-free": "^6.6.0",
+    "bootstrap": "^5.3.3"
   }
 }

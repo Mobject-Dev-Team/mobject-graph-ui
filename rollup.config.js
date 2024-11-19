@@ -5,6 +5,8 @@ import path from "path";
 import license from "rollup-plugin-license";
 import css from "rollup-plugin-css-only";
 import copy from "rollup-plugin-copy";
+import postcss from "postcss";
+import prefixer from "postcss-prefix-selector";
 
 export default {
   input: "./src/index.js",
@@ -53,6 +55,7 @@ export default {
   ],
   external: ["mobject-litegraph"],
   plugins: [
+    scopeBootstrapCSS(),
     nodeResolve(),
     css({
       output: "mobject-graph-ui.css",
@@ -70,6 +73,7 @@ export default {
       ],
     }),
     cssLicenseBanner(),
+    cssClean(),
     license({
       sourcemap: true,
       cwd: process.cwd(),
@@ -112,4 +116,47 @@ function cssLicenseBanner() {
       }
     },
   };
+}
+
+function cssClean() {
+  return {
+    name: "css-clean",
+    generateBundle(outputOptions, bundle) {
+      for (const fileName of Object.keys(bundle)) {
+        if (fileName.endsWith(".css")) {
+          bundle[fileName].source = ensureOnlyOneCharset(
+            bundle[fileName].source
+          );
+        }
+      }
+    },
+  };
+}
+
+function scopeBootstrapCSS() {
+  const inputFile = "node_modules/bootstrap/dist/css/bootstrap.min.css";
+  const outputDir = "build";
+  const outputFile = path.join(outputDir, "scoped-bootstrap.css");
+  const scopeClass = ".mgui";
+  const content = fs.readFileSync(inputFile, "utf8");
+
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  const out = postcss([require("postcss-discard-duplicates")()])
+    .use(
+      prefixer({
+        prefix: scopeClass,
+        exclude: [".c"],
+      })
+    )
+    .process(content).css;
+
+  fs.writeFileSync(outputFile, out);
+}
+
+function ensureOnlyOneCharset(cssString) {
+  let cleanedCss = cssString.replace(/@charset "UTF-8";/g, "");
+  return '@charset "UTF-8";' + cleanedCss;
 }
