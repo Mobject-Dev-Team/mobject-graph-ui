@@ -1,5 +1,5 @@
 import "../css/style.css";
-import "../build/scoped-bootstrap.css";
+import "../build/mgui.bootstrap.min.css";
 import "./core/defaults.js";
 import "bootstrap";
 
