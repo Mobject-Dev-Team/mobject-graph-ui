@@ -42,23 +42,6 @@ export class Node extends LGraphNode {
     console.log("tried setting default", name, value);
   }
 
-  // setPropertyDefaultValue(name, value) {
-  //   this.properties ||= {};
-
-  //   if (value === this.properties[name]) {
-  //     return;
-  //   }
-
-  //   this.properties[name] = value;
-  //   const widgetToUpdate = this.widgets?.find(
-  //     (widget) => widget && widget.options?.property === name
-  //   );
-
-  //   if (widgetToUpdate) {
-  //     widgetToUpdate.value = value;
-  //   }
-  // }
-
   resetSize() {
     this.setSize(this.computeSize());
   }

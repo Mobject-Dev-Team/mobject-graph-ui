@@ -48,6 +48,6 @@
     "rollup-plugin-license": "^3.5.3"
   },
   "peerDependencies": {
-    "mobject-litegraph": "^0.1.9"
+    "mobject-litegraph": "^0.1.10"
   }
 }

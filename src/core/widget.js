@@ -14,6 +14,14 @@ export class WidgetBase {
     this.name = name;
     this.parent = parent;
     this.options = options;
+    this.port_name = null;
+
+    if (this.parent && this.options && this.options.parameter) {
+      const type = getType(options.parameter.datatype);
+      const port = (this.port = this.parent.addInput(name, type));
+      port.widget_name = this.name;
+      this.port_name = port.name;
+    }
   }
 
   get value() {
@@ -74,13 +82,17 @@ export class ControlWidget extends WidgetBase {
   constructor(name, parent, options = {}) {
     super(name, parent, options);
   }
+}
 
-  // setDefaultValue(value) {
-  //   this.value = value;
+function getType(datatype) {
+  let typeString = datatype.identifier
+    ? `${datatype.typeName} (${datatype.identifier})`
+    : datatype.typeName;
 
-  //   if (this.#parent && this.#property) {
-  //     this.#parent?.setPropertyDefaultValue(this.#property, value);
-  //     this.#parent?.setDirtyCanvas(true, true);
-  //   }
-  // }
+  // Check if there's a baseDatatype and append it recursively
+  if (datatype.baseDatatype) {
+    typeString += `,${getType(datatype.baseDatatype)}`;
+  }
+
+  return typeString;
 }

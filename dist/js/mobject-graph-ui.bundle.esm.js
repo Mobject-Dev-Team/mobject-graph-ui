@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import { LiteGraph, LGraphNode, LGraph, LGraphCanvas } from 'mobject-litegraph';
+import { LiteGraph, LGraphNode, LGraphCanvas, LGraph } from 'mobject-litegraph';
 
 LiteGraph.debug = false;
 LiteGraph.logging_set_level(-1);
@@ -7243,6 +7243,14 @@ class WidgetBase {
     this.name = name;
     this.parent = parent;
     this.options = options;
+    this.port_name = null;
+
+    if (this.parent && this.options && this.options.parameter) {
+      const type = getType$1(options.parameter.datatype);
+      const port = (this.port = this.parent.addInput(name, type));
+      port.widget_name = this.name;
+      this.port_name = port.name;
+    }
   }
 
   get value() {
@@ -7303,15 +7311,19 @@ class ControlWidget extends WidgetBase {
   constructor(name, parent, options = {}) {
     super(name, parent, options);
   }
+}
 
-  // setDefaultValue(value) {
-  //   this.value = value;
+function getType$1(datatype) {
+  let typeString = datatype.identifier
+    ? `${datatype.typeName} (${datatype.identifier})`
+    : datatype.typeName;
 
-  //   if (this.#parent && this.#property) {
-  //     this.#parent?.setPropertyDefaultValue(this.#property, value);
-  //     this.#parent?.setDirtyCanvas(true, true);
-  //   }
-  // }
+  // Check if there's a baseDatatype and append it recursively
+  if (datatype.baseDatatype) {
+    typeString += `,${getType$1(datatype.baseDatatype)}`;
+  }
+
+  return typeString;
 }
 
 class Widgets {
@@ -7587,23 +7599,6 @@ class Node$1 extends LGraphNode {
   setPropertyDefaultValue(name, value) {
     console.log("tried setting default", name, value);
   }
-
-  // setPropertyDefaultValue(name, value) {
-  //   this.properties ||= {};
-
-  //   if (value === this.properties[name]) {
-  //     return;
-  //   }
-
-  //   this.properties[name] = value;
-  //   const widgetToUpdate = this.widgets?.find(
-  //     (widget) => widget && widget.options?.property === name
-  //   );
-
-  //   if (widgetToUpdate) {
-  //     widgetToUpdate.value = value;
-  //   }
-  // }
 
   resetSize() {
     this.setSize(this.computeSize());
@@ -7928,6 +7923,22 @@ class GraphFramework {
 
   getVersion() {
     return this.liteGraph.VERSION;
+  }
+}
+
+class GraphCanvas extends LGraphCanvas {
+  eventEmitter = new EventEmitter();
+
+  constructor(canvas, graph, options) {
+    super(canvas, graph, options);
+  }
+
+  on(eventName, listener) {
+    this.eventEmitter.on(eventName, listener);
+  }
+
+  off(eventName, listener) {
+    this.eventEmitter.off(eventName, listener);
   }
 }
 
@@ -8267,7 +8278,7 @@ class GraphEditor {
       ".mgui-editor-graphcanvas"
     ));
 
-    this.graphCanvas = new LGraphCanvas(canvas);
+    this.graphCanvas = new GraphCanvas(canvas);
     this.graphCanvas.render_canvas_border = false;
 
     this.parentDiv = document.getElementById(container_id);
@@ -8297,30 +8308,56 @@ class GraphEditor {
     return id;
   }
 
-  showToast(title, message, toastType) {
+  showToast(title, message, toastType, callbacks = {}) {
     const id = this.generateToastId();
-    let bgColor, textColor, btnColor;
+    let bgColor,
+      textColor,
+      btnColor,
+      delay,
+      autoHide,
+      extraHtml = "";
 
     switch (toastType) {
       case "error":
         bgColor = "bg-danger";
         textColor = "text-white";
         btnColor = "btn-close-white";
+        delay = 4000;
+        autoHide = true;
         break;
       case "warning":
         bgColor = "bg-warning";
         textColor = "text-black";
         btnColor = "btn-close-black";
+        delay = 4000;
+        autoHide = true;
         break;
       case "success":
         bgColor = "bg-success";
         textColor = "text-white";
         btnColor = "btn-close-white";
+        delay = 4000;
+        autoHide = true;
         break;
       case "info":
         bgColor = "bg-info";
         textColor = "text-black";
         btnColor = "btn-close-black";
+        delay = 4000;
+        autoHide = true;
+        break;
+      case "okCancel":
+        bgColor = "bg-light";
+        textColor = "text-black";
+        btnColor = "btn-close-black";
+        delay = 0;
+        autoHide = false;
+        extraHtml = `
+                <div class="d-flex justify-content-end mt-2">
+                    <button class="btn btn-primary btn-sm me-2" id="${id}-ok-btn">OK</button>
+                    <button class="btn btn-secondary btn-sm" id="${id}-cancel-btn">Cancel</button>
+                </div>
+            `;
         break;
       default:
         bgColor = "bg-secondary";
@@ -8329,12 +8366,12 @@ class GraphEditor {
     }
 
     const toastHtml = `
-        <div id="${id}" class="toast ${bgColor} ${textColor}" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="true" data-bs-delay="4000">
+        <div id="${id}" class="toast ${bgColor} ${textColor}" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="${autoHide}" data-bs-delay="${delay}">
             <div class="toast-header ${bgColor} ${textColor}">
                 <strong class="me-auto">${title}</strong>
                 <button type="button" class="btn-close ${btnColor}" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-            <div class="toast-body ${textColor}">${message}</div>
+            <div class="toast-body ${textColor}">${message}${extraHtml}</div>
         </div>
     `;
 
@@ -8344,6 +8381,21 @@ class GraphEditor {
     this.toastContainer.appendChild(toastNode);
 
     $(`#${id}`).toast("show");
+
+    if (toastType === "okCancel") {
+      document.getElementById(`${id}-ok-btn`).addEventListener("click", () => {
+        if (callbacks.onOk) callbacks.onOk();
+        $(`#${id}`).toast("hide");
+      });
+
+      document
+        .getElementById(`${id}-cancel-btn`)
+        .addEventListener("click", () => {
+          if (callbacks.onCancel) callbacks.onCancel();
+          $(`#${id}`).toast("hide");
+        });
+    }
+
     $(`#${id}`).on("hidden.bs.toast", function () {
       this.remove();
     });
@@ -8367,6 +8419,10 @@ class GraphEditor {
 
   showMessage(title, message) {
     this.showToast(title, message, "");
+  }
+
+  showOkCancel(title, message, callbacks) {
+    this.showToast(title, message, "okCancel", callbacks);
   }
 }
 
@@ -8516,11 +8572,25 @@ class FileOperationsExtension {
 
           const file = await fileHandle.getFile();
           const contents = await file.text();
-          this.currentGraph.configure(JSON.parse(contents));
+          const configuration = JSON.parse(contents);
+
+          const missingTypes = getMissingNodeTypes(configuration);
+          if (missingTypes) {
+            const missingTypesList = missingTypes
+              .map((type) => `<li>${type}</li>`)
+              .join("");
+            this.editor.showError(
+              "Open Failed : Missing Node Types",
+              `The following node types are missing:<ul>${missingTypesList}</ul>Please check that the required blueprints are loaded.`
+            );
+            return;
+          }
+
+          this.currentGraph.configure(configuration);
         } catch (error) {
           this.editor.showError(
-            "Failed to open file",
-            "Check that the required blueprints are loaded"
+            "Open Failed : Exception was thrown",
+            "There was an error while trying to open the file. Please check the console for more information."
           );
         }
       },
@@ -8555,6 +8625,22 @@ class FileOperationsExtension {
     this.editor.addToolbarControl(openGraphButton);
     this.editor.addToolbarControl(saveGraphButton);
   }
+}
+
+function getMissingNodeTypes(data) {
+  const nodes = data.nodes || [];
+  const missingNodeTypes = [];
+
+  nodes.forEach((node) => {
+    const nodeType = node.type;
+    const nodeTypeInstance = LiteGraph.getNodeType(nodeType);
+
+    if (!nodeTypeInstance) {
+      missingNodeTypes.push(nodeType);
+    }
+  });
+
+  return missingNodeTypes.length > 0 ? [...new Set(missingNodeTypes)] : null;
 }
 
 class EditorAutoUpdateExtension {
@@ -8956,4 +9042,4 @@ class DefaultPack {
   }
 }
 
-export { CheckboxComponent, ColorGenerator, ComboboxComponent, ControlWidget, DefaultPack, DisplayWidget, GraphEditor, GraphFramework, LedComponent, NumberLimiter, NumericDisplayComponent, NumericInputComponent, SingleLineTextDisplayComponent, SingleLineTextInputComponent };
+export { CheckboxComponent, ColorGenerator, ComboboxComponent, ControlWidget, DefaultPack, DisplayWidget, GraphCanvas, GraphEditor, GraphFramework, LedComponent, NumberLimiter, NumericDisplayComponent, NumericInputComponent, SingleLineTextDisplayComponent, SingleLineTextInputComponent };

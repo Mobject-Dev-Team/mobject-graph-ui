@@ -18,6 +18,7 @@ export { NumberLimiter } from "./utils/number-limiter.js";
 
 // core
 export { GraphFramework } from "./core/graph-framework.js";
+export { GraphCanvas } from "./core/graph-canvas.js";
 export { GraphEditor } from "./core/graph-editor.js";
 export { DisplayWidget, ControlWidget } from "./core/widget.js";
 

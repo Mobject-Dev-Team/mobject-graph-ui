@@ -1,4 +1,5 @@
 import { ToolbarButton } from "../../../editor-controls/toolbar-button.js";
+import { LiteGraph } from "mobject-litegraph";
 
 export class FileOperationsExtension {
   constructor(editor) {
@@ -51,11 +52,25 @@ export class FileOperationsExtension {
 
           const file = await fileHandle.getFile();
           const contents = await file.text();
-          this.currentGraph.configure(JSON.parse(contents));
+          const configuration = JSON.parse(contents);
+
+          const missingTypes = getMissingNodeTypes(configuration);
+          if (missingTypes) {
+            const missingTypesList = missingTypes
+              .map((type) => `<li>${type}</li>`)
+              .join("");
+            this.editor.showError(
+              "Open Failed : Missing Node Types",
+              `The following node types are missing:<ul>${missingTypesList}</ul>Please check that the required blueprints are loaded.`
+            );
+            return;
+          }
+
+          this.currentGraph.configure(configuration);
         } catch (error) {
           this.editor.showError(
-            "Failed to open file",
-            "Check that the required blueprints are loaded"
+            "Open Failed : Exception was thrown",
+            "There was an error while trying to open the file. Please check the console for more information."
           );
         }
       },
@@ -90,4 +105,20 @@ export class FileOperationsExtension {
     this.editor.addToolbarControl(openGraphButton);
     this.editor.addToolbarControl(saveGraphButton);
   }
+}
+
+function getMissingNodeTypes(data) {
+  const nodes = data.nodes || [];
+  const missingNodeTypes = [];
+
+  nodes.forEach((node) => {
+    const nodeType = node.type;
+    const nodeTypeInstance = LiteGraph.getNodeType(nodeType);
+
+    if (!nodeTypeInstance) {
+      missingNodeTypes.push(nodeType);
+    }
+  });
+
+  return missingNodeTypes.length > 0 ? [...new Set(missingNodeTypes)] : null;
 }
