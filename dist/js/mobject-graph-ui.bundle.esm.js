@@ -33,12 +33,12 @@ LiteGraph.searchbox_extras = {};
 LiteGraph.auto_sort_node_types = true;
 LiteGraph.node_box_coloured_when_on = true;
 LiteGraph.node_box_coloured_by_mode = true;
-LiteGraph.dialog_close_on_mouse_leave = true;
+LiteGraph.dialog_close_on_mouse_leave = false;
 LiteGraph.dialog_close_on_mouse_leave_delay = 500;
-LiteGraph.shift_click_do_break_link_from = false;
+LiteGraph.shift_click_do_break_link_from = true;
 LiteGraph.click_do_break_link_to = false;
 LiteGraph.search_hide_on_mouse_leave = true;
-LiteGraph.search_filter_enabled = true;
+LiteGraph.search_filter_enabled = false;
 LiteGraph.search_show_all_on_open = true;
 LiteGraph.show_node_tooltip = true;
 LiteGraph.show_node_tooltip_use_descr_property = true;
@@ -6634,7 +6634,11 @@ class ComboboxComponent {
     }
   }
 
-  computeSize() {
+  computeSize(nodeX, nodeY) {
+    if (nodeX !== undefined && nodeY !== undefined) {
+      return new Float32Array([nodeX, 20]);
+    }
+
     let size = new Float32Array([220, 20]);
     var maxValueWidth = 0;
 
@@ -6790,7 +6794,10 @@ class NumericInputComponent {
     this.eventEmitter.off(eventName, listener);
   }
 
-  computeSize() {
+  computeSize(nodeX, nodeY) {
+    if (nodeX !== undefined && nodeY !== undefined) {
+      return new Float32Array([nodeX, 20]);
+    }
     return new Float32Array([220, 20]);
   }
 

@@ -57,7 +57,11 @@ export class ComboboxComponent {
     }
   }
 
-  computeSize() {
+  computeSize(nodeX, nodeY) {
+    if (nodeX !== undefined && nodeY !== undefined) {
+      return new Float32Array([nodeX, 20]);
+    }
+
     let size = new Float32Array([220, 20]);
     var maxValueWidth = 0;
 
