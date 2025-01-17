@@ -7056,7 +7056,10 @@
       }
     }
 
-    computeSize() {
+    computeSize(nodeX, nodeY) {
+      if (nodeX !== undefined && nodeY !== undefined) {
+        return new Float32Array([nodeX, 20]);
+      }
       return new Float32Array([220, 20]);
     }
 
