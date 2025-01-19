@@ -57,3 +57,28 @@
   max-height: 100%;
   padding: 10px;
 }
+
+.litegraph.lite-search-item {
+  padding-left: 10px;
+  cursor: pointer;
+}
+
+.litegraph.litesearchbox {
+  background-color: rgb(74 74 74);
+  box-shadow: 0 0 2px #ffffff !important;
+}
+
+.litegraph.litesearchbox .name {
+  color: #ffffff;
+}
+
+.graphdialog input,
+.graphdialog textarea,
+.graphdialog select,
+.graphdialog button {
+  margin: 3px !important;
+}
+
+.graphdialog .name {
+  color: white;
+}
