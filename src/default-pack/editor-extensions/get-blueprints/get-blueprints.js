@@ -16,11 +16,11 @@ export class GetBlueprintsExtension {
       "Blueprints",
       "fa-solid fa-layer-group",
       async () => {
-        console.log("api get blueprints");
+        LiteGraph.log_log("api get blueprints");
         getBlueprintsButton.disable();
         try {
           const result = await this.connection.send("GetBlueprints");
-          console.log("api get blueprints reply", result);
+          LiteGraph.log_log("api get blueprints reply", result);
           graphFramework.installNodeBlueprints(result.blueprints);
 
           if (result?.blueprints?.length) {

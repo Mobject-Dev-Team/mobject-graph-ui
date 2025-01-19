@@ -1,4 +1,4 @@
-import { ToolbarButton } from "../../../editor-controls/toolbar-button.js";
+import { LiteGraph } from "mobject-litegraph";
 
 export class EditorAutoUpdateExtension {
   constructor(editor) {
@@ -152,7 +152,7 @@ export class EditorAutoUpdateExtension {
   async createGraph(graph) {
     this.stopPolling();
     const graphPayload = graph.exportForBackend();
-    console.log("api create graph", graph.uuid, graphPayload);
+    LiteGraph.log_log("api create graph", graph.uuid, graphPayload);
 
     try {
       const status = await this.connection.send("CreateGraph", {
@@ -169,7 +169,7 @@ export class EditorAutoUpdateExtension {
 
   async updateParameterValue(graph, node, name, value) {
     this.stopPolling();
-    console.log("api update property", node, name, value);
+    LiteGraph.log_log("api update property", node, name, value);
     try {
       const reply = await this.connection.send("UpdateParameterValue", {
         graphUuid: graph.uuid,
@@ -180,7 +180,7 @@ export class EditorAutoUpdateExtension {
       this.startPolling();
     } catch (error) {
       if (error.message.includes("Invalid or missing graphUuid")) {
-        console.log(
+        LiteGraph.log_error(
           "api update property failed due to unknown graphUuid, triggering update graph"
         );
         await this.createGraph(graph);
@@ -194,7 +194,7 @@ export class EditorAutoUpdateExtension {
     if (this.pollingTimeoutId) {
       clearTimeout(this.pollingTimeoutId);
       this.pollingTimeoutId = null;
-      console.log("polling stopped");
+      LiteGraph.log_log("polling stopped");
     }
   }
 
@@ -216,7 +216,8 @@ export class EditorAutoUpdateExtension {
           graphUuid: this.currentGraph.uuid,
         });
 
-        console.log("polling reply >", status);
+        LiteGraph.log_log("polling reply >", status);
+
         if (status.uuid !== this.currentGraph.uuid) {
           console.log("polling reply rejected as graph uuid mismatch");
           this.stopPolling();
@@ -231,7 +232,7 @@ export class EditorAutoUpdateExtension {
       }
     };
 
-    console.log("polling started");
+    LiteGraph.log_log("polling started");
     this.pollingTimeoutId = setTimeout(poll, this.pollingPeriodInMs);
   }
 }

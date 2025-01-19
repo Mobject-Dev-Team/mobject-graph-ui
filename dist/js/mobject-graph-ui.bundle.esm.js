@@ -22,45 +22,45 @@
  * SOFTWARE.
  */
 
-import { LiteGraph, LGraphNode, LGraphCanvas, LGraph } from 'mobject-litegraph';
+import { LiteGraph as LiteGraph$1, LGraphNode, LGraphCanvas, LGraph } from 'mobject-litegraph';
 
-LiteGraph.debug = false;
-LiteGraph.logging_set_level(-1);
-LiteGraph.catch_exceptions = true;
-LiteGraph.throw_errors = true;
-LiteGraph.allow_scripts = false;
-LiteGraph.searchbox_extras = {};
-LiteGraph.auto_sort_node_types = true;
-LiteGraph.node_box_coloured_when_on = true;
-LiteGraph.node_box_coloured_by_mode = true;
-LiteGraph.dialog_close_on_mouse_leave = false;
-LiteGraph.dialog_close_on_mouse_leave_delay = 500;
-LiteGraph.shift_click_do_break_link_from = true;
-LiteGraph.click_do_break_link_to = false;
-LiteGraph.search_hide_on_mouse_leave = true;
-LiteGraph.search_filter_enabled = false;
-LiteGraph.search_show_all_on_open = true;
-LiteGraph.show_node_tooltip = true;
-LiteGraph.show_node_tooltip_use_descr_property = true;
-LiteGraph.auto_load_slot_types = true;
-LiteGraph.alt_drag_do_clone_nodes = true;
-LiteGraph.do_add_triggers_slots = true;
-LiteGraph.allow_multi_output_for_events = false;
-LiteGraph.middle_click_slot_add_default_node = true;
-LiteGraph.release_link_on_empty_shows_menu = true;
-LiteGraph.pointerevents_method = "mouse";
-LiteGraph.ctrl_shift_v_paste_connect_unselected_outputs = true;
-LiteGraph.backspace_delete = false;
-LiteGraph.actionHistory_enabled = false;
-LiteGraph.actionHistoryMaxSave = 40;
-LiteGraph.showCanvasOptions = true;
-LiteGraph.use_uuids = true;
-LiteGraph.refreshAncestorsOnTriggers = false;
-LiteGraph.refreshAncestorsOnActions = false;
-LiteGraph.ensureUniqueExecutionAndActionCall = false;
-LiteGraph.use_deferred_actions = true;
-LiteGraph.context_menu_filter_enabled = false;
-LiteGraph.reprocess_slot_while_node_configure = false;
+LiteGraph$1.debug = false;
+LiteGraph$1.logging_set_level(-1);
+LiteGraph$1.catch_exceptions = true;
+LiteGraph$1.throw_errors = true;
+LiteGraph$1.allow_scripts = false;
+LiteGraph$1.searchbox_extras = {};
+LiteGraph$1.auto_sort_node_types = true;
+LiteGraph$1.node_box_coloured_when_on = true;
+LiteGraph$1.node_box_coloured_by_mode = true;
+LiteGraph$1.dialog_close_on_mouse_leave = false;
+LiteGraph$1.dialog_close_on_mouse_leave_delay = 500;
+LiteGraph$1.shift_click_do_break_link_from = true;
+LiteGraph$1.click_do_break_link_to = false;
+LiteGraph$1.search_hide_on_mouse_leave = true;
+LiteGraph$1.search_filter_enabled = false;
+LiteGraph$1.search_show_all_on_open = true;
+LiteGraph$1.show_node_tooltip = true;
+LiteGraph$1.show_node_tooltip_use_descr_property = true;
+LiteGraph$1.auto_load_slot_types = true;
+LiteGraph$1.alt_drag_do_clone_nodes = true;
+LiteGraph$1.do_add_triggers_slots = true;
+LiteGraph$1.allow_multi_output_for_events = false;
+LiteGraph$1.middle_click_slot_add_default_node = true;
+LiteGraph$1.release_link_on_empty_shows_menu = true;
+LiteGraph$1.pointerevents_method = "mouse";
+LiteGraph$1.ctrl_shift_v_paste_connect_unselected_outputs = true;
+LiteGraph$1.backspace_delete = false;
+LiteGraph$1.actionHistory_enabled = false;
+LiteGraph$1.actionHistoryMaxSave = 40;
+LiteGraph$1.showCanvasOptions = true;
+LiteGraph$1.use_uuids = true;
+LiteGraph$1.refreshAncestorsOnTriggers = false;
+LiteGraph$1.refreshAncestorsOnActions = false;
+LiteGraph$1.ensureUniqueExecutionAndActionCall = false;
+LiteGraph$1.use_deferred_actions = true;
+LiteGraph$1.context_menu_filter_enabled = false;
+LiteGraph$1.reprocess_slot_while_node_configure = false;
 
 var top = 'top';
 var bottom = 'bottom';
@@ -6619,7 +6619,7 @@ class ComboboxComponent {
     const component = this;
     if (event.type === "pointerdown") {
       var ref_window = event.target.data.getCanvasWindow();
-      new LiteGraph.ContextMenu(
+      new LiteGraph$1.ContextMenu(
         this.options,
         {
           scale: 1,
@@ -6645,14 +6645,14 @@ class ComboboxComponent {
     this.options.forEach((optionsText) => {
       maxValueWidth = Math.max(
         maxValueWidth,
-        LiteGraph.computeTextWidth(optionsText, 0.6)
+        LiteGraph$1.computeTextWidth(optionsText, 0.6)
       );
     });
 
     size[0] = maxValueWidth;
-    size[0] += LiteGraph.computeTextWidth(this.label);
+    size[0] += LiteGraph$1.computeTextWidth(this.label);
     size[0] += 70;
-    size[1] = LiteGraph.NODE_WIDGET_HEIGHT;
+    size[1] = LiteGraph$1.NODE_WIDGET_HEIGHT;
 
     return size;
   }
@@ -7631,7 +7631,7 @@ class Node$1 extends LGraphNode {
         }
       }
     }
-    LiteGraph.log_warn(
+    LiteGraph$1.log_warn(
       `Node ${this.type} was registered to handle a dropped file, but failed to handle it.`
     );
   }
@@ -7793,11 +7793,11 @@ class GraphFramework {
       return GraphFramework.instance;
     }
 
-    if (typeof LiteGraph === "undefined") {
+    if (typeof LiteGraph$1 === "undefined") {
       throw new Error("LiteGraph is not available in the global scope.");
     }
 
-    this.liteGraph = LiteGraph;
+    this.liteGraph = LiteGraph$1;
     this.liteGraph.initialize();
 
     this.nodeExtensions = [];
@@ -8090,7 +8090,7 @@ class Graph extends LGraph {
   }
 
   updateGraphUuid() {
-    this.#uuid = LiteGraph.uuidv4();
+    this.#uuid = LiteGraph$1.uuidv4();
   }
 
   update(status) {
@@ -8505,11 +8505,11 @@ class GetBlueprintsExtension {
       "Blueprints",
       "fa-solid fa-layer-group",
       async () => {
-        console.log("api get blueprints");
+        LiteGraph.log_log("api get blueprints");
         getBlueprintsButton.disable();
         try {
           const result = await this.connection.send("GetBlueprints");
-          console.log("api get blueprints reply", result);
+          LiteGraph.log_log("api get blueprints reply", result);
           graphFramework.installNodeBlueprints(result.blueprints);
 
           if (result?.blueprints?.length) {
@@ -8643,7 +8643,7 @@ function getMissingNodeTypes(data) {
 
   nodes.forEach((node) => {
     const nodeType = node.type;
-    const nodeTypeInstance = LiteGraph.getNodeType(nodeType);
+    const nodeTypeInstance = LiteGraph$1.getNodeType(nodeType);
 
     if (!nodeTypeInstance) {
       missingNodeTypes.push(nodeType);
@@ -8805,7 +8805,7 @@ class EditorAutoUpdateExtension {
   async createGraph(graph) {
     this.stopPolling();
     const graphPayload = graph.exportForBackend();
-    console.log("api create graph", graph.uuid, graphPayload);
+    LiteGraph$1.log_log("api create graph", graph.uuid, graphPayload);
 
     try {
       const status = await this.connection.send("CreateGraph", {
@@ -8822,7 +8822,7 @@ class EditorAutoUpdateExtension {
 
   async updateParameterValue(graph, node, name, value) {
     this.stopPolling();
-    console.log("api update property", node, name, value);
+    LiteGraph$1.log_log("api update property", node, name, value);
     try {
       const reply = await this.connection.send("UpdateParameterValue", {
         graphUuid: graph.uuid,
@@ -8833,7 +8833,7 @@ class EditorAutoUpdateExtension {
       this.startPolling();
     } catch (error) {
       if (error.message.includes("Invalid or missing graphUuid")) {
-        console.log(
+        LiteGraph$1.log_error(
           "api update property failed due to unknown graphUuid, triggering update graph"
         );
         await this.createGraph(graph);
@@ -8847,7 +8847,7 @@ class EditorAutoUpdateExtension {
     if (this.pollingTimeoutId) {
       clearTimeout(this.pollingTimeoutId);
       this.pollingTimeoutId = null;
-      console.log("polling stopped");
+      LiteGraph$1.log_log("polling stopped");
     }
   }
 
@@ -8869,7 +8869,8 @@ class EditorAutoUpdateExtension {
           graphUuid: this.currentGraph.uuid,
         });
 
-        console.log("polling reply >", status);
+        LiteGraph$1.log_log("polling reply >", status);
+
         if (status.uuid !== this.currentGraph.uuid) {
           console.log("polling reply rejected as graph uuid mismatch");
           this.stopPolling();
@@ -8884,7 +8885,7 @@ class EditorAutoUpdateExtension {
       }
     };
 
-    console.log("polling started");
+    LiteGraph$1.log_log("polling started");
     this.pollingTimeoutId = setTimeout(poll, this.pollingPeriodInMs);
   }
 }
