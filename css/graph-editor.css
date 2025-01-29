@@ -2,8 +2,6 @@
 
 .mgui-editor {
   font-family: "Arial", sans-serif;
-  border: 1px solid #3a3a3a;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   height: 100%;
   width: 100%;
 }
@@ -44,10 +42,6 @@
 
 .mgui-editor-main-window {
   position: relative;
-}
-
-.mgui-toolbar-section.left {
-  margin-right: auto;
 }
 
 .mgui-toolbar-section {

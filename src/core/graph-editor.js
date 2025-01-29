@@ -238,10 +238,21 @@ export class GraphEditor {
   }
 
   resizeCanvas() {
+    const toolbarStyle = window.getComputedStyle(this.toolbarElement);
+    const footerStyle = window.getComputedStyle(this.footerElement);
+
+    const toolbarHeight =
+      this.toolbarElement.offsetHeight +
+      parseInt(toolbarStyle.marginTop) +
+      parseInt(toolbarStyle.marginBottom);
+    const footerHeight =
+      this.footerElement.offsetHeight +
+      parseInt(footerStyle.marginTop) +
+      parseInt(footerStyle.marginBottom);
+
     const availableHeight =
-      this.parentDiv.clientHeight -
-      this.toolbarElement.offsetHeight -
-      this.footerElement.offsetHeight;
+      this.parentDiv.clientHeight - toolbarHeight - footerHeight;
+
     this.mainWindowElement.style.height = availableHeight + "px";
     this.canvasElement.height = availableHeight;
     this.canvasElement.style.height = availableHeight + "px";
