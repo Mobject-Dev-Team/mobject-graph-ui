@@ -3,7 +3,6 @@ import { LiteGraph } from "mobject-litegraph";
 export class EditorAutoUpdateExtension {
   constructor(editor) {
     this.editor = editor;
-    this.connection = editor.getConnection();
     this.currentGraph = null;
     this.graphIsConfiguring = false;
     this.pollingTimeoutId = null;
@@ -155,7 +154,7 @@ export class EditorAutoUpdateExtension {
     LiteGraph.log_log("api create graph", graph.uuid, graphPayload);
 
     try {
-      const status = await this.connection.send("CreateGraph", {
+      const status = await this.editor.apiSend("CreateGraph", {
         graph: graphPayload,
       });
       if (status.uuid === graph.uuid) {
@@ -171,7 +170,7 @@ export class EditorAutoUpdateExtension {
     this.stopPolling();
     LiteGraph.log_log("api update property", node, name, value);
     try {
-      const reply = await this.connection.send("UpdateParameterValue", {
+      const reply = await this.editor.apiSend("UpdateParameterValue", {
         graphUuid: graph.uuid,
         nodeId: node.id,
         parameterName: name,
@@ -212,7 +211,7 @@ export class EditorAutoUpdateExtension {
       if (!this.isPolling()) return;
 
       try {
-        const status = await this.connection.send("GetStatus", {
+        const status = await this.editor.apiSend("GetStatus", {
           graphUuid: this.currentGraph.uuid,
         });
 

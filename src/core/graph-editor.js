@@ -1,7 +1,12 @@
+import "../../css/graph-editor.css";
 import { Graph } from "./graph.js";
 import { GraphCanvas } from "../core/graph-canvas.js";
 import { GraphFramework } from "../core/graph-framework.js";
 import { EventEmitter } from "../utils/event-emitter.js";
+import { Toasts } from "../editor-utils/toasts.js";
+import { ToolbarGroup } from "../editor-controls/toolbar-group.js";
+import { ToolbarButton } from "../editor-controls/toolbar-button.js";
+import { ToolbarSeparator } from "../editor-controls/toolbar-seperator.js";
 
 export class GraphEditor {
   constructor(containerId, connection) {
@@ -14,6 +19,7 @@ export class GraphEditor {
     this.footerElement = null;
     this.canvasElement = null;
     this.toastContainer = null;
+    this.toasts = null;
     this.graphCanvas = null;
     this.graph = new Graph();
     this.toolbarControls = [];
@@ -25,12 +31,9 @@ export class GraphEditor {
     const graphFramework = new GraphFramework();
     graphFramework.applyExtensions("editor", this);
 
+    this.eventEmitter.emit("toolbarReady");
     this.eventEmitter.emit("instantiated", this);
-    return this.graph;
-  }
-
-  getConnection() {
-    return this.connection;
+    return this;
   }
 
   getGraph() {
@@ -61,11 +64,114 @@ export class GraphEditor {
     this.eventEmitter.off(eventName, listener);
   }
 
-  addToolbarControl(toolbarControl) {
-    this.toolbarControls.push(toolbarControl);
+  // addButton(id, options) {
+  //   const button = new ToolbarButton(
+  //     id,
+  //     options.label,
+  //     options.iconClass,
+  //     options.onClick,
+  //     options.tooltip
+  //   );
+  //   this.addToolbarControl(button, {
+  //     section: options.section,
+  //     position: options.position,
+  //   });
+
+  //   return button;
+  // }
+
+  addButton(id, options) {
+    const button = new ToolbarButton(
+      id,
+      options.label,
+      options.iconClass,
+      options.onClick,
+      options.tooltip
+    );
+
+    // New group handling logic
+    if (options.group) {
+      const group = this.getOrCreateButtonGroup(
+        options.group,
+        options.section || "left",
+        options.groupPosition
+      );
+      group.addButton(button);
+    } else {
+      this.addToolbarControl(button, {
+        section: options.section,
+        position: options.position,
+        referenceId: options.referenceId,
+      });
+    }
+
+    return button;
+  }
+
+  // New helper method to manage groups
+  getOrCreateButtonGroup(groupName, section = "left", position = "end") {
+    if (!this.buttonGroups)
+      this.buttonGroups = { left: {}, center: {}, right: {} };
+
+    if (!this.buttonGroups[section][groupName]) {
+      const group = new ToolbarGroup(groupName);
+      this.addToolbarControl(group, {
+        section,
+        position,
+        referenceId: groupName, // For future reference
+      });
+      this.buttonGroups[section][groupName] = group;
+    }
+
+    return this.buttonGroups[section][groupName];
+  }
+
+  addSeparator(section = "left") {
+    const separator = new ToolbarSeparator();
+    this.addToolbarControl(separator, { section });
+    return separator;
+  }
+
+  addToolbarControl(toolbarControl, options = {}) {
+    const { section = "left", position = "end", referenceId = null } = options;
+    const sectionElement = this.toolbarElement.querySelector(
+      `.mgui-toolbar-section.${section}`
+    );
+
+    if (!sectionElement) {
+      console.warn(
+        `Toolbar section '${section}' not found. Appending to left.`
+      );
+      return this.addToolbarControl(toolbarControl, {
+        ...options,
+        section: "left",
+      });
+    }
+
     const controlElement = toolbarControl.render();
-    this.toolbarElement.appendChild(controlElement);
+    toolbarControl.section = section;
+
+    if (position === "start") {
+      sectionElement.insertBefore(controlElement, sectionElement.firstChild);
+    } else if (referenceId) {
+      const referenceElement = sectionElement.querySelector(`#${referenceId}`);
+      if (referenceElement) {
+        sectionElement.insertBefore(
+          controlElement,
+          position === "before"
+            ? referenceElement
+            : referenceElement.nextSibling
+        );
+      } else {
+        sectionElement.appendChild(controlElement);
+      }
+    } else {
+      sectionElement.appendChild(controlElement);
+    }
+
+    this.toolbarControls.push(toolbarControl);
     this.resizeCanvas();
+    return controlElement;
   }
 
   applyExtension(extension) {
@@ -93,10 +199,10 @@ export class GraphEditor {
     root.className = "mgui mgui-editor";
     root.innerHTML = `
     
-    <div class="mgui-editor-toolbar">
-        <div class="mgui-editor-tools mgui-editor-tools-left">
-        </div>
-        <div class="mgui-editor-tools mgui-editor-tools-right"></div>
+    <div class="mgui-editor-toolbar ">
+      <div class="mgui-toolbar-section left"></div>
+      <div class="mgui-toolbar-section center"></div>
+      <div class="mgui-toolbar-section right"></div>
     </div>
     <div class="mgui-editor-main-window">
         <canvas class="mgui-editor-graphcanvas"></canvas>   
@@ -112,6 +218,7 @@ export class GraphEditor {
     this.mainWindowElement = root.querySelector(".mgui-editor-main-window");
     this.footerElement = root.querySelector(".mgui-editor-footer");
     this.toastContainer = root.querySelector(".toast-container");
+    this.toasts = new Toasts(this.toastContainer);
 
     const canvas = (this.canvasElement = root.querySelector(
       ".mgui-editor-graphcanvas"
@@ -141,126 +248,31 @@ export class GraphEditor {
     this.graphCanvas.resize();
   }
 
-  generateToastId() {
-    const randomPart = Math.floor(Math.random() * 1000);
-    const id = `${new Date().getTime()}-${randomPart}-toast`;
-    return id;
-  }
-
-  showToast(title, message, toastType, callbacks = {}) {
-    const id = this.generateToastId();
-    let bgColor,
-      textColor,
-      btnColor,
-      delay,
-      autoHide,
-      extraHtml = "";
-
-    switch (toastType) {
-      case "error":
-        bgColor = "bg-danger";
-        textColor = "text-white";
-        btnColor = "btn-close-white";
-        delay = 4000;
-        autoHide = true;
-        break;
-      case "warning":
-        bgColor = "bg-warning";
-        textColor = "text-black";
-        btnColor = "btn-close-black";
-        delay = 4000;
-        autoHide = true;
-        break;
-      case "success":
-        bgColor = "bg-success";
-        textColor = "text-white";
-        btnColor = "btn-close-white";
-        delay = 4000;
-        autoHide = true;
-        break;
-      case "info":
-        bgColor = "bg-info";
-        textColor = "text-black";
-        btnColor = "btn-close-black";
-        delay = 4000;
-        autoHide = true;
-        break;
-      case "okCancel":
-        bgColor = "bg-light";
-        textColor = "text-black";
-        btnColor = "btn-close-black";
-        delay = 0;
-        autoHide = false;
-        extraHtml = `
-                <div class="d-flex justify-content-end mt-2">
-                    <button class="btn btn-primary btn-sm me-2" id="${id}-ok-btn">OK</button>
-                    <button class="btn btn-secondary btn-sm" id="${id}-cancel-btn">Cancel</button>
-                </div>
-            `;
-        break;
-      default:
-        bgColor = "bg-secondary";
-        textColor = "text-white";
-        btnColor = "btn-close-white";
-    }
-
-    const toastHtml = `
-        <div id="${id}" class="toast ${bgColor} ${textColor}" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="${autoHide}" data-bs-delay="${delay}">
-            <div class="toast-header ${bgColor} ${textColor}">
-                <strong class="me-auto">${title}</strong>
-                <button type="button" class="btn-close ${btnColor}" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body ${textColor}">${message}${extraHtml}</div>
-        </div>
-    `;
-
-    let toastNode = document.createElement("div");
-    toastNode.innerHTML = toastHtml;
-
-    this.toastContainer.appendChild(toastNode);
-
-    $(`#${id}`).toast("show");
-
-    if (toastType === "okCancel") {
-      document.getElementById(`${id}-ok-btn`).addEventListener("click", () => {
-        if (callbacks.onOk) callbacks.onOk();
-        $(`#${id}`).toast("hide");
-      });
-
-      document
-        .getElementById(`${id}-cancel-btn`)
-        .addEventListener("click", () => {
-          if (callbacks.onCancel) callbacks.onCancel();
-          $(`#${id}`).toast("hide");
-        });
-    }
-
-    $(`#${id}`).on("hidden.bs.toast", function () {
-      this.remove();
-    });
-  }
-
   showWarning(title, message) {
-    this.showToast(title, message, "warning");
+    this.toasts.showWarning(title, message);
   }
 
   showError(title, message) {
-    this.showToast(title, message, "error");
+    this.toasts.showError(title, message);
   }
 
   showSuccess(title, message) {
-    this.showToast(title, message, "success");
+    this.toasts.showSuccess(title, message);
   }
 
   showInfo(title, message) {
-    this.showToast(title, message, "info");
+    this.toasts.showInfo(title, message);
   }
 
   showMessage(title, message) {
-    this.showToast(title, message, "");
+    this.toasts.showMessage(title, message);
   }
 
   showOkCancel(title, message, callbacks) {
-    this.showToast(title, message, "okCancel", callbacks);
+    this.toasts.showOkCancel(title, message, callbacks);
+  }
+
+  async apiSend(action, data) {
+    return this.connection.send(action, data);
   }
 }

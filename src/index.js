@@ -22,5 +22,8 @@ export { GraphCanvas } from "./core/graph-canvas.js";
 export { GraphEditor } from "./core/graph-editor.js";
 export { DisplayWidget, ControlWidget } from "./core/widget.js";
 
+// editor controls
+export { ToolbarButton } from "./editor-controls/toolbar-button.js";
+
 // default pack
 export { DefaultPack } from "./default-pack/default-pack.js";

@@ -1,0 +1,86 @@
+@charset "UTF-8";
+
+.mgui-editor {
+  font-family: "Arial", sans-serif;
+  border: 1px solid #3a3a3a;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  width: 100%;
+}
+
+.mgui-editor-toolbar {
+  top: 0;
+  padding: 10px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  background-color: #3a3a3a;
+  border-bottom: 1px solid #929292;
+  align-items: center;
+}
+
+.mgui-editor-footer {
+  padding: 10px;
+  width: 100%;
+  background-color: #3a3a3a;
+  border-top: 1px solid #e1e1e1;
+  align-items: center;
+}
+
+.mgui-editor-main-window {
+  padding: 0px;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.mgui-editor-graphcanvas {
+  padding: 0px;
+  background-color: #303030;
+  height: 100%;
+  width: 100%;
+}
+
+.mgui-editor-main-window {
+  position: relative;
+}
+
+.mgui-toolbar-section.left {
+  margin-right: auto;
+}
+
+.mgui-toolbar-section {
+  display: flex;
+  align-items: center;
+}
+
+.mgui-toolbar-section.left {
+  justify-content: flex-start;
+}
+
+.mgui-toolbar-section.center {
+  justify-content: center;
+}
+
+.mgui-toolbar-section.right {
+  justify-content: flex-end;
+}
+
+.mgui-toolbar-section .btn {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.mgui-toolbar-section .btn-group .btn {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.mgui-toolbar-section .btn-group .btn:first-child {
+  margin-left: 5px;
+}
+
+.mgui-toolbar-section .btn-group .btn:last-child {
+  margin-right: 5px;
+}
