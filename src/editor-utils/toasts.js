@@ -43,7 +43,7 @@ export class Toasts {
         autoHide = true;
         break;
       case "info":
-        bgColor = "bg-info";
+        bgColor = "bg-light";
         textColor = "text-black";
         btnColor = "btn-close-black";
         delay = 4000;

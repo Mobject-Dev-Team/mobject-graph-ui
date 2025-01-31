@@ -14,12 +14,18 @@ export class GetBlueprintsExtension {
         tooltip: "Get Blueprints",
         section: "left",
       });
+
+      this.onBlueprintsClicked();
     });
   }
 
   async onBlueprintsClicked() {
     const graphFramework = new GraphFramework();
     LiteGraph.log_log("api get blueprints");
+    this.editor.showInfo(
+      "Loading Blueprints",
+      "`Please wait` while we fetch the blueprints from the server."
+    );
     this.getBlueprintsButton.disable();
     try {
       const result = await this.editor.apiSend("GetBlueprints");

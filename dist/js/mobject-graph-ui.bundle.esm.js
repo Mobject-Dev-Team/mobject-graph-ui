@@ -8245,7 +8245,7 @@ class Toasts {
         autoHide = true;
         break;
       case "info":
-        bgColor = "bg-info";
+        bgColor = "bg-light";
         textColor = "text-black";
         btnColor = "btn-close-black";
         delay = 4000;
@@ -8721,12 +8721,18 @@ class GetBlueprintsExtension {
         tooltip: "Get Blueprints",
         section: "left",
       });
+
+      this.onBlueprintsClicked();
     });
   }
 
   async onBlueprintsClicked() {
     const graphFramework = new GraphFramework();
     LiteGraph.log_log("api get blueprints");
+    this.editor.showInfo(
+      "Loading Blueprints",
+      "`Please wait` while we fetch the blueprints from the server."
+    );
     this.getBlueprintsButton.disable();
     try {
       const result = await this.editor.apiSend("GetBlueprints");
