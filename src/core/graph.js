@@ -49,7 +49,34 @@ export class Graph extends LGraph {
     });
   }
 
+  getMissingNodeTypes(data) {
+    const nodes = data.nodes || [];
+    const missingNodeTypes = [];
+
+    nodes.forEach((node) => {
+      const nodeType = node.type;
+      const nodeTypeInstance = LiteGraph.getNodeType(nodeType);
+
+      if (!nodeTypeInstance) {
+        missingNodeTypes.push(nodeType);
+      }
+    });
+
+    return missingNodeTypes.length > 0 ? [...new Set(missingNodeTypes)] : null;
+  }
+
   configure(data, keep_old) {
+    // check for missing node types
+    const missingTypes = this.getMissingNodeTypes(data);
+    if (missingTypes) {
+      const missingTypesList = missingTypes
+        .map((type) => `<li>${type}</li>`)
+        .join("");
+
+      const errorMessage = `The following node types are missing:<ul>${missingTypesList}</ul>Please check that the required blueprints are loaded.`;
+      throw new Error(`${errorMessage}`);
+    }
+
     this.eventEmitter.emit("beforeGraphConfigure", this);
     this.isConfiguring = true;
     super.configure(data, keep_old);

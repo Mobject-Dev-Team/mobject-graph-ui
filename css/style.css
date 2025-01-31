@@ -24,3 +24,8 @@
 .graphdialog .name {
   color: white;
 }
+
+.btn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
