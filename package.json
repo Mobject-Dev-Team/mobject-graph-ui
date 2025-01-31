@@ -1,6 +1,6 @@
 {
   "name": "mobject-graph-ui",
-  "version": "0.1.32",
+  "version": "0.1.33",
   "description": "A UI library for graph-based interaction based on mobject-litegraph and mobject-graph",
   "type": "module",
   "main": "dist/js/mobject-graph-ui.bundle.cjs.js",
