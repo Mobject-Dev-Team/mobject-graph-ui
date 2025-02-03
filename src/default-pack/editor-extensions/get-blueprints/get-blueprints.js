@@ -24,7 +24,7 @@ export class GetBlueprintsExtension {
     LiteGraph.log_log("api get blueprints");
     this.editor.showInfo(
       "Loading Blueprints",
-      "Please wait while we fetch the blueprints from the server."
+      "Please wait while the blueprints are fetched from the server."
     );
     this.getBlueprintsButton.disable();
     try {
