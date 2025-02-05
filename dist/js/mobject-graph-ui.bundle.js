@@ -7959,6 +7959,7 @@
       if (!this.graph || !this.graph._nodes || this.graph._nodes.length === 0) {
         this.ds.offset[0] = 0;
         this.ds.offset[1] = 0;
+        this.ds.scale = 1;
         this.setDirty(true, true);
         return;
       }
@@ -7982,7 +7983,7 @@
 
       this.ds.offset[0] = -minX + 10;
       this.ds.offset[1] = -minY + 10;
-
+      this.ds.scale = 1;
       this.setDirty(true, true);
     }
   }
