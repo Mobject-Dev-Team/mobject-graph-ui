@@ -1,15 +1,10 @@
 export class FileOperationsExtension {
   constructor(editor) {
     this.editor = editor;
-    this.currentGraph = this.editor.getGraph();
     this.setupEditorListeners();
   }
 
   setupEditorListeners() {
-    this.editor.on("graphSet", (newGraph) => {
-      this.currentGraph = newGraph;
-    });
-
     this.editor.on("toolbarReady", () => {
       this.editor.addButton("New", {
         label: "New",
@@ -39,10 +34,7 @@ export class FileOperationsExtension {
   }
 
   onNewClicked() {
-    if (!this.currentGraph) {
-      return;
-    }
-    this.currentGraph.clear();
+    this.editor.clearGraph();
   }
 
   async onOpenClicked() {
@@ -62,7 +54,7 @@ export class FileOperationsExtension {
       const configuration = JSON.parse(contents);
 
       try {
-        this.currentGraph.configure(configuration);
+        this.editor.loadGraph(configuration);
         this.editor.showSuccess(
           `Graph Loaded`,
           `Successfully loaded "${file.name}"`
@@ -95,7 +87,7 @@ export class FileOperationsExtension {
       });
 
       const writable = await fileHandle.createWritable();
-      await writable.write(JSON.stringify(this.currentGraph.serialize()));
+      await writable.write(JSON.stringify(this.editor.serializeGraph()));
       await writable.close();
     } catch (error) {
       console.error("Failed to save file:", error);

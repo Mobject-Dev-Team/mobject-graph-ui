@@ -36,6 +36,19 @@ export class GraphEditor {
     return this;
   }
 
+  loadGraph(graphData) {
+    this.graph.configure(graphData);
+    this.graphCanvas.setDefaultViewpoint();
+  }
+
+  clearGraph() {
+    this.graph.clear();
+  }
+
+  serializeGraph() {
+    return this.graph.serialize();
+  }
+
   getGraph() {
     return this.graph;
   }
@@ -63,22 +76,6 @@ export class GraphEditor {
   off(eventName, listener) {
     this.eventEmitter.off(eventName, listener);
   }
-
-  // addButton(id, options) {
-  //   const button = new ToolbarButton(
-  //     id,
-  //     options.label,
-  //     options.iconClass,
-  //     options.onClick,
-  //     options.tooltip
-  //   );
-  //   this.addToolbarControl(button, {
-  //     section: options.section,
-  //     position: options.position,
-  //   });
-
-  //   return button;
-  // }
 
   addButton(id, options) {
     const button = new ToolbarButton(
@@ -108,7 +105,6 @@ export class GraphEditor {
     return button;
   }
 
-  // New helper method to manage groups
   getOrCreateButtonGroup(groupName, section = "left", position = "end") {
     if (!this.buttonGroups)
       this.buttonGroups = { left: {}, center: {}, right: {} };

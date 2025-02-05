@@ -7950,6 +7950,37 @@ class GraphCanvas extends LGraphCanvas {
   off(eventName, listener) {
     this.eventEmitter.off(eventName, listener);
   }
+
+  setDefaultViewpoint() {
+    if (!this.graph || !this.graph._nodes || this.graph._nodes.length === 0) {
+      this.ds.offset[0] = 0;
+      this.ds.offset[1] = 0;
+      this.setDirty(true, true);
+      return;
+    }
+
+    const nodes = this.graph._nodes;
+
+    let minX, minY;
+    let temp;
+
+    nodes.forEach((node) => {
+      const bounding = node.getBounding(temp, true);
+
+      if (minX === undefined || minY === undefined) {
+        minX = bounding[0];
+        minY = bounding[1];
+      } else {
+        minX = Math.min(minX, bounding[0]);
+        minY = Math.min(minY, bounding[1]);
+      }
+    });
+
+    this.ds.offset[0] = -minX + 10;
+    this.ds.offset[1] = -minY + 10;
+
+    this.setDirty(true, true);
+  }
 }
 
 // class used to convert the standard serialization of litegraph, to mobject-graph version for use
@@ -8456,6 +8487,19 @@ class GraphEditor {
     return this;
   }
 
+  loadGraph(graphData) {
+    this.graph.configure(graphData);
+    this.graphCanvas.setDefaultViewpoint();
+  }
+
+  clearGraph() {
+    this.graph.clear();
+  }
+
+  serializeGraph() {
+    return this.graph.serialize();
+  }
+
   getGraph() {
     return this.graph;
   }
@@ -8483,22 +8527,6 @@ class GraphEditor {
   off(eventName, listener) {
     this.eventEmitter.off(eventName, listener);
   }
-
-  // addButton(id, options) {
-  //   const button = new ToolbarButton(
-  //     id,
-  //     options.label,
-  //     options.iconClass,
-  //     options.onClick,
-  //     options.tooltip
-  //   );
-  //   this.addToolbarControl(button, {
-  //     section: options.section,
-  //     position: options.position,
-  //   });
-
-  //   return button;
-  // }
 
   addButton(id, options) {
     const button = new ToolbarButton(
@@ -8528,7 +8556,6 @@ class GraphEditor {
     return button;
   }
 
-  // New helper method to manage groups
   getOrCreateButtonGroup(groupName, section = "left", position = "end") {
     if (!this.buttonGroups)
       this.buttonGroups = { left: {}, center: {}, right: {} };
@@ -8756,15 +8783,10 @@ class GetBlueprintsExtension {
 class FileOperationsExtension {
   constructor(editor) {
     this.editor = editor;
-    this.currentGraph = this.editor.getGraph();
     this.setupEditorListeners();
   }
 
   setupEditorListeners() {
-    this.editor.on("graphSet", (newGraph) => {
-      this.currentGraph = newGraph;
-    });
-
     this.editor.on("toolbarReady", () => {
       this.editor.addButton("New", {
         label: "New",
@@ -8794,10 +8816,7 @@ class FileOperationsExtension {
   }
 
   onNewClicked() {
-    if (!this.currentGraph) {
-      return;
-    }
-    this.currentGraph.clear();
+    this.editor.clearGraph();
   }
 
   async onOpenClicked() {
@@ -8817,7 +8836,7 @@ class FileOperationsExtension {
       const configuration = JSON.parse(contents);
 
       try {
-        this.currentGraph.configure(configuration);
+        this.editor.loadGraph(configuration);
         this.editor.showSuccess(
           `Graph Loaded`,
           `Successfully loaded "${file.name}"`
@@ -8850,7 +8869,7 @@ class FileOperationsExtension {
       });
 
       const writable = await fileHandle.createWritable();
-      await writable.write(JSON.stringify(this.currentGraph.serialize()));
+      await writable.write(JSON.stringify(this.editor.serializeGraph()));
       await writable.close();
     } catch (error) {
       console.error("Failed to save file:", error);
