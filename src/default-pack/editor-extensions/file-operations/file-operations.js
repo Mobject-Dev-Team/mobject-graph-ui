@@ -75,9 +75,34 @@ export class FileOperationsExtension {
     }
   }
 
+  sanitizeFilename(filename) {
+    return filename.replace(/[\/\\:*?"<>|]/g, "");
+  }
+
   async onSaveClicked() {
     try {
+      const serializedGraph = this.editor.serializeGraph();
+      const saveData = JSON.stringify(serializedGraph);
+      const defaultFileName = "untitled";
+      let fileName = defaultFileName;
+
+      if (
+        serializedGraph &&
+        serializedGraph.extra &&
+        serializedGraph.extra.filemeta &&
+        serializedGraph.extra.filemeta.name
+      ) {
+        console.log("here");
+        const unsanitizedFileName = serializedGraph.extra.filemeta.name;
+        fileName = this.sanitizeFilename(unsanitizedFileName);
+        console.log(fileName);
+        if (!fileName) {
+          fileName = defaultFileName;
+        }
+      }
+
       const fileHandle = await window.showSaveFilePicker({
+        suggestedName: fileName + ".mgraph",
         types: [
           {
             description: "Graph Files",
@@ -87,10 +112,14 @@ export class FileOperationsExtension {
       });
 
       const writable = await fileHandle.createWritable();
-      await writable.write(JSON.stringify(this.editor.serializeGraph()));
+      await writable.write(saveData);
       await writable.close();
     } catch (error) {
-      console.error("Failed to save file:", error);
+      if (error.name === "AbortError") {
+        return;
+      } else {
+        console.error("Failed to save file:", error);
+      }
     }
   }
 }

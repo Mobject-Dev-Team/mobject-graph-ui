@@ -1,4 +1,4 @@
-import "../../css/toast.css";
+import "./toast.css";
 export class Toasts {
   constructor(toastContainer) {
     this.toastContainer = toastContainer;

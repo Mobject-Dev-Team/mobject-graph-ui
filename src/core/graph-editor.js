@@ -1,9 +1,58 @@
-import "../../css/graph-editor.css";
+// Description: Graph Editor class for creating a graph editor instance.
+
+// --------------------------------
+// events emitted by the editor:
+// --------------------------------
+// - toolbarReady : emitted when the toolbar is ready
+// - graphLoadInitiated : emitted when a graph load is initiated, provides the graph instance
+// - graphLoaded : emitted when a graph is loaded, provides the graph instance
+// - graphClearInitiated : emitted when a graph clear is initiated, provides the graph instance
+// - graphCleared : emitted when a graph is cleared, provides the graph instance
+// - graphSerialized : emitted when a graph is serialized, provides the serialized graph
+// - graphSet : emitted when a new graph instance is given to the editor, provides the graph instance that was set
+// - graphReplaced : emitted when a graph instance is replaced by another, provides the graph instance that was replaced
+// - applyExtension : emitted when an extension is applied, provides the extension instance
+// - instantiated : emitted when the editor is instantiated, provides the editor instance
+// --------------------------------
+
+// example of showWarning
+// --------------------------------
+// .showWarning('Warning', 'This is a warning message');
+
+// example of showModal
+// --------------------------------
+// .showModal({
+//   title: 'Edit File Details',
+//   body: `
+//     <form id="file-details">
+//       <input type="text" class="form-control mb-2" placeholder="Title">
+//       <textarea class="form-control" placeholder="Description"></textarea>
+//     </form>
+//   `,
+//   buttons: [
+//     {
+//       label: 'Cancel',
+//       type: 'secondary',
+//       onClick: (modal) => {console.log('hello'); modal.hide()}
+//     },
+//     {
+//       label: 'Save',
+//       type: 'primary',
+//       onClick: (modal) => {
+//         const inputs = modal._element.querySelectorAll('input, textarea');
+//         // Handle save logic
+//         modal.hide();
+//       }
+//     }
+//   ]
+// });
+
+import "./graph-editor.css";
 import { Graph } from "./graph.js";
 import { GraphCanvas } from "../core/graph-canvas.js";
 import { GraphFramework } from "../core/graph-framework.js";
 import { EventEmitter } from "../utils/event-emitter.js";
-import { Toasts } from "../editor-utils/toasts.js";
+import { Toasts } from "../editor-utils/toasts/toasts.js";
 import { ToolbarGroup } from "../editor-controls/toolbar-group.js";
 import { ToolbarButton } from "../editor-controls/toolbar-button.js";
 import { ToolbarSeparator } from "../editor-controls/toolbar-seperator.js";
@@ -37,16 +86,22 @@ export class GraphEditor {
   }
 
   loadGraph(graphData) {
+    this.eventEmitter.emit("graphLoadInitiated", this.graph);
     this.graph.configure(graphData);
     this.graphCanvas.setDefaultViewpoint();
+    this.eventEmitter.emit("graphLoaded", this.graph);
   }
 
   clearGraph() {
+    this.eventEmitter.emit("graphClearInitiated", this.graph);
     this.graph.clear();
+    this.eventEmitter.emit("graphCleared", this.graph);
   }
 
   serializeGraph() {
-    return this.graph.serialize();
+    const serializedGraph = this.graph.serialize();
+    this.eventEmitter.emit("graphSerialized", serializedGraph);
+    return serializedGraph;
   }
 
   getGraph() {
@@ -208,7 +263,8 @@ export class GraphEditor {
     <div class="mgui-editor-footer">
         <div class="mgui-editor-tools mgui-editor-tools-left"></div>
         <div class="mgui-editor-tools mgui-editor-tools-right"></div>
-    </div>`;
+    </div>
+    <div class="mgui-modal-container"></div>`;
 
     this.toolbarElement = root.querySelector(".mgui-editor-toolbar");
     this.mainWindowElement = root.querySelector(".mgui-editor-main-window");
@@ -253,6 +309,94 @@ export class GraphEditor {
     this.canvasElement.height = availableHeight;
     this.canvasElement.style.height = availableHeight + "px";
     this.graphCanvas.resize();
+  }
+
+  showModal(options) {
+    const modalId = `mgui-modal-${Date.now()}`;
+
+    const buttonsHtml = options.buttons
+      .map(
+        (btn) => `
+      <button type="button" 
+              class="btn btn-${btn.type || "secondary"}"
+              ${btn.dismiss ? 'data-bs-dismiss="modal"' : ""}>
+        ${btn.label}
+      </button>
+    `
+      )
+      .join("");
+
+    const modalHtml = `
+      <div class="modal fade" id="${modalId}" tabindex="-1" 
+           aria-labelledby="${modalId}-label" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="${modalId}-label">${options.title}</h5>
+              <button type="button" class="btn-close" 
+                      data-dismiss="modal" 
+                      aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              ${options.body}
+            </div>
+            <div class="modal-footer">
+              ${buttonsHtml}
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    const modalContainer = this.rootElement.querySelector(
+      ".mgui-modal-container"
+    );
+    modalContainer.insertAdjacentHTML("beforeend", modalHtml);
+
+    const modalElement = document.getElementById(modalId);
+    const modal = new bootstrap.Modal(modalElement, {
+      keyboard: true,
+      focus: true,
+    });
+
+    options.buttons.forEach((btn, index) => {
+      if (!btn.dismiss) {
+        const buttonElement = modalElement.querySelectorAll(
+          ".modal-footer button"
+        )[index];
+        buttonElement.addEventListener("click", (e) => {
+          if (btn.onClick) {
+            btn.onClick(modal);
+          } else {
+            modal.hide();
+          }
+        });
+      }
+    });
+
+    modalElement.addEventListener("hidden.bs.modal", () => {
+      setTimeout(() => {
+        modalElement.remove();
+      }, 100);
+    });
+
+    const formElement = modalElement.querySelector("form");
+    if (formElement) {
+      formElement.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const primaryBtn = options.buttons.find(
+          (btn) => btn.type === "primary"
+        );
+        if (primaryBtn) {
+          if (primaryBtn.onClick) {
+            primaryBtn.onClick(modal);
+          } else {
+            modal.hide();
+          }
+        }
+      });
+    }
+
+    modal.show();
   }
 
   showWarning(title, message) {

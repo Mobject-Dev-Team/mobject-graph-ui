@@ -1,0 +1,17 @@
+.metadata-summary {
+  padding: 0 1rem;
+  color: rgb(230, 230, 230);
+  border-left: 1px solid #c4c4c4;
+  margin-left: 1rem;
+}
+
+.summary-name {
+  font-size: 1em;
+  max-width: 200px;
+  margin-bottom: -3px;
+  cursor: pointer;
+}
+
+.metadata-summary:hover {
+  color: rgb(101, 182, 236);
+}

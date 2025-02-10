@@ -4,6 +4,7 @@ import { FileOperationsExtension } from "./editor-extensions/file-operations/fil
 import { EditorAutoUpdateExtension } from "./editor-extensions/auto-update/editor-auto-update.js";
 import { ShowExecuteOrderExtension } from "./editor-extensions/show-execute-order/show-execute-order.js";
 import { PreExecutionCheckExtension } from "./node-extensions/pre-execution-check/pre-execution-check.js";
+import { FileMetaExtension } from "./editor-extensions/file-meta/file-meta.js";
 
 export class DefaultPack {
   install(graphFramework = new GraphFramework(), options) {
@@ -39,6 +40,7 @@ export class DefaultPack {
       FileOperationsExtension: true,
       EditorAutoUpdateExtension: true,
       ShowExecuteOrderExtension: true,
+      FileMetaExtension: true,
     };
     const settings = { ...defaults, ...options };
 
@@ -55,6 +57,9 @@ export class DefaultPack {
     }
     if (settings.ShowExecuteOrderExtension) {
       graphFramework.registerEditorExtension(ShowExecuteOrderExtension);
+    }
+    if (settings.FileMetaExtension) {
+      graphFramework.registerEditorExtension(FileMetaExtension);
     }
   }
 

@@ -8460,6 +8460,8 @@ class ToolbarSeparator {
   }
 }
 
+// Description: Graph Editor class for creating a graph editor instance.
+
 class GraphEditor {
   constructor(containerId, connection) {
     this.eventEmitter = new EventEmitter();
@@ -8489,16 +8491,22 @@ class GraphEditor {
   }
 
   loadGraph(graphData) {
+    this.eventEmitter.emit("graphLoadInitiated", this.graph);
     this.graph.configure(graphData);
     this.graphCanvas.setDefaultViewpoint();
+    this.eventEmitter.emit("graphLoaded", this.graph);
   }
 
   clearGraph() {
+    this.eventEmitter.emit("graphClearInitiated", this.graph);
     this.graph.clear();
+    this.eventEmitter.emit("graphCleared", this.graph);
   }
 
   serializeGraph() {
-    return this.graph.serialize();
+    const serializedGraph = this.graph.serialize();
+    this.eventEmitter.emit("graphSerialized", serializedGraph);
+    return serializedGraph;
   }
 
   getGraph() {
@@ -8660,7 +8668,8 @@ class GraphEditor {
     <div class="mgui-editor-footer">
         <div class="mgui-editor-tools mgui-editor-tools-left"></div>
         <div class="mgui-editor-tools mgui-editor-tools-right"></div>
-    </div>`;
+    </div>
+    <div class="mgui-modal-container"></div>`;
 
     this.toolbarElement = root.querySelector(".mgui-editor-toolbar");
     this.mainWindowElement = root.querySelector(".mgui-editor-main-window");
@@ -8705,6 +8714,94 @@ class GraphEditor {
     this.canvasElement.height = availableHeight;
     this.canvasElement.style.height = availableHeight + "px";
     this.graphCanvas.resize();
+  }
+
+  showModal(options) {
+    const modalId = `mgui-modal-${Date.now()}`;
+
+    const buttonsHtml = options.buttons
+      .map(
+        (btn) => `
+      <button type="button" 
+              class="btn btn-${btn.type || "secondary"}"
+              ${btn.dismiss ? 'data-bs-dismiss="modal"' : ""}>
+        ${btn.label}
+      </button>
+    `
+      )
+      .join("");
+
+    const modalHtml = `
+      <div class="modal fade" id="${modalId}" tabindex="-1" 
+           aria-labelledby="${modalId}-label" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="${modalId}-label">${options.title}</h5>
+              <button type="button" class="btn-close" 
+                      data-dismiss="modal" 
+                      aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              ${options.body}
+            </div>
+            <div class="modal-footer">
+              ${buttonsHtml}
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    const modalContainer = this.rootElement.querySelector(
+      ".mgui-modal-container"
+    );
+    modalContainer.insertAdjacentHTML("beforeend", modalHtml);
+
+    const modalElement = document.getElementById(modalId);
+    const modal = new bootstrap.Modal(modalElement, {
+      keyboard: true,
+      focus: true,
+    });
+
+    options.buttons.forEach((btn, index) => {
+      if (!btn.dismiss) {
+        const buttonElement = modalElement.querySelectorAll(
+          ".modal-footer button"
+        )[index];
+        buttonElement.addEventListener("click", (e) => {
+          if (btn.onClick) {
+            btn.onClick(modal);
+          } else {
+            modal.hide();
+          }
+        });
+      }
+    });
+
+    modalElement.addEventListener("hidden.bs.modal", () => {
+      setTimeout(() => {
+        modalElement.remove();
+      }, 100);
+    });
+
+    const formElement = modalElement.querySelector("form");
+    if (formElement) {
+      formElement.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const primaryBtn = options.buttons.find(
+          (btn) => btn.type === "primary"
+        );
+        if (primaryBtn) {
+          if (primaryBtn.onClick) {
+            primaryBtn.onClick(modal);
+          } else {
+            modal.hide();
+          }
+        }
+      });
+    }
+
+    modal.show();
   }
 
   showWarning(title, message) {
@@ -8858,9 +8955,34 @@ class FileOperationsExtension {
     }
   }
 
+  sanitizeFilename(filename) {
+    return filename.replace(/[\/\\:*?"<>|]/g, "");
+  }
+
   async onSaveClicked() {
     try {
+      const serializedGraph = this.editor.serializeGraph();
+      const saveData = JSON.stringify(serializedGraph);
+      const defaultFileName = "untitled";
+      let fileName = defaultFileName;
+
+      if (
+        serializedGraph &&
+        serializedGraph.extra &&
+        serializedGraph.extra.filemeta &&
+        serializedGraph.extra.filemeta.name
+      ) {
+        console.log("here");
+        const unsanitizedFileName = serializedGraph.extra.filemeta.name;
+        fileName = this.sanitizeFilename(unsanitizedFileName);
+        console.log(fileName);
+        if (!fileName) {
+          fileName = defaultFileName;
+        }
+      }
+
       const fileHandle = await window.showSaveFilePicker({
+        suggestedName: fileName + ".mgraph",
         types: [
           {
             description: "Graph Files",
@@ -8870,10 +8992,14 @@ class FileOperationsExtension {
       });
 
       const writable = await fileHandle.createWritable();
-      await writable.write(JSON.stringify(this.editor.serializeGraph()));
+      await writable.write(saveData);
       await writable.close();
     } catch (error) {
-      console.error("Failed to save file:", error);
+      if (error.name === "AbortError") {
+        return;
+      } else {
+        console.error("Failed to save file:", error);
+      }
     }
   }
 }
@@ -9193,6 +9319,147 @@ class PreExecutionCheckExtension {
   }
 }
 
+class FileMetaExtension {
+  constructor(editor) {
+    this.editor = editor;
+    this.setupEditorListeners();
+  }
+
+  setupEditorListeners() {
+    this.editor.on("toolbarReady", () => {
+      this.fileMetaDisplayControl = new FileMetaDisplayControl(
+        "FileMetaDisplayControl",
+        this.onClick.bind(this)
+      );
+
+      this.editor.addToolbarControl(this.fileMetaDisplayControl, {
+        section: "right",
+      });
+
+      this.editor.on("graphSet", (graph) => {
+        this.fileMetaDisplayControl.update(graph);
+      });
+
+      this.editor.on("graphLoaded", (graph) => {
+        this.fileMetaDisplayControl.update(graph);
+      });
+
+      this.editor.on("graphCleared", (graph) => {
+        this.fileMetaDisplayControl.update(graph);
+      });
+    });
+  }
+
+  onClick() {
+    const graph = this.editor.graph;
+    if (!graph) {
+      return;
+    }
+
+    const name =
+      (graph.extra && graph.extra.filemeta && graph.extra.filemeta.name) || "";
+    const description =
+      (graph.extra &&
+        graph.extra.filemeta &&
+        graph.extra.filemeta.description) ||
+      "";
+    const tags =
+      (graph.extra && graph.extra.filemeta && graph.extra.filemeta.tags) || [];
+    const tagsString = tags.join(", ");
+
+    this.editor.showModal({
+      title: "Edit Graph Details",
+      body: `
+    <form id="metadataForm">
+        <div class="mb-3">
+          <label for="fileMetaName" class="form-label">Name</label>
+          <input type="text" class="form-control" id="fileMetaName" placeholder="Enter name" required value="${name}">
+        </div>
+        <div class="mb-3">
+          <label for="fileMetaDescription" class="form-label">Description</label>
+          <textarea class="form-control" id="fileMetaDescription" rows="2" placeholder="Enter description">${description}</textarea>
+        </div>
+        <div class="mb-3">
+          <label for="fileMetaTags" class="form-label">Tags</label>
+          <input type="text" class="form-control" id="fileMetaTags" placeholder="Enter tags (comma separated)" value="${tagsString}">
+        </div>
+        <button type="submit" class="d-none"></button>
+      </form>
+
+  `,
+      buttons: [
+        {
+          label: "Cancel",
+          type: "secondary",
+          onClick: (modal) => {
+            modal.hide();
+          },
+        },
+        {
+          label: "Ok",
+          type: "primary",
+          onClick: (modal) => {
+            const name = modal._element.querySelector("#fileMetaName").value;
+            const description = modal._element.querySelector(
+              "#fileMetaDescription"
+            ).value;
+            const tags = modal._element.querySelector("#fileMetaTags").value;
+
+            const graph = this.editor.graph;
+            graph.extra.filemeta = graph.extra.filemeta || {};
+            graph.extra.filemeta.name = (name.trim() && name) || "Untitled";
+            graph.extra.filemeta.description = description;
+            graph.extra.filemeta.tags = tags
+              .split(",")
+              .map((tag) => tag.trim());
+
+            this.fileMetaDisplayControl.update(graph);
+
+            modal.hide();
+          },
+        },
+      ],
+    });
+  }
+}
+
+class FileMetaDisplayControl {
+  constructor(name, onClickSummary) {
+    this.container = document.createElement("div");
+    this.container.id = name;
+
+    this.container.innerHTML = `
+      <div class="metadata-summary" style="cursor: pointer;">
+        <div class="d-flex align-items-center">
+          <span class="summary-name text-truncate">Untitled</span>
+          <i class="far fa-edit edit-icon" style="margin-left: 10px;"></i>
+        </div>
+      </div>`;
+
+    this.summaryName = this.container.querySelector(".summary-name");
+    this.metadataSummary = this.container.querySelector(".metadata-summary");
+
+    if (typeof onClickSummary === "function") {
+      this.metadataSummary.addEventListener("click", () => onClickSummary());
+    }
+  }
+
+  render() {
+    return this.container;
+  }
+
+  update(graph) {
+    const fileMeta = (graph && graph.extra && graph.extra.filemeta) || {};
+    this.summaryName.textContent = fileMeta.name || "Untitled";
+
+    this.metadataSummary.onclick = () => {
+      if (typeof this.onClickSummary === "function") {
+        this.onClickSummary();
+      }
+    };
+  }
+}
+
 class DefaultPack {
   install(graphFramework = new GraphFramework(), options) {
     this.registerBundledPacks(graphFramework, options);
@@ -9227,6 +9494,7 @@ class DefaultPack {
       FileOperationsExtension: true,
       EditorAutoUpdateExtension: true,
       ShowExecuteOrderExtension: true,
+      FileMetaExtension: true,
     };
     const settings = { ...defaults, ...options };
 
@@ -9243,6 +9511,9 @@ class DefaultPack {
     }
     if (settings.ShowExecuteOrderExtension) {
       graphFramework.registerEditorExtension(ShowExecuteOrderExtension);
+    }
+    if (settings.FileMetaExtension) {
+      graphFramework.registerEditorExtension(FileMetaExtension);
     }
   }
 
