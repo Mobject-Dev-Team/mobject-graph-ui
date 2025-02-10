@@ -54,7 +54,7 @@ export class FileMetaExtension {
     <form id="metadataForm">
         <div class="mb-3">
           <label for="fileMetaName" class="form-label">Name</label>
-          <input type="text" class="form-control" id="fileMetaName" placeholder="Enter name" required value="${name}">
+          <input type="text" class="form-control" id="fileMetaName" placeholder="Enter name" required value="${name}" autofocus>
         </div>
         <div class="mb-3">
           <label for="fileMetaDescription" class="form-label">Description</label>

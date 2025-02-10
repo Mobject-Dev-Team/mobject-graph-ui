@@ -355,7 +355,11 @@ export class GraphEditor {
     const modalElement = document.getElementById(modalId);
     const modal = new bootstrap.Modal(modalElement, {
       keyboard: true,
-      focus: true,
+      focus: false,
+    });
+
+    $(".modal").on("shown.bs.modal", function () {
+      $(this).find("[autofocus]").focus();
     });
 
     options.buttons.forEach((btn, index) => {
