@@ -51,3 +51,15 @@ This project uses FontAwesome Free icons under the Creative Commons Attribution 
 Include the following attribution in your project documentation or footer:
 
 "Icons made by [FontAwesome](https://fontawesome.com/) under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)"
+
+### Use-Bootstrap
+
+This project uses code modified from the MIT project [use-bootstrap-tag](https://github.com/use-bootstrap/use-bootstrap-tag)
+
+#### Third-Party Assets
+
+Use-Bootstrap uses the following 3rd party assets.
+
+##### stef
+
+This project uses code modified from the MIT project [stef](https://github.com/erwinheldy/stef/)

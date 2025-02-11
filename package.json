@@ -51,5 +51,8 @@
   },
   "peerDependencies": {
     "mobject-litegraph": "^0.1.11"
+  },
+  "dependencies": {
+    "stef": "^0.0.1"
   }
 }

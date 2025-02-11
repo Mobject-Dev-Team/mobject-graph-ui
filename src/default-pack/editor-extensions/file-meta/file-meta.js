@@ -1,4 +1,6 @@
 import "./file-meta.css";
+import UseBootstrapTag from "../../../editor-utils/use-bootstrap-tag/use-bootstrap-tag.esm";
+import "../../../editor-utils/use-bootstrap-tag/use-bootstrap-tag.css";
 
 export class FileMetaExtension {
   constructor(editor) {
@@ -52,17 +54,23 @@ export class FileMetaExtension {
       title: "Edit Graph Details",
       body: `
     <form id="metadataForm">
-        <div class="mb-3">
+        <div class="mgui mb-3">
           <label for="fileMetaName" class="form-label">Name</label>
           <input type="text" class="form-control" id="fileMetaName" placeholder="Enter name" required value="${name}" autofocus>
         </div>
-        <div class="mb-3">
+        <div class="mgui mb-3">
           <label for="fileMetaDescription" class="form-label">Description</label>
           <textarea class="form-control" id="fileMetaDescription" rows="2" placeholder="Enter description">${description}</textarea>
         </div>
-        <div class="mb-3">
+        <div class="mgui mb-3 active">
           <label for="fileMetaTags" class="form-label">Tags</label>
-          <input type="text" class="form-control" id="fileMetaTags" placeholder="Enter tags (comma separated)" value="${tagsString}">
+          <div class="input-wrapper">
+            <input type="text" class="form-control active" id="fileMetaTags" placeholder="Enter tags (comma separated)" value="${tagsString}" 
+            data-ub-tag-separator=","
+            data-ub-tag-variant="primary"
+            data-ub-tag-x-position="left"
+            data-ub-tag-no-input-onblur>
+          </div>
         </div>
         <button type="submit" class="d-none"></button>
       </form>
@@ -100,6 +108,11 @@ export class FileMetaExtension {
           },
         },
       ],
+      preShow: (modal, modalElement) => {
+        const example = UseBootstrapTag(
+          modal._element.querySelector("#fileMetaTags")
+        );
+      },
     });
   }
 }

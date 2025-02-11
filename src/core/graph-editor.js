@@ -44,7 +44,8 @@
 //         modal.hide();
 //       }
 //     }
-//   ]
+//   ],
+//   preShow : (modal, modalElement)=>{console.log('pre-show')}
 // });
 
 import "./graph-editor.css";
@@ -400,6 +401,9 @@ export class GraphEditor {
       });
     }
 
+    if (options.preShow) {
+      options.preShow(modal, modalElement);
+    }
     modal.show();
   }
 
