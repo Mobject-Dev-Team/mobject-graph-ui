@@ -1,0 +1,12 @@
+﻿@charset "UTF-8";
+
+.btn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 768px) {
+  .button-label {
+    display: none;
+  }
+}

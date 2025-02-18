@@ -1,3 +1,5 @@
+import "./toolbar-button.css";
+
 export class ToolbarButton {
   constructor(id, label, iconClass, onClick, tooltip) {
     this.id = id;
@@ -14,11 +16,13 @@ export class ToolbarButton {
     this.button.className = "mgui mgui-toolbar-button btn btn-primary";
     this.button.title = this.tooltip;
 
+    let contentHtml = "";
     if (this.iconClass) {
-      this.button.innerHTML = `<i class="${this.iconClass}"></i> `;
+      contentHtml += `<i class="${this.iconClass}"></i> `;
     }
 
-    this.button.innerHTML += this.label;
+    contentHtml += `<span class="button-label">${this.label}</span>`;
+    this.button.innerHTML = contentHtml;
     if (this.onClick) {
       this.button.addEventListener("click", this.onClick);
     }

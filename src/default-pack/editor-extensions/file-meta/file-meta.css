@@ -15,3 +15,15 @@
 .metadata-summary:hover {
   color: rgb(101, 182, 236);
 }
+
+@media (max-width: 860px) {
+  .summary-name {
+    max-width: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .summary-name {
+    display: none;
+  }
+}
