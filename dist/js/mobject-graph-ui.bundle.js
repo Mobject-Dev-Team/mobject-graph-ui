@@ -8744,7 +8744,7 @@
             <div class="modal-header">
               <h5 class="modal-title" id="${modalId}-label">${options.title}</h5>
               <button type="button" class="btn-close" 
-                      data-bs-dismiss="modal" 
+                      data-dismiss="modal" 
                       aria-label="Close"></button>
             </div>
             <div class="modal-body">
