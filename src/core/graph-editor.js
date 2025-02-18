@@ -23,6 +23,7 @@
 // --------------------------------
 // .showModal({
 //   title: 'Edit File Details',
+//   dialogClass: "modal-lg",
 //   body: `
 //     <form id="file-details">
 //       <input type="text" class="form-control mb-2" placeholder="Title">
@@ -45,7 +46,21 @@
 //       }
 //     }
 //   ],
-//   preShow : (modal, modalElement)=>{console.log('pre-show')}
+//   preShow: (modal, modalElement) => {
+//     console.log("Modal is about to be shown.", modalElement);
+//   },
+//   onShow: (modal, modalElement) => {
+//     console.log("Modal is now being shown.", modalElement);
+//   },
+//   onShown: (modal, modalElement) => {
+//     console.log("Modal is fully displayed.", modalElement);
+//   },
+//   onHide: (modal, modalElement) => {
+//     console.log("Modal is about to hide.", modalElement);
+//   },
+//   onHidden: (modal, modalElement) => {
+//       console.log("Modal is completely hidden and will now be removed.", modalElement);
+//   }
 // });
 
 import "./graph-editor.css";
@@ -315,6 +330,7 @@ export class GraphEditor {
   showModal(options) {
     const modalId = `mgui-modal-${Date.now()}`;
 
+    const dialogClass = options.dialogClass ? ` ${options.dialogClass}` : "";
     const buttonsHtml = options.buttons
       .map(
         (btn) => `
@@ -330,7 +346,7 @@ export class GraphEditor {
     const modalHtml = `
       <div class="modal fade" id="${modalId}" tabindex="-1" 
            aria-labelledby="${modalId}-label" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog ${dialogClass}">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="${modalId}-label">${options.title}</h5>
@@ -363,6 +379,32 @@ export class GraphEditor {
       $(this).find("[autofocus]").focus();
     });
 
+    $(".modal").on("show.bs.modal", () => {
+      if (options.onShow) {
+        options.onShow(modal, modalElement);
+      }
+    });
+
+    $(".modal").on("shown.bs.modal", () => {
+      modalElement.querySelector("[autofocus]")?.focus();
+      if (options.onShown) {
+        options.onShown(modal, modalElement);
+      }
+    });
+
+    $(".modal").on("hide.bs.modal", () => {
+      if (options.onHide) {
+        options.onHide(modal, modalElement);
+      }
+    });
+
+    $(".modal").on("hidden.bs.modal", () => {
+      if (options.onHidden) {
+        options.onHidden(modal, modalElement);
+      }
+      modalElement.remove();
+    });
+
     options.buttons.forEach((btn, index) => {
       if (!btn.dismiss) {
         const buttonElement = modalElement.querySelectorAll(
@@ -376,12 +418,6 @@ export class GraphEditor {
           }
         });
       }
-    });
-
-    modalElement.addEventListener("hidden.bs.modal", () => {
-      setTimeout(() => {
-        modalElement.remove();
-      }, 100);
     });
 
     const formElement = modalElement.querySelector("form");

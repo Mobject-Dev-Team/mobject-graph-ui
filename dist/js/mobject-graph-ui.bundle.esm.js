@@ -8719,6 +8719,7 @@ class GraphEditor {
   showModal(options) {
     const modalId = `mgui-modal-${Date.now()}`;
 
+    const dialogClass = options.dialogClass ? ` ${options.dialogClass}` : "";
     const buttonsHtml = options.buttons
       .map(
         (btn) => `
@@ -8734,7 +8735,7 @@ class GraphEditor {
     const modalHtml = `
       <div class="modal fade" id="${modalId}" tabindex="-1" 
            aria-labelledby="${modalId}-label" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog ${dialogClass}">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="${modalId}-label">${options.title}</h5>
@@ -8767,6 +8768,32 @@ class GraphEditor {
       $(this).find("[autofocus]").focus();
     });
 
+    $(".modal").on("show.bs.modal", () => {
+      if (options.onShow) {
+        options.onShow(modal, modalElement);
+      }
+    });
+
+    $(".modal").on("shown.bs.modal", () => {
+      modalElement.querySelector("[autofocus]")?.focus();
+      if (options.onShown) {
+        options.onShown(modal, modalElement);
+      }
+    });
+
+    $(".modal").on("hide.bs.modal", () => {
+      if (options.onHide) {
+        options.onHide(modal, modalElement);
+      }
+    });
+
+    $(".modal").on("hidden.bs.modal", () => {
+      if (options.onHidden) {
+        options.onHidden(modal, modalElement);
+      }
+      modalElement.remove();
+    });
+
     options.buttons.forEach((btn, index) => {
       if (!btn.dismiss) {
         const buttonElement = modalElement.querySelectorAll(
@@ -8780,12 +8807,6 @@ class GraphEditor {
           }
         });
       }
-    });
-
-    modalElement.addEventListener("hidden.bs.modal", () => {
-      setTimeout(() => {
-        modalElement.remove();
-      }, 100);
     });
 
     const formElement = modalElement.querySelector("form");
