@@ -8729,7 +8729,7 @@
           (btn) => `
       <button type="button" 
               class="btn btn-${btn.type || "secondary"}"
-              ${btn.dismiss ? 'data-bs-dismiss="modal"' : ""}>
+              ${btn.dismiss ? 'data-dismiss="modal"' : ""}>
         ${btn.label}
       </button>
     `
@@ -8744,7 +8744,7 @@
             <div class="modal-header">
               <h5 class="modal-title" id="${modalId}-label">${options.title}</h5>
               <button type="button" class="btn-close" 
-                      data-dismiss="modal" 
+                      data-bs-dismiss="modal" 
                       aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -8768,30 +8768,27 @@
         focus: false,
       });
 
-      $(".modal").on("shown.bs.modal", function () {
-        $(this).find("[autofocus]").focus();
-      });
-
-      $(".modal").on("show.bs.modal", () => {
+      // Event listeners scoped to this modal instance
+      $(modalElement).on("show.bs.modal", () => {
         if (options.onShow) {
           options.onShow(modal, modalElement);
         }
       });
 
-      $(".modal").on("shown.bs.modal", () => {
+      $(modalElement).on("shown.bs.modal", () => {
         modalElement.querySelector("[autofocus]")?.focus();
         if (options.onShown) {
           options.onShown(modal, modalElement);
         }
       });
 
-      $(".modal").on("hide.bs.modal", () => {
+      $(modalElement).on("hide.bs.modal", () => {
         if (options.onHide) {
           options.onHide(modal, modalElement);
         }
       });
 
-      $(".modal").on("hidden.bs.modal", () => {
+      $(modalElement).on("hidden.bs.modal", () => {
         if (options.onHidden) {
           options.onHidden(modal, modalElement);
         }
