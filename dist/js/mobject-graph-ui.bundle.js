@@ -8486,6 +8486,7 @@
       this.extensions = [];
 
       this.makeEditorWindow(containerId);
+      this.disableScrolling();
       this.setGraph(this.graph);
 
       const graphFramework = new GraphFramework();
@@ -8494,6 +8495,22 @@
       this.eventEmitter.emit("toolbarReady");
       this.eventEmitter.emit("instantiated", this);
       return this;
+    }
+
+    handleTouchMove(event) {
+      event.preventDefault();
+    }
+
+    enableScrolling() {
+      this.canvasElement.removeEventListener("touchmove", this.handleTouchMove, {
+        passive: false,
+      });
+    }
+
+    disableScrolling() {
+      this.canvasElement.addEventListener("touchmove", this.handleTouchMove, {
+        passive: false,
+      });
     }
 
     loadGraph(graphData) {
