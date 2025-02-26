@@ -17,10 +17,17 @@ export class WidgetBase {
     this.port_name = null;
 
     if (this.parent && this.options && this.options.parameter) {
-      const type = getType(options.parameter.datatype);
-      const port = (this.port = this.parent.addInput(name, type));
-      port.widget_name = this.name;
-      this.port_name = port.name;
+      const metadata = this.options.parameter.metadata || [];
+      const suppressInput = metadata.some(
+        (item) => item.name === "suppressInput" && item.value === true
+      );
+
+      if (!suppressInput) {
+        const type = getType(options.parameter.datatype);
+        const port = (this.port = this.parent.addInput(name, type));
+        port.widget_name = this.name;
+        this.port_name = port.name;
+      }
     }
   }
 
