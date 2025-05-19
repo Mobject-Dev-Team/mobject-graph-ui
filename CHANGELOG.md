@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.1.49
+
+- Removed debug logging from numeric-input-component.
+- Optimized auto-update logic for stability
+
 ## 0.1.48
 
 - Removed focus on toolbar buttons.

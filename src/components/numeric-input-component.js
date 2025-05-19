@@ -138,7 +138,6 @@ export class NumericInputComponent {
   }
 
   notifyValueChange() {
-    console.log("Value changed:", this.value);
     this.eventEmitter.emit("onChange", this.value);
   }
 
