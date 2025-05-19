@@ -7,11 +7,11 @@ export class NumericInputComponent {
     this.precision = precision;
     this.limiter = limiter;
     this.colorGenerator = colorGenerator;
-    this._value = defaultValue;
     this.isDragging = false;
     this.startX = 0;
     this.step = this.calculateStep(precision);
     this.setupDefaults();
+    this.limiter.value = defaultValue;
   }
 
   setupDefaults() {
@@ -26,12 +26,14 @@ export class NumericInputComponent {
   }
 
   get value() {
-    return this._value;
+    return this.limiter.value;
   }
 
   set value(value) {
-    this._value = value;
-    this.eventEmitter.emit("onChange", this._value);
+    if (value == this.limiter.value) return;
+
+    this.limiter.value = value;
+    this.notifyValueChange();
   }
 
   on(eventName, listener) {
@@ -89,7 +91,6 @@ export class NumericInputComponent {
     if (Math.abs(currentX - this.startX) > 1) {
       const stepCount = Math.floor(currentX - this.startX);
       this.limiter.incrementBy(stepCount * this.step * multiplier);
-      this._value = this.limiter.getValue();
       this.startX = currentX;
       this.isDragging = true;
     }
@@ -101,7 +102,7 @@ export class NumericInputComponent {
     }
     this.isDragging = false;
     this.isMyMouseEvent = false;
-    this.updateValueOnRelease();
+    this.notifyValueChange();
   }
 
   isInsideInputArea(x, widgetWidth) {
@@ -116,7 +117,6 @@ export class NumericInputComponent {
       // up arrow
       this.limiter.incrementBy(this.step * multiplier);
     }
-    this._value = this.limiter.getValue();
   }
 
   promptForValue(event) {
@@ -128,9 +128,7 @@ export class NumericInputComponent {
       function (inputValue) {
         const value = Number(inputValue);
         if (!isNaN(value)) {
-          widget.limiter.setValue(value);
-          widget.value = widget.limiter.getValue();
-          widget.updateValueOnRelease();
+          widget.value = value;
         } else {
           console.error("Invalid input: Input is not a number.");
         }
@@ -139,9 +137,9 @@ export class NumericInputComponent {
     );
   }
 
-  updateValueOnRelease() {
-    this.limiter.setValue(this.value);
-    this.value = this.limiter.getValue();
+  notifyValueChange() {
+    console.log("Value changed:", this.value);
+    this.eventEmitter.emit("onChange", this.value);
   }
 
   draw(ctx, node, widget_width, y, H) {
@@ -192,7 +190,7 @@ export class NumericInputComponent {
     ctx.fillStyle = this.valueTextColor;
     ctx.textAlign = "right";
     ctx.fillText(
-      Number(this._value).toFixed(this.precision),
+      Number(this.value).toFixed(this.precision),
       drawWidth - 5,
       y + H * 0.7
     );

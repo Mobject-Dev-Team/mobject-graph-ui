@@ -21,7 +21,7 @@ export class NumberLimiter {
     this.#precision = precision;
 
     this.#initLimits();
-    this.setValue(this.#value);
+    this.value = initialValue;
   }
 
   #shouldAdjust(number) {
@@ -39,7 +39,27 @@ export class NumberLimiter {
     this.#limitMaximum = this.#adjustLimit(this.#maximum, -1);
   }
 
-  setValue(newValue) {
+  incrementBy(amount) {
+    let newVal = this.#value + amount;
+    if (this.#shouldAdjust(newVal)) {
+      newVal += 1;
+    }
+    this.value = newVal;
+  }
+
+  decrementBy(amount) {
+    let newVal = this.#value - amount;
+    if (this.#shouldAdjust(newVal)) {
+      newVal += 1;
+    }
+    this.value = newVal;
+  }
+
+  get value() {
+    return this.#value;
+  }
+
+  set value(newValue) {
     if (this.#shouldAdjust(newValue)) {
       newValue += 1;
     }
@@ -50,21 +70,11 @@ export class NumberLimiter {
     );
   }
 
-  incrementBy(amount) {
-    if (this.#shouldAdjust(this.#value + amount)) {
-      amount += 1;
-    }
-    this.setValue(this.#value + amount);
-  }
-
-  decrementBy(amount) {
-    if (this.#shouldAdjust(this.#value - amount)) {
-      amount += 1;
-    }
-    this.setValue(this.#value - amount);
+  setValue(newValue) {
+    this.value = newValue;
   }
 
   getValue() {
-    return this.#value;
+    return this.value;
   }
 }

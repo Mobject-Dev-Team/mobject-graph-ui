@@ -6759,11 +6759,11 @@ class NumericInputComponent {
     this.precision = precision;
     this.limiter = limiter;
     this.colorGenerator = colorGenerator;
-    this._value = defaultValue;
     this.isDragging = false;
     this.startX = 0;
     this.step = this.calculateStep(precision);
     this.setupDefaults();
+    this.limiter.value = defaultValue;
   }
 
   setupDefaults() {
@@ -6778,12 +6778,14 @@ class NumericInputComponent {
   }
 
   get value() {
-    return this._value;
+    return this.limiter.value;
   }
 
   set value(value) {
-    this._value = value;
-    this.eventEmitter.emit("onChange", this._value);
+    if (value == this.limiter.value) return;
+
+    this.limiter.value = value;
+    this.notifyValueChange();
   }
 
   on(eventName, listener) {
@@ -6841,7 +6843,6 @@ class NumericInputComponent {
     if (Math.abs(currentX - this.startX) > 1) {
       const stepCount = Math.floor(currentX - this.startX);
       this.limiter.incrementBy(stepCount * this.step * multiplier);
-      this._value = this.limiter.getValue();
       this.startX = currentX;
       this.isDragging = true;
     }
@@ -6853,7 +6854,7 @@ class NumericInputComponent {
     }
     this.isDragging = false;
     this.isMyMouseEvent = false;
-    this.updateValueOnRelease();
+    this.notifyValueChange();
   }
 
   isInsideInputArea(x, widgetWidth) {
@@ -6868,7 +6869,6 @@ class NumericInputComponent {
       // up arrow
       this.limiter.incrementBy(this.step * multiplier);
     }
-    this._value = this.limiter.getValue();
   }
 
   promptForValue(event) {
@@ -6880,9 +6880,7 @@ class NumericInputComponent {
       function (inputValue) {
         const value = Number(inputValue);
         if (!isNaN(value)) {
-          widget.limiter.setValue(value);
-          widget.value = widget.limiter.getValue();
-          widget.updateValueOnRelease();
+          widget.value = value;
         } else {
           console.error("Invalid input: Input is not a number.");
         }
@@ -6891,9 +6889,9 @@ class NumericInputComponent {
     );
   }
 
-  updateValueOnRelease() {
-    this.limiter.setValue(this.value);
-    this.value = this.limiter.getValue();
+  notifyValueChange() {
+    console.log("Value changed:", this.value);
+    this.eventEmitter.emit("onChange", this.value);
   }
 
   draw(ctx, node, widget_width, y, H) {
@@ -6944,7 +6942,7 @@ class NumericInputComponent {
     ctx.fillStyle = this.valueTextColor;
     ctx.textAlign = "right";
     ctx.fillText(
-      Number(this._value).toFixed(this.precision),
+      Number(this.value).toFixed(this.precision),
       drawWidth - 5,
       y + H * 0.7
     );
@@ -7162,7 +7160,7 @@ class NumberLimiter {
     this.#precision = precision;
 
     this.#initLimits();
-    this.setValue(this.#value);
+    this.value = initialValue;
   }
 
   #shouldAdjust(number) {
@@ -7180,7 +7178,27 @@ class NumberLimiter {
     this.#limitMaximum = this.#adjustLimit(this.#maximum, -1);
   }
 
-  setValue(newValue) {
+  incrementBy(amount) {
+    let newVal = this.#value + amount;
+    if (this.#shouldAdjust(newVal)) {
+      newVal += 1;
+    }
+    this.value = newVal;
+  }
+
+  decrementBy(amount) {
+    let newVal = this.#value - amount;
+    if (this.#shouldAdjust(newVal)) {
+      newVal += 1;
+    }
+    this.value = newVal;
+  }
+
+  get value() {
+    return this.#value;
+  }
+
+  set value(newValue) {
     if (this.#shouldAdjust(newValue)) {
       newValue += 1;
     }
@@ -7191,22 +7209,12 @@ class NumberLimiter {
     );
   }
 
-  incrementBy(amount) {
-    if (this.#shouldAdjust(this.#value + amount)) {
-      amount += 1;
-    }
-    this.setValue(this.#value + amount);
-  }
-
-  decrementBy(amount) {
-    if (this.#shouldAdjust(this.#value - amount)) {
-      amount += 1;
-    }
-    this.setValue(this.#value - amount);
+  setValue(newValue) {
+    this.value = newValue;
   }
 
   getValue() {
-    return this.#value;
+    return this.value;
   }
 }
 
