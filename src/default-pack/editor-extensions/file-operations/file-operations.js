@@ -66,6 +66,9 @@ export class FileOperationsExtension {
         );
       }
     } catch (error) {
+      if (error.name === "AbortError") {
+        return;
+      }
       this.editor.showError(
         "Open Failed : File Access",
         "There was an error while trying to access or read the file. Please check the console for more information."

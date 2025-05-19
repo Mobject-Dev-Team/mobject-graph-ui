@@ -24,7 +24,10 @@ export class ToolbarButton {
     contentHtml += `<span class="button-label">${this.label}</span>`;
     this.button.innerHTML = contentHtml;
     if (this.onClick) {
-      this.button.addEventListener("click", this.onClick);
+      this.button.addEventListener("click", (e) => {
+        this.onClick(e);
+        e.currentTarget.blur();
+      });
     }
     return this.button;
   }

@@ -8440,7 +8440,10 @@ class ToolbarButton {
     contentHtml += `<span class="button-label">${this.label}</span>`;
     this.button.innerHTML = contentHtml;
     if (this.onClick) {
-      this.button.addEventListener("click", this.onClick);
+      this.button.addEventListener("click", (e) => {
+        this.onClick(e);
+        e.currentTarget.blur();
+      });
     }
     return this.button;
   }
@@ -9009,6 +9012,9 @@ class FileOperationsExtension {
         );
       }
     } catch (error) {
+      if (error.name === "AbortError") {
+        return;
+      }
       this.editor.showError(
         "Open Failed : File Access",
         "There was an error while trying to access or read the file. Please check the console for more information."
