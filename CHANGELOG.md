@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.50
+
+- mobile compatible file open / save.
+
 ## 0.1.49
 
 - Removed debug logging from numeric-input-component.
