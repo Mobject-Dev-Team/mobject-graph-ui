@@ -4,12 +4,14 @@ import { LiteGraphConverter } from "../utils/litegraph-converter.js";
 
 export class Graph extends LGraph {
   #uuid = null;
+  emitOnNodePropertyChangeBound = null;
 
   constructor(o) {
     super(o);
     this.eventEmitter = new EventEmitter();
     this.#uuid = null;
     this.isConfiguring = false;
+    this.emitOnNodePropertyChangeBound = this.emitOnNodePropertyChange.bind(this);
     this.updateGraphUuid();
   }
 
@@ -106,7 +108,7 @@ export class Graph extends LGraph {
       this.updateGraphUuid();
     }
 
-    node.on("propertyChanged", this.emitOnNodePropertyChange.bind(this));
+    node.on("propertyChanged", this.emitOnNodePropertyChangeBound);
     this.eventEmitter.emit("nodeAdded", this, node);
   }
 
@@ -114,7 +116,7 @@ export class Graph extends LGraph {
     if (!this.isConfiguring) {
       this.updateGraphUuid();
     }
-    node.off("propertyChanged", this.emitOnNodePropertyChange.bind(this));
+    node.off("propertyChanged", this.emitOnNodePropertyChangeBound);
     this.eventEmitter.emit("nodeRemoved", this, node);
   }
 
