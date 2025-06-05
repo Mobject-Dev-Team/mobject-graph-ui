@@ -50,7 +50,7 @@ export class NumberLimiter {
   decrementBy(amount) {
     let newVal = this.#value - amount;
     if (this.#shouldAdjust(newVal)) {
-      newVal += 1;
+      newVal -= 1;
     }
     this.value = newVal;
   }
