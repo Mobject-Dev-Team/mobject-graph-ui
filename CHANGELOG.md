@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.1.53
+
+- added server examples
+- refactor to allow options
+
+## 0.1.52
+
+- moved example extension to graph-ui
+
 ## 0.1.51
 
 - added new draw helpers, theme and clamp.

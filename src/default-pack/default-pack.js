@@ -5,6 +5,7 @@ import { EditorAutoUpdateExtension } from "./editor-extensions/auto-update/edito
 import { ShowExecuteOrderExtension } from "./editor-extensions/show-execute-order/show-execute-order.js";
 import { PreExecutionCheckExtension } from "./node-extensions/pre-execution-check/pre-execution-check.js";
 import { FileMetaExtension } from "./editor-extensions/file-meta/file-meta.js";
+import { ServerExamplesEditorExtension } from "./editor-extensions/server-examples/server-examples-editor-extension.js";
 
 export class DefaultPack {
   install(graphFramework = new GraphFramework(), options) {
@@ -41,6 +42,7 @@ export class DefaultPack {
       EditorAutoUpdateExtension: true,
       ShowExecuteOrderExtension: true,
       FileMetaExtension: true,
+      ServerExamplesEditorExtension: false,
     };
     const settings = { ...defaults, ...options };
 
@@ -60,6 +62,12 @@ export class DefaultPack {
     }
     if (settings.FileMetaExtension) {
       graphFramework.registerEditorExtension(FileMetaExtension);
+    }
+    if (settings.ServerExamplesEditorExtension) {
+      graphFramework.registerEditorExtension(
+        ServerExamplesEditorExtension,
+        settings
+      );
     }
   }
 

@@ -1,11 +1,16 @@
 import { EventEmitter } from "../utils/event-emitter.js";
 import { LGraphCanvas } from "mobject-litegraph";
+import { GraphFramework } from "../core/graph-framework.js";
 
 export class GraphCanvas extends LGraphCanvas {
   eventEmitter = new EventEmitter();
 
   constructor(canvas, graph, options) {
     super(canvas, graph, options);
+
+    this.extensions = [];
+    const graphFramework = new GraphFramework();
+    graphFramework.applyExtensions("canvas", this);
   }
 
   on(eventName, listener) {
@@ -14,6 +19,26 @@ export class GraphCanvas extends LGraphCanvas {
 
   off(eventName, listener) {
     this.eventEmitter.off(eventName, listener);
+  }
+
+  applyExtension(extension, options = {}) {
+    this.eventEmitter.emit("applyExtension", extension, options);
+    try {
+      const instance = new extension(this, options);
+      this.extensions.push(instance);
+    } catch (error) {
+      if (
+        typeof extension === "object" &&
+        typeof extension.apply === "function"
+      ) {
+        extension.apply(this, options);
+        this.extensions.push(extension);
+      } else {
+        throw new Error(
+          "Extension must be a class or an object with an apply method"
+        );
+      }
+    }
   }
 
   setDefaultViewpoint() {

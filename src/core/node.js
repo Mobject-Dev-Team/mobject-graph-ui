@@ -102,17 +102,17 @@ export class Node extends LGraphNode {
     );
   }
 
-  applyExtension(extension) {
-    this.eventEmitter.emit("applyExtension", extension);
+  applyExtension(extension, options = {}) {
+    this.eventEmitter.emit("applyExtension", extension, options);
     try {
-      const instance = new extension(this);
+      const instance = new extension(this, options);
       this.extensions.push(instance);
     } catch (error) {
       if (
         typeof extension === "object" &&
         typeof extension.apply === "function"
       ) {
-        extension.apply(this);
+        extension.apply(this, options);
         this.extensions.push(extension);
       } else {
         throw new Error(

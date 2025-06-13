@@ -123,16 +123,15 @@ export class GraphFramework {
     }
   }
 
-  registerNodeExtension(extension) {
-    this.nodeExtensions.push(extension);
+  registerNodeExtension(extension, options = {}) {
+    this.nodeExtensions.push([extension, options]);
+  }
+  registerCanvasExtension(extension, options = {}) {
+    this.canvasExtensions.push([extension, options]);
   }
 
-  registerCanvasExtension(extension) {
-    this.canvasExtensions.push(extension);
-  }
-
-  registerEditorExtension(extension) {
-    this.editorExtensions.push(extension);
+  registerEditorExtension(extension, options = {}) {
+    this.editorExtensions.push([extension, options]);
   }
 
   applyExtensions(type, instance) {
@@ -151,7 +150,9 @@ export class GraphFramework {
         throw new Error(`Unknown extension type: ${type}`);
     }
 
-    extensions.forEach((extension) => instance.applyExtension(extension));
+    extensions.forEach(([extension, options]) => {
+      instance.applyExtension(extension, options);
+    });
   }
 
   getVersion() {
