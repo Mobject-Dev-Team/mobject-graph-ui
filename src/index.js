@@ -3,6 +3,10 @@ import "../build/mgui.bootstrap.min.css";
 import "./core/defaults.js";
 import "bootstrap";
 
+// Draw utilities
+export { UiDraw } from "./draw/ui-draw.js";
+export { UiTheme } from "./draw/ui-theme.js";
+
 // visual components
 export { LedComponent } from "./components/led-component.js";
 export { CheckboxComponent } from "./components/checkbox-component.js";
@@ -15,6 +19,7 @@ export { SingleLineTextInputComponent } from "./components/single-line-text-inpu
 // utility
 export { ColorGenerator } from "./utils/color-generator.js";
 export { NumberLimiter } from "./utils/number-limiter.js";
+export { clamp } from "./utils/clamp.js";
 
 // core
 export { GraphFramework } from "./core/graph-framework.js";

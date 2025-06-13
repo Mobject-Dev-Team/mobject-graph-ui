@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.1.51
+
+- added new draw helpers, theme and clamp.
+- updated to latest mobject-litegraph
+
 ## 0.1.50
 
 - mobile compatible file open / save.
