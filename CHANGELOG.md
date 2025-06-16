@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.54
+
+- updated to latest mobject-litegraph
+
 ## 0.1.53
 
 - added server examples
