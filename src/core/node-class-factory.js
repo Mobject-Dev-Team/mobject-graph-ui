@@ -42,12 +42,30 @@ export class NodeClassFactory {
     return blueprint.path;
   }
 
+  // checkBlueprintParametersAreSupported(blueprint) {
+  //   if (!blueprint.node.parameters) return true;
+
+  //   return blueprint.node.parameters.every((parameter) => {
+  //     const { typeName, identifier } = parameter.datatype;
+  //     return this.widgets.hasControl(typeName, identifier);
+  //   });
+  // }
+
   checkBlueprintParametersAreSupported(blueprint) {
     if (!blueprint.node.parameters) return true;
 
     return blueprint.node.parameters.every((parameter) => {
       const { typeName, identifier } = parameter.datatype;
-      return this.widgets.hasControl(typeName, identifier);
+      const hasWidget = this.widgets.hasControl(typeName, identifier);
+
+      // Extract metadata array
+      const metadata = parameter.metadata || [];
+      const suppressInput = metadata.some(
+        (item) => item.name === "suppressInput" && item.value === true
+      );
+
+      // Only disallow if suppressInput is true and there is no widget
+      return hasWidget || !suppressInput;
     });
   }
 

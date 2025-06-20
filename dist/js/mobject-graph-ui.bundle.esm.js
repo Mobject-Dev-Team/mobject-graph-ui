@@ -7495,7 +7495,7 @@ class WidgetBase {
       if (this.parent && this.options && this.options.property) {
         this.parent.setProperty(this.options.property, newValue);
       }
-      this.parent?.setDirtyCanvas(true, true);
+      this.requestRedraw();
     }
   }
 
@@ -7509,6 +7509,10 @@ class WidgetBase {
 
   triggerParentResetSize() {
     if (this.parent) this.parent.resetSize();
+  }
+
+  requestRedraw() {
+    this.parent?.requestRedraw();
   }
 }
 
@@ -7634,6 +7638,27 @@ class Widgets {
   }
 }
 
+class EmptyControlWidget extends ControlWidget {
+  constructor(name, parent, options) {
+    super(name, parent, options);
+    const colorPallet = new ColorGenerator("");
+
+    this.textDisplayComponent = new SingleLineTextDisplayComponent(
+      name,
+      "",
+      colorPallet
+    );
+  }
+
+  computeSize() {
+    return this.textDisplayComponent.computeSize();
+  }
+
+  draw(ctx, node, widget_width, y, H) {
+    this.textDisplayComponent.draw(ctx, node, widget_width, y, H);
+  }
+}
+
 class NodeBlueprintHandlers {
   constructor() {
     this.handlers = [];
@@ -7738,7 +7763,7 @@ class NodeParametersBlueprintHandler extends NodeBlueprintHandler {
           identifier
         );
         if (!widgetClasses.length) {
-          throw new Error(`Unable to find widget of type :  ${type}`);
+          widgetClasses.push(EmptyControlWidget);
         }
         const widget = new widgetClasses[0](name, node, {
           property: name,
@@ -7834,6 +7859,10 @@ class Node$1 extends LGraphNode {
     this.setSize(this.computeSize());
   }
 
+  requestRedraw() {
+    this.setDirtyCanvas(true, false);
+  }
+
   onDropFile(file, widgetName = null) {
     if (this.widgets && this.widgets.length) {
       if (widgetName !== null) {
@@ -7856,17 +7885,36 @@ class Node$1 extends LGraphNode {
     );
   }
 
-  onConfigure() {
+  onConfigure(info) {
+    const widgets_data =
+      info.extra && info.extra.widget_data ? info.extra.widget_data : {};
     if (this.widgets) {
       this.widgets.forEach((widget) => {
-        if (!widget) {
-          return;
-        }
-        if (widget.postConfigure) {
-          widget.postConfigure();
+        if (!widget || !widget.name || !widget.onConfigure) return;
+        const extra = widgets_data[widget.name] || null;
+        widget.onConfigure(extra);
+      });
+    }
+  }
+
+  onSerialize(o) {
+    if (!o.extra) o.extra = {};
+    if (!o.extra.widget_data) o.extra.widget_data = {};
+
+    if (this.widgets) {
+      this.widgets.forEach((widget) => {
+        if (!widget || !widget.name || !widget.onSerialize) return;
+        const data = widget.onSerialize();
+        if (data !== undefined && data !== null) {
+          o.extra.widget_data[widget.name] = data;
         }
       });
     }
+    // If widgets is empty, remove it for cleanliness
+    if (Object.keys(o.extra.widget_data).length === 0)
+      delete o.extra.widget_data;
+    if (Object.keys(o.extra).length === 0) delete o.extra;
+    return o;
   }
 
   registerCallbackHandlers() {
@@ -7952,12 +8000,30 @@ class NodeClassFactory {
     return blueprint.path;
   }
 
+  // checkBlueprintParametersAreSupported(blueprint) {
+  //   if (!blueprint.node.parameters) return true;
+
+  //   return blueprint.node.parameters.every((parameter) => {
+  //     const { typeName, identifier } = parameter.datatype;
+  //     return this.widgets.hasControl(typeName, identifier);
+  //   });
+  // }
+
   checkBlueprintParametersAreSupported(blueprint) {
     if (!blueprint.node.parameters) return true;
 
     return blueprint.node.parameters.every((parameter) => {
       const { typeName, identifier } = parameter.datatype;
-      return this.widgets.hasControl(typeName, identifier);
+      const hasWidget = this.widgets.hasControl(typeName, identifier);
+
+      // Extract metadata array
+      const metadata = parameter.metadata || [];
+      const suppressInput = metadata.some(
+        (item) => item.name === "suppressInput" && item.value === true
+      );
+
+      // Only disallow if suppressInput is true and there is no widget
+      return hasWidget || !suppressInput;
     });
   }
 

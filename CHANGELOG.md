@@ -3,6 +3,9 @@
 ## 0.1.54
 
 - updated to latest mobject-litegraph
+- added requestRedraw() to node and widget base.
+- enhanced onSerialize and onConfigure for working with widget extra data
+- added empty widget for parameters which support inputs
 
 ## 0.1.53
 

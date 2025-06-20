@@ -43,7 +43,7 @@ export class WidgetBase {
       if (this.parent && this.options && this.options.property) {
         this.parent.setProperty(this.options.property, newValue);
       }
-      this.parent?.setDirtyCanvas(true, true);
+      this.requestRedraw();
     }
   }
 
@@ -57,6 +57,10 @@ export class WidgetBase {
 
   triggerParentResetSize() {
     if (this.parent) this.parent.resetSize();
+  }
+
+  requestRedraw() {
+    this.parent?.requestRedraw();
   }
 }
 

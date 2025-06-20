@@ -1,3 +1,5 @@
+import { EmptyControlWidget } from "./empty-widget.js";
+
 export class NodeBlueprintHandlers {
   constructor() {
     this.handlers = [];
@@ -102,7 +104,7 @@ export class NodeParametersBlueprintHandler extends NodeBlueprintHandler {
           identifier
         );
         if (!widgetClasses.length) {
-          throw new Error(`Unable to find widget of type :  ${type}`);
+          widgetClasses.push(EmptyControlWidget);
         }
         const widget = new widgetClasses[0](name, node, {
           property: name,

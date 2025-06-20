@@ -46,6 +46,10 @@ export class Node extends LGraphNode {
     this.setSize(this.computeSize());
   }
 
+  requestRedraw() {
+    this.setDirtyCanvas(true, false);
+  }
+
   onDropFile(file, widgetName = null) {
     if (this.widgets && this.widgets.length) {
       if (widgetName !== null) {
@@ -68,17 +72,36 @@ export class Node extends LGraphNode {
     );
   }
 
-  onConfigure() {
+  onConfigure(info) {
+    const widgets_data =
+      info.extra && info.extra.widget_data ? info.extra.widget_data : {};
     if (this.widgets) {
       this.widgets.forEach((widget) => {
-        if (!widget) {
-          return;
-        }
-        if (widget.postConfigure) {
-          widget.postConfigure();
+        if (!widget || !widget.name || !widget.onConfigure) return;
+        const extra = widgets_data[widget.name] || null;
+        widget.onConfigure(extra);
+      });
+    }
+  }
+
+  onSerialize(o) {
+    if (!o.extra) o.extra = {};
+    if (!o.extra.widget_data) o.extra.widget_data = {};
+
+    if (this.widgets) {
+      this.widgets.forEach((widget) => {
+        if (!widget || !widget.name || !widget.onSerialize) return;
+        const data = widget.onSerialize();
+        if (data !== undefined && data !== null) {
+          o.extra.widget_data[widget.name] = data;
         }
       });
     }
+    // If widgets is empty, remove it for cleanliness
+    if (Object.keys(o.extra.widget_data).length === 0)
+      delete o.extra.widget_data;
+    if (Object.keys(o.extra).length === 0) delete o.extra;
+    return o;
   }
 
   registerCallbackHandlers() {
